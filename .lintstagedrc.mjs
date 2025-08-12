@@ -1,61 +1,35 @@
-import micromatch from 'micromatch'
-
-// Helper to escape file paths for shell commands
-const escapeFileNames = (filenames) => {
-  return filenames.map((filename) => `"${filename}"`).join(' ')
-}
-
-export default async (stagedFiles) => {
-  const commands = []
-
-  // TypeScript files - exclude templates/** completely
-  const tsFiles = micromatch(stagedFiles, ['**/*.{ts,tsx}', '!templates/**', '!fixtures/**'])
-  if (tsFiles.length) {
-    // ESLint with --fix and zero warnings tolerance
-    commands.push(`eslint ${escapeFileNames(tsFiles)} --fix --max-warnings 0`)
-    
-    // Type check staged files only
-    commands.push('tsc --noEmit --pretty false')
-  }
-
-  // JavaScript/MJS/CJS files - exclude templates/** completely  
-  const jsFiles = micromatch(stagedFiles, ['**/*.{js,jsx,mjs,cjs}', '!templates/**', '!fixtures/**'])
-  if (jsFiles.length) {
-    // ESLint with --fix and zero warnings tolerance
-    commands.push(`eslint ${escapeFileNames(jsFiles)} --fix --max-warnings 0`)
-  }
-
-  // JSON files - format everything including templates (JSON should be formatted)
-  const jsonFiles = micromatch(stagedFiles, ['**/*.json'])
-  if (jsonFiles.length) {
-    commands.push(`prettier --write ${escapeFileNames(jsonFiles)}`)
-  }
-
-  // YAML files - format everything
-  const yamlFiles = micromatch(stagedFiles, ['**/*.{yml,yaml}'])
-  if (yamlFiles.length) {
-    commands.push(`prettier --write ${escapeFileNames(yamlFiles)}`)
-  }
-
-  // Markdown files - format everything
-  const mdFiles = micromatch(stagedFiles, ['**/*.md'])
-  if (mdFiles.length) {
-    commands.push(`prettier --write ${escapeFileNames(mdFiles)}`)
-  }
-
-  // Template validation - ONLY validate, no linting/formatting of template source
-  const templateManifests = micromatch(stagedFiles, ['templates/**/manifest.json'])
-  const addonSteps = micromatch(stagedFiles, ['addons/**/steps.json'])
-  const migrationPlans = micromatch(stagedFiles, ['migrations/**/plan.json'])
+export default {
+  // Authoritative ignore - lint-staged v15+ will respect this
+  ignores: ['templates/**'],
   
-  const schemaFiles = [...templateManifests, ...addonSteps, ...migrationPlans]
-  if (schemaFiles.length) {
-    // Run incremental validation on changed schema files
-    commands.push('pnpm validate --changed || pnpm validate')
-  }
+  // TypeScript files
+  '**/*.{ts,tsx}': [
+    'eslint --fix --max-warnings 0',
+    'tsc --noEmit --pretty false'
+  ],
+  
+  // JavaScript/MJS/CJS files
+  '**/*.{js,jsx,mjs,cjs}': [
+    'eslint --fix --max-warnings 0'
+  ],
 
-  // The forbidden files check is handled in precommit.mjs for better error messages
-  // The file size check is also handled in precommit.mjs
+  // JSON files
+  '**/*.json': [
+    'prettier --write'
+  ],
 
-  return commands
+  // YAML files
+  '**/*.{yml,yaml}': [
+    'prettier --write'
+  ],
+
+  // Markdown files
+  '**/*.md': [
+    'prettier --write'
+  ],
+
+  // Schema validation for manifests
+  'templates/**/manifest.json': 'pnpm validate --changed || pnpm validate',
+  'addons/**/steps.json': 'pnpm validate --changed || pnpm validate', 
+  'migrations/**/plan.json': 'pnpm validate --changed || pnpm validate'
 }

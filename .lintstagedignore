@@ -1,0 +1,3 @@
+# Ignore template files - they are meant to run in their own context
+# Templates contain dependencies and configs that only work when extracted
+templates/**
