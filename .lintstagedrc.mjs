@@ -1,6 +1,6 @@
 export default {
-  // Authoritative ignore - lint-staged v15+ will respect this
-  ignores: ['templates/**'],
+  // Authoritative ignore - lint-staged will respect this
+  ignore: ['templates/**'],
   
   // TypeScript files
   '**/*.{ts,tsx}': [
@@ -8,8 +8,8 @@ export default {
     'tsc --noEmit --pretty false'
   ],
   
-  // JavaScript/MJS/CJS files
-  '**/*.{js,jsx,mjs,cjs}': [
+  // JavaScript/MJS/CJS files (exclude config files that ESLint ignores)
+  '**/*.{js,jsx,cjs}': [
     'eslint --fix --max-warnings 0'
   ],
 
