@@ -1,0 +1,11 @@
+# prepare-commit-msg hook
+# This hook runs after the default commit message is created but before the commit message editor is fired up.
+# It can be used to edit the commit message file before the user sees it.
+
+# Currently not doing any automatic modifications
+# Future enhancements could include:
+# - Auto-adding issue numbers from branch names
+# - Adding commit templates based on type
+# - Auto-generating changelogs references
+
+exit 0

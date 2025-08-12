@@ -1,0 +1,16 @@
+# Check if lockfile changed
+if git diff HEAD~ HEAD --name-only | grep -q "pnpm-lock.yaml"; then
+  echo "Lockfile changed. Installing dependencies..."
+  pnpm install --frozen-lockfile || {
+    echo "Failed to install dependencies"
+    echo "   Run 'pnpm install' manually"
+    exit 1
+  }
+  echo "Dependencies updated successfully"
+fi
+
+# Check if environment variables changed
+if git diff HEAD~ HEAD --name-only | grep -qE "\.env\.example|\.env\.production\.example"; then
+  echo "Environment variables may have changed."
+  echo "   Review .env.example for new required variables"
+fi

@@ -1,0 +1,26 @@
+# Only run on branch checkout (not file checkout)
+if [ "$3" = "1" ]; then
+  PREV_COMMIT=$1
+  POST_COMMIT=$2
+
+  # Check if lockfile changed between branches
+  if git diff "$PREV_COMMIT" "$POST_COMMIT" --name-only | grep -q "pnpm-lock.yaml"; then
+    echo "Lockfile differs between branches. Installing dependencies..."
+    pnpm install --frozen-lockfile || {
+      echo "Failed to install dependencies"
+      echo "   Run 'pnpm install' manually"
+    }
+  fi
+
+  # Check if node version changed
+  if [ -f .nvmrc ]; then
+    CURRENT_NODE=$(node -v)
+    REQUIRED_NODE=$(cat .nvmrc)
+    if [ "$CURRENT_NODE" \!= "v$REQUIRED_NODE" ]; then
+      echo "Node version mismatch\!"
+      echo "   Current: $CURRENT_NODE"
+      echo "   Required: v$REQUIRED_NODE"
+      echo "   Run 'nvm use' to switch versions"
+    fi
+  fi
+fi
