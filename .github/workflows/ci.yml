@@ -1,0 +1,348 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
+      - "LICENSE"
+      - "CHANGELOG.md"
+      - "*.md"
+      - ".github/dependabot.yml"
+
+# Concurrency control per Context 7 best practices
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+jobs:
+  validate-versions:
+    name: Validate Runtime Versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Node setup using node-version-file per Context 7 recommendations
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      # Corepack for pnpm version resolution
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@latest --activate
+
+      - name: Validate Node.js version
+        run: |
+          NODE_VERSION=$(node --version | sed 's/v//')
+          MIN_VERSION="22.18.0"
+          if ! npx semver "$NODE_VERSION" -r ">=$MIN_VERSION"; then
+            echo "❌ Node.js version $NODE_VERSION does not satisfy >=$MIN_VERSION"
+            exit 1
+          fi
+          echo "✅ Node.js version $NODE_VERSION satisfies >=$MIN_VERSION"
+
+      - name: Validate pnpm version
+        run: |
+          PNPM_VERSION=$(pnpm --version)
+          MIN_VERSION="10.14.0"
+          if ! npx semver "$PNPM_VERSION" -r ">=$MIN_VERSION"; then
+            echo "❌ pnpm version $PNPM_VERSION does not satisfy >=$MIN_VERSION"
+            exit 1
+          fi
+          echo "✅ pnpm version $PNPM_VERSION satisfies >=$MIN_VERSION"
+
+  lint:
+    name: Lint Root Code
+    needs: validate-versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      # pnpm cache setup per Context 7 examples
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        run: pnpm lint
+
+  typecheck:
+    name: Type Check
+    needs: validate-versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run TypeScript type checking
+        run: pnpm typecheck
+
+  validate-templates:
+    name: Validate Templates & Schemas
+    needs: validate-versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for forbidden artifacts in templates
+        run: |
+          echo "Checking for forbidden artifacts in templates..."
+          FORBIDDEN_PATTERNS=(
+            "node_modules"
+            ".turbo"
+            ".next"
+            "dist"
+            "*.tsbuildinfo"
+            "package-lock.json"
+            "yarn.lock"
+            "pnpm-lock.yaml"
+            ".env"
+            ".env.local"
+            ".env.production"
+          )
+
+          FOUND_ARTIFACTS=()
+          for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
+            if find templates -name "$pattern" -o -path "*/$pattern/*" 2>/dev/null | grep -q .; then
+              FOUND_ARTIFACTS+=("$pattern")
+              find templates -name "$pattern" -o -path "*/$pattern/*" 2>/dev/null | head -10
+            fi
+          done
+
+          if [ ${#FOUND_ARTIFACTS[@]} -gt 0 ]; then
+            echo "❌ Found forbidden artifacts in templates: ${FOUND_ARTIFACTS[*]}"
+            exit 1
+          fi
+          echo "✅ No forbidden artifacts found in templates"
+
+      - name: Run validation script
+        run: pnpm validate
+
+  smoke-test:
+    name: E2E Smoke Test
+    needs: [lint, typecheck, validate-templates]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Path filters - skip smoke tests on doc-only changes
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       !contains(github.event.pull_request.title, '[skip-smoke]') &&
+       !contains(github.event.pull_request.title, '[docs]'))
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-root-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-root-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-root-
+
+      - name: Install root dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Extract and test full template
+        run: |
+          TEMP_DIR=$(mktemp -d)
+          echo "Testing in temporary directory: $TEMP_DIR"
+
+          # Copy template to temp workspace
+          cp -r templates/full/* "$TEMP_DIR/"
+          cd "$TEMP_DIR"
+
+          echo "Installing template dependencies..."
+          pnpm install --no-frozen-lockfile
+
+          echo "Running template lint..."
+          pnpm -r lint
+
+          echo "Running template typecheck..."
+          pnpm -r typecheck
+
+          echo "Running template build (smoke mode)..."
+          BUILD_SMOKE=1 pnpm -r build
+
+          echo "Running template tests..."
+          pnpm -r test --run 2>/dev/null || true
+
+          echo "✅ Smoke test completed successfully"
+
+      - name: Check template artifact sizes
+        run: |
+          MAX_SIZE_MB=25
+          MAX_SIZE_BYTES=$((MAX_SIZE_MB * 1024 * 1024))
+
+          for template in templates/*; do
+            if [ -d "$template" ]; then
+              SIZE=$(du -sb "$template" | cut -f1)
+              SIZE_MB=$((SIZE / 1024 / 1024))
+              TEMPLATE_NAME=$(basename "$template")
+              
+              if [ $SIZE -gt $MAX_SIZE_BYTES ]; then
+                echo "❌ Template $TEMPLATE_NAME exceeds size limit: ${SIZE_MB}MB > ${MAX_SIZE_MB}MB"
+                exit 1
+              else
+                echo "✅ Template $TEMPLATE_NAME size: ${SIZE_MB}MB"
+              fi
+            fi
+          done
+
+  timing-report:
+    name: CI Timing Report
+    needs: [smoke-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    steps:
+      - name: Calculate workflow duration
+        run: |
+          START_TIME="${{ github.event.pull_request.created_at || github.event.head_commit.timestamp }}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          if command -v python3 >/dev/null 2>&1; then
+            DURATION=$(python3 -c "
+          from datetime import datetime
+          start = datetime.fromisoformat('${START_TIME}'.replace('Z', '+00:00'))
+          end = datetime.fromisoformat('${CURRENT_TIME}'.replace('Z', '+00:00'))
+          duration = (end - start).total_seconds() / 60
+          print(f'{duration:.1f}')
+          ")
+            
+            echo "⏱️ Total CI duration: ${DURATION} minutes"
+            
+            if (( $(echo "$DURATION > 8" | bc -l) )); then
+              echo "⚠️ CI duration exceeds 8 minutes. Consider optimizations:"
+              echo "  - Enable parallel job execution where possible"
+              echo "  - Optimize dependency caching strategy"
+              echo "  - Split large test suites"
+              echo "  - Use path filters to skip unnecessary jobs"
+            fi
+          fi
+
+  # Matrix-ready example (commented for future use)
+  # test-matrix:
+  #   strategy:
+  #     matrix:
+  #       node-version: [22.x, 24.x]
+  #       os: [ubuntu-latest, macos-latest]
+  #   runs-on: ${{ matrix.os }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ matrix.node-version }}

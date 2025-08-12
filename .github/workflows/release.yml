@@ -1,0 +1,381 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g., v1.0.0)"
+        required: true
+        type: string
+
+# Prevent concurrent releases
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-versions:
+    name: Validate Runtime Versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Node setup using node-version-file per Context 7
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      # Corepack for pnpm version resolution
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@latest --activate
+
+      - name: Validate Node.js version
+        run: |
+          NODE_VERSION=$(node --version | sed 's/v//')
+          MIN_VERSION="22.18.0"
+          if ! npx semver "$NODE_VERSION" -r ">=$MIN_VERSION"; then
+            echo "❌ Node.js version $NODE_VERSION does not satisfy >=$MIN_VERSION"
+            exit 1
+          fi
+          echo "✅ Node.js version $NODE_VERSION satisfies >=$MIN_VERSION"
+
+      - name: Validate pnpm version
+        run: |
+          PNPM_VERSION=$(pnpm --version)
+          MIN_VERSION="10.14.0"
+          if ! npx semver "$PNPM_VERSION" -r ">=$MIN_VERSION"; then
+            echo "❌ pnpm version $PNPM_VERSION does not satisfy >=$MIN_VERSION"
+            exit 1
+          fi
+          echo "✅ pnpm version $PNPM_VERSION satisfies >=$MIN_VERSION"
+
+  pre-flight-check:
+    name: Pre-flight Checks
+    needs: validate-versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      # pnpm cache setup per Context 7 recommendations
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check for forbidden artifacts before packaging
+        run: |
+          echo "Pre-flight check: Ensuring no forbidden artifacts exist..."
+          FORBIDDEN_PATTERNS=(
+            "node_modules"
+            ".turbo"
+            ".next"
+            "dist"
+            "*.tsbuildinfo"
+            "package-lock.json"
+            "yarn.lock"
+            "pnpm-lock.yaml"
+            ".env"
+            ".env.local"
+            ".env.production"
+          )
+
+          FOUND_ARTIFACTS=()
+          for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
+            if find templates -name "$pattern" -o -path "*/$pattern/*" 2>/dev/null | grep -q .; then
+              FOUND_ARTIFACTS+=("$pattern")
+              find templates -name "$pattern" -o -path "*/$pattern/*" 2>/dev/null | head -10
+            fi
+          done
+
+          if [ ${#FOUND_ARTIFACTS[@]} -gt 0 ]; then
+            echo "❌ Found forbidden artifacts in templates: ${FOUND_ARTIFACTS[*]}"
+            echo "Please clean templates before release"
+            exit 1
+          fi
+          echo "✅ Pre-flight check passed - no forbidden artifacts found"
+
+      - name: Run all root checks
+        run: |
+          echo "Running lint..."
+          pnpm lint
+
+          echo "Running typecheck..."
+          pnpm typecheck
+
+          echo "Running validation..."
+          pnpm validate
+
+          echo "Running tests..."
+          BUILD_SMOKE=skip pnpm test:ci
+
+  build-artifacts:
+    name: Build Release Artifacts
+    needs: pre-flight-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building for version: $VERSION"
+
+      - name: Build release artifacts
+        run: |
+          echo "Building release artifacts..."
+          pnpm build:release
+
+          echo "Artifacts built:"
+          ls -lah release/
+
+      - name: Generate SHA256 checksums
+        run: |
+          cd release
+          sha256sum *.tar.gz *.tgz 2>/dev/null > SHA256SUMS || sha256sum *.tar.gz 2>/dev/null > SHA256SUMS || true
+          echo "Checksums generated:"
+          cat SHA256SUMS
+
+      - name: Verify artifact sizes
+        run: |
+          MAX_SIZE_MB=25
+          MAX_SIZE_BYTES=$((MAX_SIZE_MB * 1024 * 1024))
+
+          for artifact in release/*.tar.gz release/*.tgz; do
+            if [ -f "$artifact" ]; then
+              SIZE=$(stat -f%z "$artifact" 2>/dev/null || stat -c%s "$artifact")
+              SIZE_MB=$((SIZE / 1024 / 1024))
+              ARTIFACT_NAME=$(basename "$artifact")
+              
+              if [ $SIZE -gt $MAX_SIZE_BYTES ]; then
+                echo "❌ Artifact $ARTIFACT_NAME exceeds size limit: ${SIZE_MB}MB > ${MAX_SIZE_MB}MB"
+                exit 1
+              else
+                echo "✅ Artifact $ARTIFACT_NAME size: ${SIZE_MB}MB"
+              fi
+            fi
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: release/
+          retention-days: 7
+
+  determinism-probe:
+    name: Determinism Probe (Optional)
+    needs: build-artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download first build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-first/
+
+      - name: Rebuild artifacts
+        run: |
+          echo "Rebuilding artifacts for determinism check..."
+          pnpm build:release
+
+      - name: Compare SHA256 checksums
+        run: |
+          echo "Comparing checksums for determinism..."
+          cd release
+          sha256sum *.tar.gz *.tgz 2>/dev/null > SHA256SUMS-rebuild || sha256sum *.tar.gz 2>/dev/null > SHA256SUMS-rebuild || true
+
+          cd ../release-first
+          sha256sum *.tar.gz *.tgz 2>/dev/null > SHA256SUMS-first || sha256sum *.tar.gz 2>/dev/null > SHA256SUMS-first || true
+
+          if diff SHA256SUMS-first ../release/SHA256SUMS-rebuild; then
+            echo "✅ Build is deterministic - SHA256 checksums match!"
+          else
+            echo "⚠️ Build is non-deterministic - SHA256 checksums differ"
+            echo "First build:"
+            cat SHA256SUMS-first
+            echo "Rebuild:"
+            cat ../release/SHA256SUMS-rebuild
+          fi
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-artifacts, determinism-probe]
+    if: always() && needs.build-artifacts.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: release/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build-artifacts.outputs.version }}
+          name: Atlas Templates ${{ needs.build-artifacts.outputs.version }}
+          draft: false
+          prerelease: ${{ contains(needs.build-artifacts.outputs.version, '-') }}
+          generate_release_notes: true
+          files: |
+            release/*.tar.gz
+            release/*.tgz
+            release/index.json
+            release/SHA256SUMS
+          body: |
+            ## Atlas Templates ${{ needs.build-artifacts.outputs.version }}
+
+            ### Release Artifacts
+            - Core templates package
+            - Addons packages
+            - Migration scripts
+            - SHA256 checksums for verification
+
+            ### Installation
+            ```bash
+            # Download and verify checksums
+            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ needs.build-artifacts.outputs.version }}/SHA256SUMS
+            sha256sum -c SHA256SUMS
+            ```
+
+            ### Checksums
+            See `SHA256SUMS` file in release assets for artifact verification.
+
+            ---
+            *Built with Node.js 22.18+ and pnpm 10.14.0+*
+
+  timing-report:
+    name: Release Timing Report
+    needs: create-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    steps:
+      - name: Calculate workflow duration
+        run: |
+          START_TIME="${{ github.event.head_commit.timestamp }}"
+          CURRENT_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          if command -v python3 >/dev/null 2>&1; then
+            DURATION=$(python3 -c "
+          from datetime import datetime
+          start = datetime.fromisoformat('${START_TIME}'.replace('Z', '+00:00'))
+          end = datetime.fromisoformat('${CURRENT_TIME}'.replace('Z', '+00:00'))
+          duration = (end - start).total_seconds() / 60
+          print(f'{duration:.1f}')
+          ")
+            
+            echo "⏱️ Total release duration: ${DURATION} minutes"
+            
+            if (( $(echo "$DURATION > 8" | bc -l) )); then
+              echo "⚠️ Release duration exceeds 8 minutes. Consider optimizations:"
+              echo "  - Parallelize artifact builds where possible"
+              echo "  - Optimize build scripts"
+              echo "  - Consider using build caching strategies"
+            fi
+          fi
