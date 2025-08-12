@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json.schemastore.org/prettierrc",
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "bracketSameLine": false,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "quoteProps": "as-needed",
+  "proseWrap": "preserve",
+  "htmlWhitespaceSensitivity": "css",
+  "embeddedLanguageFormatting": "auto",
+  "requirePragma": false,
+  "insertPragma": false,
+  "singleAttributePerLine": false,
+  "jsxSingleQuote": false,
+  "experimentalTernaries": false,
+  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+  "importOrder": [
+    "^(react/(.*)$)|^(react$)",
+    "^(next/(.*)$)|^(next$)",
+    "<THIRD_PARTY_MODULES>",
+    "^@repo/(.*)$",
+    "^@/components/(.*)$",
+    "^@/hooks/(.*)$",
+    "^@/utils/(.*)$",
+    "^@/lib/(.*)$",
+    "^@/types/(.*)$",
+    "^@/constants/(.*)$",
+    "^@/(.*)$",
+    "^[./]"
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderTypeScriptVersion": "5.9.2",
+  "tailwindFunctions": ["clsx", "cn", "cva", "twMerge", "tw"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "options": {
+        "parser": "typescript"
+      }
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "options": {
+        "parser": "babel"
+      }
+    },
+    {
+      "files": ["*.mjs"],
+      "options": {
+        "parser": "babel"
+      }
+    },
+    {
+      "files": ["*.cjs"],
+      "options": {
+        "parser": "babel"
+      }
+    },
+    {
+      "files": "*.json",
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 100,
+        "parser": "json",
+        "trailingComma": "none"
+      }
+    },
+    {
+      "files": "*.jsonc",
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 100,
+        "parser": "json5",
+        "trailingComma": "none"
+      }
+    },
+    {
+      "files": "package.json",
+      "options": {
+        "parser": "json-stringify"
+      }
+    },
+    {
+      "files": ["tsconfig.json", "tsconfig.*.json"],
+      "options": {
+        "parser": "json",
+        "trailingComma": "none"
+      }
+    },
+    {
+      "files": "*.md",
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 100,
+        "proseWrap": "always",
+        "parser": "markdown"
+      }
+    },
+    {
+      "files": "*.mdx",
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 100,
+        "proseWrap": "always",
+        "parser": "mdx"
+      }
+    },
+    {
+      "files": ["*.yml", "*.yaml"],
+      "options": {
+        "tabWidth": 2,
+        "singleQuote": false,
+        "parser": "yaml"
+      }
+    },
+    {
+      "files": "*.toml",
+      "options": {
+        "tabWidth": 2,
+        "parser": "toml"
+      }
+    },
+    {
+      "files": "*.css",
+      "options": {
+        "singleQuote": false,
+        "parser": "css"
+      }
+    },
+    {
+      "files": "*.scss",
+      "options": {
+        "singleQuote": false,
+        "parser": "scss"
+      }
+    },
+    {
+      "files": ".prettierrc",
+      "options": {
+        "parser": "json"
+      }
+    },
+    {
+      "files": ["*.html"],
+      "options": {
+        "parser": "html",
+        "printWidth": 120
+      }
+    },
+    {
+      "files": ["*.svg"],
+      "options": {
+        "parser": "html"
+      }
+    }
+  ]
+}

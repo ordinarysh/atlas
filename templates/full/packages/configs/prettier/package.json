@@ -1,0 +1,39 @@
+{
+  "name": "@atlas/config-prettier",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared Prettier configuration for the monorepo with import sorting and Tailwind CSS support",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "base.js",
+    "base.json",
+    ".prettierignore"
+  ],
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./base.json",
+      "default": "./base.js"
+    },
+    "./base": "./base.js",
+    "./base.json": "./base.json",
+    "./json": "./base.json",
+    "./ignore": "./.prettierignore",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.6.1",
+    "prettier-plugin-tailwindcss": "^0.6.14"
+  },
+  "peerDependencies": {
+    "prettier": "^3.6.0"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

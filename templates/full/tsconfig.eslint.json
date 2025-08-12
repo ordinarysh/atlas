@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Ensure that nobody can accidentally use this config for a build
+    "noEmit": true,
+    // Allow importing from devDependencies for linting purposes
+    "skipLibCheck": true,
+    // More lenient for config files
+    "allowJs": true
+  },
+  "include": [
+    // Include all TypeScript and JavaScript files for linting
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.mjs",
+    "**/*.cjs",
+    // Include configuration files
+    "*.config.*",
+    "eslint.config.*",
+    "vite.config.*",
+    "tailwind.config.*",
+    "postcss.config.*",
+    "next.config.*",
+    // Include test files
+    "**/__tests__/**/*",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "exclude": [
+    // Exclude build outputs and dependencies
+    "node_modules",
+    "**/node_modules/**",
+    "dist",
+    "**/dist/**",
+    ".next",
+    "**/.next/**",
+    ".turbo",
+    "**/.turbo/**",
+    "build",
+    "**/build/**",
+    "coverage",
+    "**/coverage/**",
+    // Exclude generated files
+    "**/*.min.js",
+    "**/*.min.mjs",
+    "**/.*/",
+    // Exclude Storybook
+    "storybook-static",
+    "**/storybook-static/**"
+  ]
+}

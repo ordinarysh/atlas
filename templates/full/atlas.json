@@ -1,0 +1,22 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "type": "core",
+  "description": "Full-featured monorepo template with apps, packages, and services",
+  "features": [
+    "TypeScript 5.5+",
+    "pnpm workspaces",
+    "Turbo monorepo",
+    "ESLint 9 flat config",
+    "Prettier 3",
+    "Vitest testing",
+    "GitHub Actions CI/CD"
+  ],
+  "structure": {
+    "apps": "Application packages",
+    "packages": "Shared packages",
+    "services": "Backend services",
+    "tools": "Development tools",
+    "docs": "Documentation"
+  }
+}

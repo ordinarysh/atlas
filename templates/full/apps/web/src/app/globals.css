@@ -1,0 +1,196 @@
+/**
+ * Tailwind CSS v4 Boilerplate - Application Styles
+ * 
+ * This is your main CSS entry point. Customize it to match your project needs.
+ * 
+ * Quick Start:
+ * 1. Update the theme in packages/ui/src/theme.css for global design tokens
+ * 2. Modify base styles below for app-specific defaults
+ * 3. Add your custom component classes in @layer components
+ * 4. Use arbitrary values [value] when needed for one-off styles
+ * 
+ * Architecture:
+ * - Layer ordering ensures predictable cascade: theme → base → components → utilities
+ * - Static compilation for optimal performance (no runtime CSS-in-JS)
+ * - Prefix 'web' prevents conflicts in monorepo (change in tailwind.config.ts)
+ */
+
+/* ========================================
+ * EXPLICIT CSS LAYER ARCHITECTURE
+ * Ensures predictable cascade in complex applications
+ * ======================================== */
+@layer theme, base, components, utilities;
+
+/* Core Tailwind imports with app-specific prefix */
+@import "tailwindcss" prefix(web);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+
+/* Typography plugin for beautiful prose styles */
+@plugin "@tailwindcss/typography";
+
+/* Import Atlas Design System semantic tokens */
+@import "@atlas/design-system/styles.css";
+
+/* Optional: Runtime theming for dark mode or multi-tenant apps */
+/* Uncomment if you need dynamic theme switching */
+/* @import "../../../../packages/ui/src/theme-runtime.css"; */
+
+/* Generate utilities in the correct layer */
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* ========================================
+ * APP-SPECIFIC CUSTOMIZATIONS
+ * Override design system defaults for your app
+ * ======================================== */
+@theme {
+  /* Example: Use your custom fonts (currently using Next.js Geist fonts) */
+  --font-sans: var(--font-geist-sans, var(--font-body));
+  --font-mono: var(--font-geist-mono, var(--font-code));
+
+  /* Example: Override brand colors for your app */
+  /* --color-primary: oklch(0.65 0.18 250); */
+  /* --color-secondary: oklch(0.7 0.15 280); */
+
+  /* Example: Adjust spacing for your design */
+  /* --spacing: 0.25rem; */
+}
+
+/* ========================================
+ * BASE STYLES
+ * App-wide defaults - keep these minimal for a good boilerplate
+ * ======================================== */
+@layer base {
+  /* Smooth scrolling and text rendering optimizations */
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Browser compatibility */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Accessibility: Respect user motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Focus styles with motion safety */
+  @media (prefers-reduced-motion: no-preference) {
+    :focus-visible {
+      transition: outline-color var(--duration-fast) var(--ease-smooth);
+    }
+  }
+
+  /* Form element defaults */
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+  }
+
+  /* Consistent button styling baseline */
+  button {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+  }
+
+  /* Typography defaults */
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: var(--font-sans--font-feature-settings);
+    text-rendering: optimizeLegibility;
+
+    /* Font optimization */
+    font-synthesis: none;
+    font-optical-sizing: auto;
+    font-kerning: normal;
+
+    /* Improved line height and letter spacing */
+    line-height: var(--leading-normal);
+    letter-spacing: var(--tracking-normal);
+  }
+
+  /* High-DPI display optimizations */
+  @media (min-resolution: 2dppx) {
+    body {
+      -webkit-font-smoothing: subpixel-antialiased;
+    }
+  }
+
+  /* Code blocks */
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+  }
+
+  /* Headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    line-height: var(--leading-tight);
+  }
+}
+
+/* ========================================
+ * COMPONENT STYLES
+ * Add your reusable component classes here
+ * Use @apply to compose utility classes
+ * ======================================== */
+@layer components {
+  /* Example: Button component */
+  /* 
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2;
+    @apply text-sm font-medium transition-colors duration-200;
+    @apply focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-600;
+  }
+  */
+
+  /* Example: Container queries for responsive components */
+  /*
+  .container-query {
+    container-type: inline-size;
+  }
+  
+  @container (min-width: 20rem) {
+    .cq\:grid-cols-2 { 
+      grid-template-columns: repeat(2, 1fr); 
+    }
+  }
+  */
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "../typescript/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "."
+  },
+  "include": ["*.js"],
+  "exclude": ["node_modules", "dist"]
+}

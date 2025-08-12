@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Next.js Enterprise Configuration",
+  "extends": "./base.json",
+  "compilerOptions": {
+    // =================================================================
+    // Next.js Specific Environment
+    // =================================================================
+    "target": "ES2020", // Next.js optimized target
+    "lib": ["ES2020", "DOM", "DOM.Iterable"], // Browser + Modern JS APIs
+    "jsx": "preserve", // Let Next.js handle JSX transformation
+
+    // =================================================================
+    // Module Configuration - Next.js Requirements
+    // =================================================================
+    "module": "ESNext", // Use latest module features
+    "moduleResolution": "bundler", // Next.js bundler resolution
+    "resolveJsonModule": true, // Allow JSON imports
+    "isolatedModules": true, // Required for Next.js Fast Refresh
+
+    // =================================================================
+    // JavaScript Support - Next.js Flexibility
+    // =================================================================
+    "allowJs": true, // Allow JS files in Next.js apps
+    "checkJs": false, // Don't type-check JS files
+
+    // =================================================================
+    // Next.js Optimizations
+    // =================================================================
+    "incremental": true, // Speed up builds
+    "tsBuildInfoFile": ".tsbuildinfo", // Cache file location
+    "plugins": [
+      {
+        "name": "next" // Next.js TypeScript plugin
+      }
+    ],
+
+    // =================================================================
+    // Path Mapping - Import Aliases
+    // =================================================================
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"], // App-specific alias
+      "@/*": ["./src/*"] // Alternative alias
+    },
+
+    // =================================================================
+    // Next.js Specific Overrides
+    // =================================================================
+    "noEmit": true, // Next.js handles emit
+    "declaration": false, // No .d.ts for apps
+    "declarationMap": false, // No sourcemaps for .d.ts
+    "sourceMap": true, // Enable source maps for debugging
+    "removeComments": false, // Keep comments in development
+    "verbatimModuleSyntax": false, // Next.js handles module syntax internally
+    "importHelpers": false, // Next.js bundles helpers
+
+    // =================================================================
+    // Relaxed Strictness for Next.js Apps (Still Secure)
+    // =================================================================
+    "exactOptionalPropertyTypes": false, // More flexible for Next.js apps
+    "noPropertyAccessFromIndexSignature": false, // Allow dot notation for flexibility
+    "useUnknownInCatchVariables": false // Keep 'any' in catch for compatibility
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.mjs",
+    "**/*.cjs",
+    ".next/types/**/*.ts",
+    "next.config.ts",
+    "next.config.js",
+    "next.config.mjs"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "cypress/**",
+    "e2e/**"
+  ]
+}

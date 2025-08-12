@@ -1,0 +1,53 @@
+{
+  "name": "@atlas/app-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings 0",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "clean": "rm -rf .next .turbo"
+  },
+  "dependencies": {
+    "@atlas/api-client": "workspace:*",
+    "@atlas/config-typescript": "workspace:*",
+    "@atlas/design-system": "workspace:*",
+    "@atlas/query": "workspace:*",
+    "@atlas/ui": "workspace:*",
+    "@tanstack/react-query": "5.84.1",
+    "@tanstack/react-query-devtools": "5.84.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
+    "next": "15.4.6",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@atlas/config-eslint": "workspace:*",
+    "@atlas/config-prettier": "workspace:*",
+    "@eslint/js": "^9.17.0",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^5",
+    "jsdom": "^25.0.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5",
+    "typescript-eslint": "^8.39.0",
+    "vite": "^7.1.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "pnpm": "10.14.0"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "React Library Enterprise Configuration",
+  "extends": "./base.json",
+  "compilerOptions": {
+    // =================================================================
+    // Library-Specific Environment
+    // =================================================================
+    "target": "ES2020", // Wide browser compatibility
+    "lib": ["ES2020", "ES2021.String", "DOM", "DOM.Iterable"], // Include DOM for React and ES2021 String methods
+    "jsx": "react-jsx", // Modern JSX transform
+
+    // =================================================================
+    // Module Configuration - Library Requirements
+    // =================================================================
+    "module": "ESNext", // Output modern modules
+    "moduleResolution": "bundler", // Modern resolution
+
+    // =================================================================
+    // Build Output - Library Distribution
+    // =================================================================
+    "outDir": "dist", // Output directory
+    "rootDir": "src", // Source directory
+    "declaration": true, // Generate .d.ts files
+    "declarationMap": true, // Generate .d.ts.map files
+    "sourceMap": true, // Generate source maps
+    "declarationDir": "dist/types", // Separate types directory
+
+    // =================================================================
+    // Library Strictness - Maximum Type Safety
+    // =================================================================
+    "composite": true, // Enable project references
+    "stripInternal": true, // Remove @internal declarations
+    "noEmitOnError": true, // Don't emit on errors
+    "preserveConstEnums": true, // Must be true with isolatedModules
+    "removeComments": true, // Remove comments from output
+    "importHelpers": true, // Use tslib for helpers
+
+    // =================================================================
+    // Additional Library Checks
+    // =================================================================
+    "noUnusedLocals": false, // Let ESLint handle unused locals
+    "noUnusedParameters": false, // Let ESLint handle unused parameters
+    "noImplicitReturns": true, // All code paths must return
+    "noFallthroughCasesInSwitch": true, // Prevent switch fallthrough
+    "noUncheckedIndexedAccess": false, // Too strict for library development
+    "exactOptionalPropertyTypes": false, // Disabled for better library compatibility
+    "noPropertyAccessFromIndexSignature": false, // Allow dot notation for better DX
+
+    // =================================================================
+    // Type-Only Imports - Optimize Bundle Size (TypeScript 5.0+)
+    // =================================================================
+    "verbatimModuleSyntax": true, // Modern import/export syntax with type safety
+
+    // =================================================================
+    // Library-Specific Settings
+    // =================================================================
+    "allowJs": false, // No JS in library packages
+    "checkJs": false, // No JS checking
+    "emitDeclarationOnly": false, // Emit JS too
+    "skipLibCheck": true, // Skip lib checking for performance
+    "skipDefaultLibCheck": false // Check default lib
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.stories.ts",
+    "**/*.stories.tsx"
+  ]
+}

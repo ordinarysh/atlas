@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Skip on CI
+if [ "$CI" = "true" ]; then
+  echo "⏭️  Skipping pre-commit hooks in CI environment"
+  exit 0
+fi
+
+echo "🔍 Running pre-commit checks..."
+pnpm lint-staged && pnpm typecheck

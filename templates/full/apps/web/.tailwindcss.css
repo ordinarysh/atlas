@@ -1,0 +1,66 @@
+/**
+ * Tailwind CSS Reference File
+ * 
+ * For use in isolated component stylesheets (Vue <style> blocks, 
+ * Svelte components, CSS Modules, etc.) Use @reference to import
+ * without duplicating output.
+ * 
+ * Usage in component files:
+ * @reference "./.tailwindcss.css";
+ * 
+ * Then use @apply or CSS variables:
+ * .my-component {
+ *   @apply text-lg font-medium;
+ *   color: var(--color-primary);
+ * }
+ */
+
+/* Import complete Tailwind setup */
+@import "tailwindcss";
+@import "./src/app/globals.css";
+
+/* Pre-generate commonly used utilities for better performance */
+@layer utilities {
+  /* Commonly used combinations - pre-generate for better performance */
+  .flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .flex-col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}

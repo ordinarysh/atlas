@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Enterprise Base Configuration",
+  "compilerOptions": {
+    // =================================================================
+    // Type Checking - Maximum Strictness
+    // =================================================================
+    "strict": true, // Enables all strict type-checking options
+    "noImplicitReturns": true, // Report error when not all code paths return
+    "noImplicitOverride": true, // Ensure 'override' modifier is used
+    "exactOptionalPropertyTypes": false, // Disabled for better library compatibility
+    "noUncheckedIndexedAccess": false, // Too strict for practical development
+    "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases
+    "noPropertyAccessFromIndexSignature": false, // Allow dot notation for better DX
+    "useUnknownInCatchVariables": true, // Default catch clause variables to 'unknown'
+    "allowUnreachableCode": false, // Disallow unreachable code
+    "allowUnusedLabels": false, // Disallow unused labels
+
+    // =================================================================
+    // Module Resolution - Optimized for Modern Bundlers
+    // =================================================================
+    "moduleResolution": "bundler", // Modern resolution for bundlers
+    "resolveJsonModule": true, // Allow importing JSON files
+    "resolvePackageJsonExports": true, // Respect package.json "exports" field
+    "resolvePackageJsonImports": true, // Respect package.json "imports" field
+    "allowImportingTsExtensions": false, // Disallow .ts/.tsx imports
+    "allowArbitraryExtensions": false, // Disallow arbitrary file extensions
+    "customConditions": [], // Custom conditions for package.json exports
+
+    // =================================================================
+    // Emit Configuration - Build Output Control
+    // =================================================================
+    "declaration": true, // Generate .d.ts files for libraries
+    "declarationMap": true, // Generate sourcemaps for .d.ts files
+    "sourceMap": true, // Generate sourcemaps for debugging
+    "inlineSources": false, // Don't inline source content in sourcemaps
+    "removeComments": false, // Keep comments for better debugging
+    "importHelpers": true, // Import emit helpers from tslib
+    "preserveConstEnums": true, // Must be true with isolatedModules
+    "stripInternal": true, // Strip declarations marked @internal
+    "newLine": "lf", // Use Unix line endings
+
+    // =================================================================
+    // JavaScript Support - Gradual Migration Support
+    // =================================================================
+    "allowJs": false, // Disallow JS files in library packages
+    "checkJs": false, // Don't type-check JS files
+    "maxNodeModuleJsDepth": 0, // Don't search node_modules for JS
+
+    // =================================================================
+    // Interop Constraints - Cross-Module Compatibility
+    // =================================================================
+    "esModuleInterop": true, // Enable interop between ESM and CJS
+    "allowSyntheticDefaultImports": true, // Allow default imports from modules without default export
+    "forceConsistentCasingInFileNames": true, // Disallow inconsistent file name casing
+    "isolatedModules": true, // Ensure each file can be transpiled in isolation
+    "verbatimModuleSyntax": true, // Modern import/export handling (TS 5.0+, replaces importsNotUsedAsValues)
+    "preserveSymlinks": false, // Follow symlinks for better monorepo support
+
+    // =================================================================
+    // Language and Environment - Target Modern Environments
+    // =================================================================
+    "target": "ES2022", // Target modern JavaScript
+    "lib": ["ES2022"], // Use ES2022 standard library
+    "module": "ESNext", // Use latest module syntax
+    "useDefineForClassFields": true, // Use standard class field semantics
+    "experimentalDecorators": false, // Don't use legacy decorators
+    "emitDecoratorMetadata": false, // Don't emit decorator metadata
+    "moduleDetection": "force", // Treat all files as modules
+
+    // =================================================================
+    // Performance Optimizations - Speed Up Compilation
+    // =================================================================
+    "incremental": true, // Enable incremental compilation
+    "tsBuildInfoFile": ".tsbuildinfo", // Specify incremental compilation file
+    "skipLibCheck": true, // Skip type checking of declaration files
+    "skipDefaultLibCheck": false, // Type check default lib declaration files
+    "disableSourceOfProjectReferenceRedirect": true, // Improve monorepo performance
+
+    // =================================================================
+    // Completeness Checking - Code Quality
+    // =================================================================
+    "noUnusedLocals": false, // Handled by ESLint
+    "noUnusedParameters": false, // Handled by ESLint
+
+    // =================================================================
+    // Watch Options - Development Experience
+    // =================================================================
+    "assumeChangesOnlyAffectDirectDependencies": false,
+    "preserveWatchOutput": true // Keep console clear during watch mode
+  },
+  "watchOptions": {
+    "watchFile": "useFsEvents", // Use native file system events
+    "watchDirectory": "useFsEvents", // Use native directory watching
+    "fallbackPolling": "dynamicPriority", // Smart fallback for polling
+    "synchronousWatchDirectory": false, // Non-blocking directory watching
+    "excludeDirectories": [
+      "**/node_modules",
+      "**/.git",
+      "**/dist",
+      "**/build",
+      "**/.next",
+      "**/.turbo"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**"
+  ]
+}

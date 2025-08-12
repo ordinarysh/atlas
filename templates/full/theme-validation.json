@@ -1,0 +1,32 @@
+{
+  "success": false,
+  "errors": [
+    "Missing CSS variable for color: --color-brand-50",
+    "Missing CSS variable for color: --color-brand-100",
+    "Missing CSS variable for color: --color-brand-200",
+    "Missing CSS variable for color: --color-brand-300",
+    "Missing CSS variable for color: --color-brand-400",
+    "Missing CSS variable for color: --color-brand-500",
+    "Missing CSS variable for color: --color-brand-600",
+    "Missing CSS variable for color: --color-brand-700",
+    "Missing CSS variable for color: --color-brand-800",
+    "Missing CSS variable for color: --color-brand-900",
+    "Missing CSS variable for color: --color-brand-950"
+  ],
+  "warnings": [
+    "CSS color variable has no TypeScript type: --color-primary",
+    "CSS color variable has no TypeScript type: --color-secondary",
+    "CSS color variable has no TypeScript type: --color-accent",
+    "CSS breakpoint variable has no TypeScript type: --breakpoint-4xl",
+    "CSS color variable has no TypeScript type: --color-brand-primary",
+    "CSS color variable has no TypeScript type: --color-brand-secondary",
+    "CSS color variable has no TypeScript type: --color-brand-accent",
+    "CSS container variable has no TypeScript type: --container-max"
+  ],
+  "stats": {
+    "cssVariables": 270,
+    "typeDefinitions": 88,
+    "matchedTokens": 77,
+    "timestamp": "2025-08-10T15:35:34.597Z"
+  }
+}

@@ -1,0 +1,65 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+.vercel
+dist
+build
+out
+.turbo
+
+# Testing
+coverage
+.nyc_output
+
+# Minified files
+*.min.js
+*.min.css
+
+# Public assets
+public
+
+# Version control
+.git
+.gitignore
+
+# Environment
+.env*
+
+# Lock files (formatted separately if needed)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Documentation (preserve original formatting)
+README.md
+CHANGELOG.md
+LICENSE
+
+# IDE and tooling
+.claude
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# TypeScript
+.tsbuildinfo
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Generated files
+*.generated.*
+generated/
+
+# Storybook
+storybook-static

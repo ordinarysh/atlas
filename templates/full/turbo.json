@@ -1,0 +1,113 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "ui": "tui",
+  "daemon": true,
+  "envMode": "strict",
+  "cacheDir": ".turbo/cache",
+  "globalDependencies": [
+    "**/.env*",
+    "turbo.json",
+    "pnpm-workspace.yaml",
+    "package.json",
+    "tsconfig.json",
+    ".prettierrc*",
+    ".eslintrc*",
+    "postcss.config.*",
+    "tailwind.config.*",
+    "packages/ui/src/theme.css",
+    "packages/ui/src/theme.types.ts",
+    "**/globals.css"
+  ],
+  "globalEnv": ["NODE_ENV", "VERCEL_ENV", "CI", "GITHUB_ACTIONS"],
+  "globalPassThroughEnv": ["NEXT_PUBLIC_*", "TURBO_*"],
+  "remoteCache": {
+    "enabled": true,
+    "signature": true,
+    "preflight": false,
+    "timeout": 30,
+    "uploadTimeout": 60
+  },
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "type-check"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.test.*", "!**/*.spec.*"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**", "storybook-static/**"],
+      "outputLogs": "new-only",
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*"]
+    },
+    "dev": {
+      "dependsOn": ["^dev:setup"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full",
+      "env": ["NODE_ENV", "NEXT_PUBLIC_*"]
+    },
+    "dev:setup": {
+      "outputs": [".codegen/**", "generated/**"],
+      "cache": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/dist/**", "!**/.next/**"],
+      "outputLogs": "errors-only"
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/dist/**", "!**/.next/**"],
+      "cache": false,
+      "outputLogs": "errors-only"
+    },
+    "type-check": {
+      "dependsOn": ["^type-check"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/dist/**", "!**/.next/**"],
+      "outputLogs": "errors-only"
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md"],
+      "outputs": ["coverage/**", ".nyc_output/**"],
+      "outputLogs": "errors-only"
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "clean": {
+      "cache": false,
+      "outputLogs": "full"
+    },
+    "format": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/dist/**", "!**/.next/**"],
+      "cache": false,
+      "outputLogs": "errors-only"
+    },
+    "format:check": {
+      "dependsOn": ["^format:check"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/dist/**", "!**/.next/**"],
+      "outputLogs": "errors-only"
+    },
+    "//#format": {
+      "inputs": ["**/*.{js,jsx,ts,tsx,md,json,yml,yaml}"],
+      "cache": false,
+      "outputLogs": "errors-only"
+    },
+    "//#format:check": {
+      "inputs": ["**/*.{js,jsx,ts,tsx,md,json,yml,yaml}"],
+      "outputLogs": "errors-only"
+    },
+    "theme-validate": {
+      "dependsOn": ["^type-check"],
+      "inputs": ["packages/ui/src/theme.css", "packages/ui/src/theme.types.ts"],
+      "outputs": ["theme-validation.json"],
+      "outputLogs": "errors-only"
+    },
+    "css-analysis": {
+      "dependsOn": ["build"],
+      "inputs": ["**/*.css", "**/*.tsx", "**/*.jsx"],
+      "outputs": ["css-analysis.json"],
+      "cache": true,
+      "outputLogs": "new-only"
+    }
+  }
+}

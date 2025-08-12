@@ -1,0 +1,16 @@
+{
+  "extends": "@atlas/config-typescript/nextjs",
+  "compilerOptions": {
+    "composite": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/*": ["./src/*"],
+      "@atlas/ui": ["../../packages/ui/src"],
+      "@atlas/query": ["../../packages/query/src"],
+      "@atlas/api-client": ["../../packages/api-client/src"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/types/**/*.d.ts"],
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./packages/configs/typescript/base.json",
+  "compilerOptions": {
+    // =================================================================
+    // Monorepo Root Configuration
+    // =================================================================
+    "composite": true, // Enable project references
+    "declarationMap": true, // Generate source maps for declarations
+    "declaration": true, // Generate .d.ts files
+    "disableSolutionSearching": false, // Enable solution-wide searching
+
+    // =================================================================
+    // Module Resolution - Monorepo Optimized
+    // =================================================================
+    "baseUrl": ".",
+    "paths": {
+      "@atlas/ui": ["./packages/ui/src"],
+      "@atlas/ui/*": ["./packages/ui/src/*"],
+      "@atlas/config-typescript": ["./packages/configs/typescript"],
+      "@atlas/config-typescript/*": ["./packages/configs/typescript/*"],
+      "@atlas/config-eslint": ["./packages/configs/eslint"],
+      "@atlas/config-eslint/*": ["./packages/configs/eslint/*"]
+    },
+    "module": "ESNext", // Use modern module syntax
+    "moduleResolution": "bundler", // Use modern bundler resolution
+
+    // =================================================================
+    // Build Configuration - Root Level
+    // =================================================================
+    "noEmit": true, // Don't emit at root level
+    "incremental": true, // Enable incremental compilation
+    "tsBuildInfoFile": ".tsbuildinfo", // Cache file
+
+    // =================================================================
+    // Development Experience
+    // =================================================================
+    "allowJs": true, // Allow JS files in monorepo root
+    "skipLibCheck": true, // Skip lib checking for speed
+    "forceConsistentCasingInFileNames": true, // Enforce consistent casing
+    "assumeChangesOnlyAffectDirectDependencies": false // Ensure proper rebuilds
+  },
+  "references": [
+    { "path": "./packages/ui" },
+    { "path": "./packages/configs/eslint" },
+    { "path": "./packages/configs/typescript" }
+  ],
+  "include": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.mjs", "*.cjs", "*.json"],
+  "exclude": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/.turbo/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/*.min.js",
+    "**/.*/**",
+    "**/.tsbuildinfo",
+    "**/out/**"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "allowJs": true,
+      "noEmit": false
+    }
+  }
+}
