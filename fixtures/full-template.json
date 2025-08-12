@@ -1,0 +1,781 @@
+{
+  "name": "full-template",
+  "version": "1.0.0",
+  "generated": "2025-08-12T13:34:04.622Z",
+  "structure": [
+    {
+      "type": "directory",
+      "name": ".claude"
+    },
+    {
+      "type": "directory",
+      "name": ".github",
+      "children": [
+        {
+          "type": "directory",
+          "name": "workflows",
+          "children": [
+            {
+              "type": "file",
+              "name": "ci.yml"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": ".vscode"
+    },
+    {
+      "type": "directory",
+      "name": "apps",
+      "children": [
+        {
+          "type": "directory",
+          "name": "web",
+          "children": [
+            {
+              "type": "directory",
+              "name": "public",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "file.svg"
+                },
+                {
+                  "type": "file",
+                  "name": "globe.svg"
+                },
+                {
+                  "type": "file",
+                  "name": "next.svg"
+                },
+                {
+                  "type": "file",
+                  "name": "vercel.svg"
+                },
+                {
+                  "type": "file",
+                  "name": "window.svg"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "app",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "example-todos",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "create-todo.tsx"
+                        },
+                        {
+                          "type": "file",
+                          "name": "page.tsx"
+                        },
+                        {
+                          "type": "file",
+                          "name": "todo-list.tsx"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "favicon.ico"
+                    },
+                    {
+                      "type": "file",
+                      "name": "globals.css"
+                    },
+                    {
+                      "type": "file",
+                      "name": "layout.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "page.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "providers.tsx"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "components",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "example-todos.tsx"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "constants",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "index.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "hooks",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "use-auth.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "use-todos.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "lib",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "utils.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "types",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "css.d.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "index.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "utils"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": ".prettierrc"
+            },
+            {
+              "type": "file",
+              "name": ".tailwindcss.css"
+            },
+            {
+              "type": "file",
+              "name": "eslint.config.mjs"
+            },
+            {
+              "type": "file",
+              "name": "next-env.d.ts"
+            },
+            {
+              "type": "file",
+              "name": "next.config.ts"
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "postcss.config.mjs"
+            },
+            {
+              "type": "file",
+              "name": "tailwind.config.ts"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "docs",
+      "children": [
+        {
+          "type": "directory",
+          "name": "api"
+        },
+        {
+          "type": "directory",
+          "name": "auth"
+        },
+        {
+          "type": "directory",
+          "name": "data"
+        },
+        {
+          "type": "directory",
+          "name": "development",
+          "children": [
+            {
+              "type": "file",
+              "name": "COMMANDS.md"
+            },
+            {
+              "type": "file",
+              "name": "CONFIG_SYSTEM.md"
+            },
+            {
+              "type": "file",
+              "name": "WORKFLOW.md"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "devops"
+        },
+        {
+          "type": "directory",
+          "name": "frontend",
+          "children": [
+            {
+              "type": "file",
+              "name": "TAILWIND.md"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "guides",
+          "children": [
+            {
+              "type": "file",
+              "name": "TROUBLESHOOTING.md"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "setup",
+          "children": [
+            {
+              "type": "file",
+              "name": "ENVIRONMENT.md"
+            },
+            {
+              "type": "file",
+              "name": "FONT_SETUP.md"
+            },
+            {
+              "type": "file",
+              "name": "GETTING_STARTED.md"
+            },
+            {
+              "type": "file",
+              "name": "MONOREPO_LAYOUTS.md"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "testing"
+        },
+        {
+          "type": "file",
+          "name": "_INDEX.md"
+        },
+        {
+          "type": "file",
+          "name": "README.md"
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "domains"
+    },
+    {
+      "type": "directory",
+      "name": "infra",
+      "children": [
+        {
+          "type": "directory",
+          "name": "environments"
+        },
+        {
+          "type": "directory",
+          "name": "secrets"
+        },
+        {
+          "type": "directory",
+          "name": "terraform"
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "packages",
+      "children": [
+        {
+          "type": "directory",
+          "name": "api-client",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": ".prettierrc"
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "configs",
+          "children": [
+            {
+              "type": "directory",
+              "name": "eslint",
+              "children": [
+                {
+                  "type": "file",
+                  "name": ".prettierrc"
+                },
+                {
+                  "type": "file",
+                  "name": "base.js"
+                },
+                {
+                  "type": "file",
+                  "name": "index.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                },
+                {
+                  "type": "file",
+                  "name": "tsconfig.json"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "prettier",
+              "children": [
+                {
+                  "type": "file",
+                  "name": ".prettierignore"
+                },
+                {
+                  "type": "file",
+                  "name": ".prettierrc"
+                },
+                {
+                  "type": "file",
+                  "name": "base.js"
+                },
+                {
+                  "type": "file",
+                  "name": "base.json"
+                },
+                {
+                  "type": "file",
+                  "name": "index.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.js"
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                },
+                {
+                  "type": "file",
+                  "name": "README.md"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "typescript",
+              "children": [
+                {
+                  "type": "file",
+                  "name": ".prettierrc"
+                },
+                {
+                  "type": "file",
+                  "name": "base.json"
+                },
+                {
+                  "type": "file",
+                  "name": "index.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "nextjs.json"
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                },
+                {
+                  "type": "file",
+                  "name": "react-library.json"
+                },
+                {
+                  "type": "file",
+                  "name": "README.md"
+                },
+                {
+                  "type": "file",
+                  "name": "tsconfig.json"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "design-system",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": ".prettierrc"
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "query",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "fetch.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "keys.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "examples",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "index.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "keys.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "types.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "useTodos.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "useTodosInfinite.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "client.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "fetch.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "hooks.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "keys.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "provider.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "ssr.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "utils.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "ui",
+          "children": [
+            {
+              "type": "directory",
+              "name": "scripts",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "validate-theme.ts"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "button.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "card.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "input.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "test-imports.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "theme-examples.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "theme-provider.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "theme-runtime.css"
+                },
+                {
+                  "type": "file",
+                  "name": "theme.css"
+                },
+                {
+                  "type": "file",
+                  "name": "theme.types.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "utils.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": ".prettierrc"
+            },
+            {
+              "type": "file",
+              "name": "eslint.config.mjs"
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tailwind.config.shared.ts"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "services"
+    },
+    {
+      "type": "directory",
+      "name": "tooling",
+      "children": [
+        {
+          "type": "directory",
+          "name": "ci"
+        },
+        {
+          "type": "directory",
+          "name": "generators"
+        },
+        {
+          "type": "directory",
+          "name": "scripts",
+          "children": [
+            {
+              "type": "file",
+              "name": "copy-fonts.js"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "name": ".gitignore"
+    },
+    {
+      "type": "file",
+      "name": ".nvmrc"
+    },
+    {
+      "type": "file",
+      "name": ".prettierignore"
+    },
+    {
+      "type": "file",
+      "name": ".prettierrc"
+    },
+    {
+      "type": "file",
+      "name": "atlas.json"
+    },
+    {
+      "type": "file",
+      "name": "eslint.config.mjs"
+    },
+    {
+      "type": "file",
+      "name": "next-env.d.ts"
+    },
+    {
+      "type": "file",
+      "name": "package.json"
+    },
+    {
+      "type": "file",
+      "name": "pnpm-workspace.yaml"
+    },
+    {
+      "type": "file",
+      "name": "README.md"
+    },
+    {
+      "type": "file",
+      "name": "theme-validation.json"
+    },
+    {
+      "type": "file",
+      "name": "tsconfig.base.json"
+    },
+    {
+      "type": "file",
+      "name": "tsconfig.eslint.json"
+    },
+    {
+      "type": "file",
+      "name": "tsconfig.json"
+    },
+    {
+      "type": "file",
+      "name": "turbo.json"
+    }
+  ]
+}
