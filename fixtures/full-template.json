@@ -1,11 +1,17 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-12T13:34:04.622Z",
+  "generated": "2025-08-12T19:08:14.041Z",
   "structure": [
     {
       "type": "directory",
-      "name": ".claude"
+      "name": ".claude",
+      "children": [
+        {
+          "type": "file",
+          "name": "settings.local.json"
+        }
+      ]
     },
     {
       "type": "directory",
@@ -20,6 +26,20 @@
               "name": "ci.yml"
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": ".husky",
+      "children": [
+        {
+          "type": "file",
+          "name": "commit-msg"
+        },
+        {
+          "type": "file",
+          "name": "pre-commit"
         }
       ]
     },
@@ -65,6 +85,28 @@
               "type": "directory",
               "name": "src",
               "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "env.client.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "env.server.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "env.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.ts"
+                    }
+                  ]
+                },
                 {
                   "type": "directory",
                   "name": "app",
@@ -115,7 +157,23 @@
                   "children": [
                     {
                       "type": "file",
+                      "name": "env-demo.tsx"
+                    },
+                    {
+                      "type": "file",
                       "name": "example-todos.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "header.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "theme-provider.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "theme-toggle.tsx"
                     }
                   ]
                 },
@@ -149,6 +207,14 @@
                   "children": [
                     {
                       "type": "file",
+                      "name": "api.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "theme-script.ts"
+                    },
+                    {
+                      "type": "file",
                       "name": "utils.ts"
                     }
                   ]
@@ -170,6 +236,18 @@
                 {
                   "type": "directory",
                   "name": "utils"
+                },
+                {
+                  "type": "file",
+                  "name": "env.client.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "env.server.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "env.ts"
                 }
               ]
             },
@@ -208,6 +286,10 @@
             {
               "type": "file",
               "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
             }
           ]
         }
@@ -342,6 +424,42 @@
               "name": "src",
               "children": [
                 {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "client.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "index.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "todos.test.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "resources",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "todos.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "client.ts"
+                },
+                {
                   "type": "file",
                   "name": "index.ts"
                 }
@@ -357,7 +475,15 @@
             },
             {
               "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
               "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
             }
           ]
         },
@@ -478,8 +604,26 @@
               "name": "src",
               "children": [
                 {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "preset.test.ts"
+                    }
+                  ]
+                },
+                {
                   "type": "file",
                   "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "preset.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "styles.css"
                 }
               ]
             },
@@ -490,6 +634,10 @@
             {
               "type": "file",
               "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             },
             {
               "type": "file",
@@ -616,6 +764,24 @@
               "name": "src",
               "children": [
                 {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "button.test.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "card.test.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "text.test.tsx"
+                    }
+                  ]
+                },
+                {
                   "type": "file",
                   "name": "button.tsx"
                 },
@@ -629,31 +795,7 @@
                 },
                 {
                   "type": "file",
-                  "name": "input.tsx"
-                },
-                {
-                  "type": "file",
-                  "name": "test-imports.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "theme-examples.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "theme-provider.tsx"
-                },
-                {
-                  "type": "file",
-                  "name": "theme-runtime.css"
-                },
-                {
-                  "type": "file",
-                  "name": "theme.css"
-                },
-                {
-                  "type": "file",
-                  "name": "theme.types.ts"
+                  "name": "text.tsx"
                 },
                 {
                   "type": "file",
@@ -679,13 +821,19 @@
             },
             {
               "type": "file",
-              "name": "tailwind.config.shared.ts"
-            },
-            {
-              "type": "file",
               "name": "tsconfig.json"
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "scripts",
+      "children": [
+        {
+          "type": "file",
+          "name": "smoke.mjs"
         }
       ]
     },
@@ -723,6 +871,14 @@
     },
     {
       "type": "file",
+      "name": ".lintstagedrc.mjs"
+    },
+    {
+      "type": "file",
+      "name": ".npmrc"
+    },
+    {
+      "type": "file",
       "name": ".nvmrc"
     },
     {
@@ -736,6 +892,10 @@
     {
       "type": "file",
       "name": "atlas.json"
+    },
+    {
+      "type": "file",
+      "name": "commitlint.config.cjs"
     },
     {
       "type": "file",
