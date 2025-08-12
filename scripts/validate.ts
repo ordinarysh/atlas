@@ -218,6 +218,58 @@ async function validateTemplateStructure() {
       console.error(pc.red(`  ✗ Found node_modules/ - this should not be committed`));
     }
 
+    // Guard against pnpm-lock.yaml
+    const pnpmLockPath = join(templateDir, "pnpm-lock.yaml");
+    if (existsSync(pnpmLockPath)) {
+      allValid = false;
+      console.error(pc.red(`  ✗ Found pnpm-lock.yaml - lockfile should not be in template source`));
+    }
+
+    // Guard against .turbo directory
+    const turboPath = join(templateDir, ".turbo");
+    if (existsSync(turboPath)) {
+      allValid = false;
+      console.error(pc.red(`  ✗ Found .turbo/ - build cache should not be committed`));
+    }
+
+    // Guard against .next directory
+    const nextPaths = await glob("**/.next", {
+      cwd: templateDir,
+      dot: true,
+      onlyDirectories: true,
+      absolute: false,
+    });
+    
+    if (nextPaths.length > 0) {
+      allValid = false;
+      console.error(pc.red(`  ✗ Found .next/ directories - Next.js build output should not be committed`));
+    }
+
+    // Guard against dist directories
+    const distPaths = await glob("**/dist", {
+      cwd: templateDir,
+      onlyDirectories: true,
+      absolute: false,
+    });
+    
+    if (distPaths.length > 0) {
+      allValid = false;
+      console.error(pc.red(`  ✗ Found dist/ directories - build outputs should not be committed`));
+    }
+
+    // Guard against *.tsbuildinfo files
+    const tsBuildInfoFiles = await glob("**/*.tsbuildinfo", {
+      cwd: templateDir,
+      absolute: false,
+    });
+    
+    if (tsBuildInfoFiles.length > 0) {
+      allValid = false;
+      console.error(
+        pc.red(`  ✗ Found .tsbuildinfo files: ${tsBuildInfoFiles.join(", ")} - TypeScript build cache should not be committed`),
+      );
+    }
+
     // Guard against .env files (except .env.example)
     const envFiles = await glob(".env*", {
       cwd: templateDir,
