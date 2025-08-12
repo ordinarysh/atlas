@@ -267,9 +267,10 @@ class SmokeTestRunner {
       });
       this.log(`Command executed: ${command}`);
       this.log(`Output: ${output.trim()}`);
-    } catch (error: any) {
-      const stderr = error.stderr?.toString() || "";
-      const stdout = error.stdout?.toString() || "";
+    } catch (error: unknown) {
+      const execError = error as { stderr?: unknown; stdout?: unknown };
+      const stderr = execError.stderr?.toString() || "";
+      const stdout = execError.stdout?.toString() || "";
       this.log(`Command failed: ${command}`);
       this.log(`stdout: ${stdout}`);
       this.log(`stderr: ${stderr}`);

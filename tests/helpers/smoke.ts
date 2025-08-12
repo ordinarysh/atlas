@@ -63,25 +63,37 @@ export async function runSmokeTests(templatePath: string) {
   return results;
 }
 
+// Snapshot item structure
+interface SnapshotItem {
+  name: string;
+  children?: SnapshotItem[];
+  [key: string]: unknown;
+}
+
+type SnapshotData = SnapshotItem[] | SnapshotItem | unknown;
+
 /**
  * Compare template structure against snapshot
  */
 export function compareSnapshot(
-  actual: any,
-  expected: any,
+  actual: SnapshotData,
+  expected: SnapshotData,
   path: string = ""
 ): { match: boolean; differences: string[] } {
   const differences: string[] = [];
 
-  function compare(a: any, b: any, currentPath: string) {
+  function compare(a: SnapshotData, b: SnapshotData, currentPath: string) {
     if (typeof a !== typeof b) {
       differences.push(`Type mismatch at ${currentPath}: ${typeof a} vs ${typeof b}`);
       return;
     }
 
     if (Array.isArray(a) && Array.isArray(b)) {
-      const aNames = a.map(item => item.name).sort();
-      const bNames = b.map(item => item.name).sort();
+      const aItems = a as SnapshotItem[];
+      const bItems = b as SnapshotItem[];
+      
+      const aNames = aItems.map(item => item.name).sort();
+      const bNames = bItems.map(item => item.name).sort();
       
       const missing = bNames.filter(name => !aNames.includes(name));
       const extra = aNames.filter(name => !bNames.includes(name));
@@ -94,8 +106,8 @@ export function compareSnapshot(
       }
       
       // Compare children recursively
-      for (const item of a) {
-        const expectedItem = b.find((i: any) => i.name === item.name);
+      for (const item of aItems) {
+        const expectedItem = bItems.find((i: SnapshotItem) => i.name === item.name);
         if (expectedItem && item.children && expectedItem.children) {
           compare(
             item.children, 

@@ -11,8 +11,8 @@ export default async (stagedFiles) => {
   // TypeScript files - exclude templates/** completely
   const tsFiles = micromatch(stagedFiles, ['**/*.{ts,tsx}', '!templates/**', '!fixtures/**'])
   if (tsFiles.length) {
-    // ESLint with --fix
-    commands.push(`eslint ${escapeFileNames(tsFiles)} --fix`)
+    // ESLint with --fix and zero warnings tolerance
+    commands.push(`eslint ${escapeFileNames(tsFiles)} --fix --max-warnings 0`)
     
     // Type check staged files only
     commands.push('tsc --noEmit --pretty false')
@@ -21,8 +21,8 @@ export default async (stagedFiles) => {
   // JavaScript/MJS/CJS files - exclude templates/** completely  
   const jsFiles = micromatch(stagedFiles, ['**/*.{js,jsx,mjs,cjs}', '!templates/**', '!fixtures/**'])
   if (jsFiles.length) {
-    // ESLint with --fix
-    commands.push(`eslint ${escapeFileNames(jsFiles)} --fix`)
+    // ESLint with --fix and zero warnings tolerance
+    commands.push(`eslint ${escapeFileNames(jsFiles)} --fix --max-warnings 0`)
   }
 
   // JSON files - format everything including templates (JSON should be formatted)

@@ -27,11 +27,12 @@ export async function runCommand(
       stderr: stderr.trim(),
       exitCode: 0,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const execError = error as { stdout?: string; stderr?: string; message?: string; code?: number };
     return {
-      stdout: error.stdout?.trim() || "",
-      stderr: error.stderr?.trim() || error.message,
-      exitCode: error.code || 1,
+      stdout: execError.stdout?.trim() || "",
+      stderr: execError.stderr?.trim() || execError.message || "Unknown error",
+      exitCode: execError.code || 1,
     };
   }
 }

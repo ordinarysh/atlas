@@ -38,14 +38,20 @@ describe("Full Template E2E", () => {
     const actualTree = await getDirectoryTree(templatePath);
     
     // Convert tree to snapshot format
-    function treeToSnapshot(tree: any): any[] {
+    interface SnapshotItem {
+      type: "file" | "directory";
+      name: string;
+      children?: SnapshotItem[];
+    }
+    
+    function treeToSnapshot(tree: Record<string, unknown>): SnapshotItem[] {
       return Object.entries(tree).map(([name, value]) => {
         if (value === "file") {
-          return { type: "file", name };
+          return { type: "file" as const, name };
         } else {
-          const children = treeToSnapshot(value as any);
+          const children = treeToSnapshot(value as Record<string, unknown>);
           return {
-            type: "directory",
+            type: "directory" as const,
             name,
             children: children.length > 0 ? children : undefined
           };

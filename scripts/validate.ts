@@ -14,8 +14,17 @@ const ajv = new Ajv({
   allowUnionTypes: true,
 });
 
+// JSON Schema interface
+interface JsonSchema {
+  $schema?: string;
+  type?: string;
+  properties?: Record<string, unknown>;
+  required?: string[];
+  [key: string]: unknown;
+}
+
 // Type-safe schema loaders
-function loadSchema(schemaPath: string): any {
+function loadSchema(schemaPath: string): JsonSchema {
   const fullPath = join(process.cwd(), schemaPath);
   if (!existsSync(fullPath)) {
     throw new Error(`Schema file not found: ${schemaPath}`);

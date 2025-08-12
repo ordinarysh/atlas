@@ -125,7 +125,7 @@ interface ArtifactInfo {
   sha256: string;
   size: number;
   fileCount: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 async function getVersion(): Promise<string> {
@@ -320,7 +320,7 @@ async function createTemplateArchive(
   templatePath: string,
   templateName: string,
   version: string,
-): Promise<{ fileName: string; fileCount: number; metadata: any }> {
+): Promise<{ fileName: string; fileCount: number; metadata: Record<string, unknown> }> {
   const outputFileName = `atlas-${templateName}-v${version}.tar.gz`;
   const outputPath = join(RELEASE_DIR, outputFileName);
 
@@ -438,7 +438,7 @@ async function createAddonArchive(
   addonPath: string,
   addonName: string,
   version: string,
-): Promise<{ fileName: string; fileCount: number; metadata: any }> {
+): Promise<{ fileName: string; fileCount: number; metadata: Record<string, unknown> }> {
   const outputFileName = `atlas-addon-${addonName}-v${version}.tar.gz`;
   const outputPath = join(RELEASE_DIR, outputFileName);
 
@@ -484,7 +484,7 @@ async function createMigrationArchive(
   migrationPath: string,
   migrationName: string,
   version: string,
-): Promise<{ fileName: string; fileCount: number; metadata: any }> {
+): Promise<{ fileName: string; fileCount: number; metadata: Record<string, unknown> }> {
   const outputFileName = `atlas-migration-${migrationName}-v${version}.tar.gz`;
   const outputPath = join(RELEASE_DIR, outputFileName);
 

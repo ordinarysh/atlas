@@ -19,13 +19,18 @@ export async function extractTarball(tarballPath: string, destPath: string): Pro
   execSync(`tar -xzf "${tarballPath}" -C "${destPath}"`, { encoding: "utf-8" });
 }
 
+// Directory tree structure types
+interface DirectoryTree {
+  [key: string]: DirectoryTree | 'file';
+}
+
 export async function getDirectoryTree(
   dirPath: string,
   ignore: string[] = ["node_modules", ".git", ".DS_Store", ".env.example", ".env", ".env.*", ".next", "dist", "build", ".turbo", "coverage", "pnpm-lock.yaml", ".tsbuildinfo"]
-): Promise<Record<string, any>> {
-  const tree: Record<string, any> = {};
+): Promise<DirectoryTree> {
+  const tree: DirectoryTree = {};
   
-  async function scan(currentPath: string, currentTree: Record<string, any>) {
+  async function scan(currentPath: string, currentTree: DirectoryTree) {
     const entries = await readdir(currentPath, { withFileTypes: true });
     
     for (const entry of entries) {
@@ -49,8 +54,9 @@ export async function getDirectoryTree(
       const fullPath = join(currentPath, entry.name);
       
       if (entry.isDirectory()) {
-        currentTree[entry.name] = {};
-        await scan(fullPath, currentTree[entry.name]);
+        const subTree: DirectoryTree = {};
+        currentTree[entry.name] = subTree;
+        await scan(fullPath, subTree);
       } else {
         currentTree[entry.name] = "file";
       }
@@ -61,11 +67,11 @@ export async function getDirectoryTree(
   return tree;
 }
 
-export async function writeJsonFile(path: string, data: any): Promise<void> {
+export async function writeJsonFile(path: string, data: unknown): Promise<void> {
   await writeFile(path, JSON.stringify(data, null, 2));
 }
 
-export async function readJsonFile<T = any>(path: string): Promise<T> {
+export async function readJsonFile<T = unknown>(path: string): Promise<T> {
   const content = await readFile(path, "utf-8");
   return JSON.parse(content);
 }
