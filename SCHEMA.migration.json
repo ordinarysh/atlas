@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ordinary.sh/atlas/schemas/migration/v1.0.0",
+  "title": "Atlas Migration Plan Schema",
+  "description": "Schema for migrations/*/plan.json",
+  "type": "object",
+  "required": ["id", "from", "to", "steps"],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique migration identifier"
+    },
+    "from": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Source version"
+    },
+    "to": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Target version"
+    },
+    "description": {
+      "type": "string",
+      "description": "Migration description"
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "description"],
+        "additionalProperties": true,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["codemod", "manual", "script", "command"],
+            "description": "Migration step type"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Step description"
+          },
+          "path": {
+            "type": "string",
+            "description": "Path to codemod or script"
+          },
+          "script": {
+            "type": "string",
+            "description": "Inline script content"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Additional options"
+          }
+        }
+      }
+    },
+    "breaking": {
+      "type": "boolean",
+      "description": "Whether this migration contains breaking changes"
+    },
+    "automated": {
+      "type": "boolean",
+      "description": "Whether this migration can be fully automated"
+    }
+  }
+}

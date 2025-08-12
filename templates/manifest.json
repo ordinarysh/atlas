@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "templates": [
+    {
+      "id": "full",
+      "name": "Atlas Full Template",
+      "description": "Full-featured monorepo template with apps, packages, and services",
+      "type": "web",
+      "dependencies": []
+    }
+  ]
+}
