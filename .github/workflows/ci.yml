@@ -105,8 +105,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run ESLint
-        run: pnpm lint
+      - name: Run ESLint (excluding templates)
+        run: |
+          echo "Running ESLint on root codebase (templates excluded)..."
+          pnpm lint
 
   typecheck:
     name: Type Check
@@ -143,8 +145,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run TypeScript type checking
-        run: pnpm typecheck
+      - name: Run TypeScript type checking (excluding templates)
+        run: |
+          echo "Running TypeScript checks on root codebase (templates excluded)..."
+          pnpm typecheck
 
   validate-templates:
     name: Validate Templates & Schemas
