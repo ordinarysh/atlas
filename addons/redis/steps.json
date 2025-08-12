@@ -1,0 +1,33 @@
+{
+  "id": "redis-addon",
+  "name": "Redis Cache Addon",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "type": "package",
+      "action": "install",
+      "target": "redis@^4.6.0"
+    },
+    {
+      "type": "package",
+      "action": "install-dev",
+      "target": "@types/redis@^4.0.0"
+    },
+    {
+      "type": "file",
+      "action": "create",
+      "target": "packages/cache/redis.ts",
+      "content": {
+        "template": "redis-client"
+      }
+    },
+    {
+      "type": "config",
+      "action": "update",
+      "target": ".env.example",
+      "content": {
+        "append": ["REDIS_URL=redis://localhost:6379"]
+      }
+    }
+  ]
+}
