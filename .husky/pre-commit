@@ -1,4 +1,10 @@
-#!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
+#!/bin/sh
+set -e
 
-pnpm precommit
+STAGED="$(git diff --cached --name-only --diff-filter=ACMR)"
+[ -z "$STAGED" ] && exit 0
+
+echo "$STAGED" | grep -qv '^templates/' || exit 0
+
+# Force root config so it never discovers template configs
+pnpm exec lint-staged --config ./.lintstagedrc.mjs
