@@ -1,0 +1,21 @@
+{
+  "id": "migration-v030-to-v040",
+  "from": "0.3.0",
+  "to": "0.4.0",
+  "steps": [
+    {
+      "type": "codemod",
+      "description": "Update import paths for new package structure",
+      "path": "codemods/update-imports.js"
+    },
+    {
+      "type": "script",
+      "description": "Update TypeScript configuration",
+      "script": "scripts/update-tsconfig.js"
+    },
+    {
+      "type": "manual",
+      "description": "Review and update environment variables in .env files"
+    }
+  ]
+}
