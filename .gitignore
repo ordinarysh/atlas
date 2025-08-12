@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+release/
+.vscode/
+.DS_Store
+/.vscode/
