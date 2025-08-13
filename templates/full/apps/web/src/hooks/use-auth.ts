@@ -6,8 +6,8 @@
  */
 
 import { useRouter } from 'next/navigation'
-import { makeApi } from '@/lib/api'
 import { createKeys, useMutation, useQuery, useQueryClient } from '@atlas/query'
+import { makeApi } from '@/lib/api'
 
 // Types
 export interface User {

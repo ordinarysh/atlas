@@ -1,6 +1,6 @@
 /**
  * Theme initialization script to prevent FOUC
- * 
+ *
  * This script should be inlined in the <head> to run before React hydrates.
  * It sets the initial theme based on localStorage or system preference.
  */

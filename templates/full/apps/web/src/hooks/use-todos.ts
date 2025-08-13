@@ -5,7 +5,6 @@
  * using TanStack Query with our custom utilities.
  */
 
-import { makeApi } from '@/lib/api'
 import { type PaginatedResponse } from '@atlas/api-client'
 import {
   createKeys,
@@ -15,6 +14,7 @@ import {
   useOptimisticMutation,
   useQuery,
 } from '@atlas/query'
+import { makeApi } from '@/lib/api'
 
 // Types
 export interface Todo {
@@ -81,7 +81,9 @@ export function useInfiniteTodos(filters?: { completed?: boolean }) {
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
-      lastPage.meta.page < lastPage.meta.totalPages ? lastPage.meta.page + 1 : undefined,
+      lastPage.meta.page < lastPage.meta.totalPages
+        ? lastPage.meta.page + 1
+        : undefined,
   })
 }
 
@@ -177,7 +179,9 @@ export function useBulkUpdateTodos() {
   return useMutation({
     mutationFn: (updates: Array<{ id: string; data: UpdateTodoInput }>) =>
       Promise.all(
-        updates.map(({ id, data }) => makeApi().patch<Todo>(`/todos/${id}`, data))
+        updates.map(({ id, data }) =>
+          makeApi().patch<Todo>(`/todos/${id}`, data)
+        )
       ),
     onSuccess: () => {
       // Invalidate all todo queries
