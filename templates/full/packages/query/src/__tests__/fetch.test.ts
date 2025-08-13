@@ -80,12 +80,14 @@ describe("fetchJson", () => {
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(body),
-        headers: expect.any(Headers),
+        headers: expect.any(Headers) as Headers,
       }),
     );
 
-    const callArgs = (global.fetch as any).mock.calls[0];
-    expect(callArgs[1].headers.get("Content-Type")).toBe("application/json");
+    const mockFetch = vi.mocked(global.fetch);
+    const callArgs = mockFetch.mock.calls[0];
+    const headers = callArgs[1]?.headers as Headers;
+    expect(headers.get("Content-Type")).toBe("application/json");
   });
 
   it("should throw FetchError on 4xx without retry", async () => {
@@ -189,8 +191,10 @@ describe("createFetch", () => {
 
     await api("/endpoint");
 
-    const callArgs = (global.fetch as any).mock.calls[0];
-    expect(callArgs[1].headers.get("X-API-Key")).toBe("secret");
+    const mockFetch = vi.mocked(global.fetch);
+    const callArgs = mockFetch.mock.calls[0];
+    const headers = callArgs[1]?.headers as Headers;
+    expect(headers.get("X-API-Key")).toBe("secret");
   });
 
   it("should merge options with defaults", async () => {
@@ -208,9 +212,11 @@ describe("createFetch", () => {
       headers: { "X-Custom": "value" },
     });
 
-    const callArgs = (global.fetch as any).mock.calls[0];
-    expect(callArgs[1].headers.get("X-API-Key")).toBe("secret");
-    expect(callArgs[1].headers.get("X-Custom")).toBe("value");
+    const mockFetch = vi.mocked(global.fetch);
+    const callArgs = mockFetch.mock.calls[0];
+    const headers = callArgs[1]?.headers as Headers;
+    expect(headers.get("X-API-Key")).toBe("secret");
+    expect(headers.get("X-Custom")).toBe("value");
   });
 });
 

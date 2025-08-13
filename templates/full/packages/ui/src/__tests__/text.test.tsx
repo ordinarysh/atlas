@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { Text } from './text'
+import { describe, expect, it } from 'vitest'
+import { Text } from '../text'
 
 describe('Text', () => {
   it('renders with base size by default', () => {

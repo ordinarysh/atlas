@@ -10,18 +10,21 @@ describe('index exports', () => {
   })
 
   it('should NOT export preconfigured api or auth module', () => {
-    expect((exports as any).api).toBeUndefined()
-    expect((exports as any).auth).toBeUndefined()
+    const exportedModules = exports as Record<string, unknown>
+    expect(exportedModules.api).toBeUndefined()
+    expect(exportedModules.auth).toBeUndefined()
   })
 
   it('should NOT export resource functions directly', () => {
-    expect((exports as any).listTodos).toBeUndefined()
-    expect((exports as any).createTodo).toBeUndefined()
+    const exportedModules = exports as Record<string, unknown>
+    expect(exportedModules.listTodos).toBeUndefined()
+    expect(exportedModules.createTodo).toBeUndefined()
   })
 
   it('should NOT export schemas directly', () => {
-    expect((exports as any).TodoSchema).toBeUndefined()
-    expect((exports as any).TodosResponseSchema).toBeUndefined()
-    expect((exports as any).CreateTodoInputSchema).toBeUndefined()
+    const exportedModules = exports as Record<string, unknown>
+    expect(exportedModules.TodoSchema).toBeUndefined()
+    expect(exportedModules.TodosResponseSchema).toBeUndefined()
+    expect(exportedModules.CreateTodoInputSchema).toBeUndefined()
   })
 })

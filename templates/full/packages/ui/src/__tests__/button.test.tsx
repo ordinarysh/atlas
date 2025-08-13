@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
-import { Button } from './button'
+import { describe, expect, it } from 'vitest'
+import { Button } from '../button'
 
 describe('Button', () => {
   it('renders with default variant tokens', () => {

@@ -98,7 +98,7 @@ describe('createApi', () => {
         '/todos',
         expect.objectContaining({
           method: 'GET',
-          headers: expect.any(Headers),
+          headers: expect.any(Headers) as Headers,
         })
       )
 
