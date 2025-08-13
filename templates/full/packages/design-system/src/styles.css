@@ -15,55 +15,55 @@
    * COLOR TOKENS - Light Theme (Default)
    * Using OKLCH for perceptually uniform colors
    * ======================================== */
-  
+
   /* Foreground */
-  --fg: 0.13 0.004 279;              /* Near black for text */
-  --fg-muted: 0.45 0.006 279;        /* Muted gray text */
-  
+  --fg: 0.13 0.004 279; /* Near black for text */
+  --fg-muted: 0.45 0.006 279; /* Muted gray text */
+
   /* Surfaces */
-  --surface: 1 0 0;                  /* Pure white */
-  --elevated: 0.985 0.001 279;       /* Slightly elevated */
-  --muted: 0.96 0.003 279;           /* Muted background */
-  
+  --surface: 1 0 0; /* Pure white */
+  --elevated: 0.985 0.001 279; /* Slightly elevated */
+  --muted: 0.96 0.003 279; /* Muted background */
+
   /* Primary brand */
-  --primary: 0.545 0.218 264.5;      /* Brand blue */
-  --primary-contrast: 1 0 0;         /* White on primary */
-  
+  --primary: 0.545 0.218 264.5; /* Brand blue */
+  --primary-contrast: 1 0 0; /* White on primary */
+
   /* Status colors */
-  --success: 0.65 0.15 145;          /* Green */
-  --warning: 0.75 0.15 85;           /* Amber */
-  --danger: 0.65 0.2 25;             /* Red */
-  
+  --success: 0.65 0.15 145; /* Green */
+  --warning: 0.75 0.15 85; /* Amber */
+  --danger: 0.65 0.2 25; /* Red */
+
   /* UI elements */
-  --border: 0.89 0.004 279;          /* Light gray border */
-  --ring: 0.545 0.218 264.5;         /* Primary for focus rings */
-  --outline: 0.75 0.01 279;          /* Subtle outline */
+  --border: 0.89 0.004 279; /* Light gray border */
+  --ring: 0.545 0.218 264.5; /* Primary for focus rings */
+  --outline: 0.75 0.01 279; /* Subtle outline */
 }
 
 /* Dark theme */
 [data-theme="dark"] {
   /* Foreground */
-  --fg: 0.98 0.001 279;              /* Near white for text */
-  --fg-muted: 0.65 0.004 279;        /* Muted gray text */
-  
+  --fg: 0.98 0.001 279; /* Near white for text */
+  --fg-muted: 0.65 0.004 279; /* Muted gray text */
+
   /* Surfaces */
-  --surface: 0.12 0.004 279;         /* Dark surface */
-  --elevated: 0.18 0.004 279;        /* Elevated dark */
-  --muted: 0.15 0.004 279;           /* Muted dark */
-  
+  --surface: 0.12 0.004 279; /* Dark surface */
+  --elevated: 0.18 0.004 279; /* Elevated dark */
+  --muted: 0.15 0.004 279; /* Muted dark */
+
   /* Primary brand */
-  --primary: 0.645 0.218 264.5;      /* Lighter brand blue */
+  --primary: 0.645 0.218 264.5; /* Lighter brand blue */
   --primary-contrast: 0.12 0.004 279; /* Dark on primary */
-  
+
   /* Status colors (slightly adjusted for dark mode) */
-  --success: 0.7 0.15 145;           /* Lighter green */
-  --warning: 0.8 0.15 85;            /* Lighter amber */
-  --danger: 0.7 0.2 25;              /* Lighter red */
-  
+  --success: 0.7 0.15 145; /* Lighter green */
+  --warning: 0.8 0.15 85; /* Lighter amber */
+  --danger: 0.7 0.2 25; /* Lighter red */
+
   /* UI elements */
-  --border: 0.25 0.004 279;          /* Dark gray border */
-  --ring: 0.645 0.218 264.5;         /* Primary for focus rings */
-  --outline: 0.35 0.004 279;         /* Subtle dark outline */
+  --border: 0.25 0.004 279; /* Dark gray border */
+  --ring: 0.645 0.218 264.5; /* Primary for focus rings */
+  --outline: 0.35 0.004 279; /* Subtle dark outline */
 }
 
 /* ========================================
@@ -72,13 +72,13 @@
  * ======================================== */
 @media (prefers-contrast: high) {
   :root {
-    --fg: 0 0 0;                    /* Pure black */
-    --border: 0.5 0.004 279;        /* Stronger borders */
+    --fg: 0 0 0; /* Pure black */
+    --border: 0.5 0.004 279; /* Stronger borders */
   }
-  
+
   [data-theme="dark"] {
-    --fg: 1 0 0;                    /* Pure white */
-    --border: 0.5 0.004 279;        /* Stronger borders */
+    --fg: 1 0 0; /* Pure white */
+    --border: 0.5 0.004 279; /* Stronger borders */
   }
 }
 
@@ -101,38 +101,40 @@
   --color-border: oklch(var(--border));
   --color-ring: oklch(var(--ring));
   --color-outline: oklch(var(--outline));
-  
+
   /* Typography scale - exact values as specified */
   --font-size-3xl: 1.802rem;
   --font-size-3xl--line-height: 1.2;
-  
+
   --font-size-2xl: 1.602rem;
   --font-size-2xl--line-height: 1.2;
-  
+
   --font-size-xl: 1.424rem;
   --font-size-xl--line-height: 1.2;
-  
+
   --font-size-lg: 1.266rem;
   --font-size-lg--line-height: 1.3;
-  
+
   --font-size-md: 1.125rem;
   --font-size-md--line-height: 1.4;
-  
+
   --font-size-base: 1rem;
   --font-size-base--line-height: 1.4;
-  
+
   --font-size-sm: 0.889rem;
   --font-size-sm--line-height: 1.5;
-  
-  --font-size-xs: 0.790rem;
+
+  --font-size-xs: 0.79rem;
   --font-size-xs--line-height: 1.5;
-  
+
   /* Font weights - semantic naming */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 700;
-  
+
   /* Font families */
-  --font-family-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-family-sans:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }

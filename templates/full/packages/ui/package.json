@@ -26,13 +26,16 @@
     "@atlas/config-eslint": "workspace:*",
     "@atlas/config-prettier": "workspace:*",
     "@atlas/config-typescript": "workspace:*",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/jest-dom": "^6.6.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "tsx": "^4.19.2",
     "typescript": "^5",
-    "typescript-eslint": "^8.39.0"
+    "typescript-eslint": "^8.39.0",
+    "vitest": "^2.1.9"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
