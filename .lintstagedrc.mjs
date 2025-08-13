@@ -5,7 +5,7 @@ export default {
   // TypeScript files
   '**/*.{ts,tsx}': [
     'eslint --fix --max-warnings 0',
-    'tsc --noEmit --pretty false'
+    () => 'tsc --project tsconfig.json --noEmit --pretty false'
   ],
   
   // JavaScript/MJS/CJS files (exclude config files that ESLint ignores)

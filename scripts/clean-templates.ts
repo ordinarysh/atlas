@@ -16,8 +16,8 @@
 import { rm, readdir, stat } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import * as pc from "picocolors";
-import { glob } from "fast-glob";
+import pc from "picocolors";
+import glob from "fast-glob";
 
 // Global configuration
 const isDryRun = process.argv.includes("--dry-run") || process.env.DRY_RUN === "1";
