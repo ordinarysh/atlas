@@ -1,4 +1,3 @@
-import { fetchJson } from '@atlas/query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import {
@@ -8,6 +7,7 @@ import {
   TodoSchema,
   TodosResponseSchema,
 } from '../resources/todos'
+import { mockFetchJson } from './setup'
 
 describe('todos resource', () => {
   beforeEach(() => {
@@ -32,7 +32,6 @@ describe('todos resource', () => {
         },
       ]
 
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue(mockTodos)
 
       const result = await listTodos()
@@ -49,7 +48,6 @@ describe('todos resource', () => {
     })
 
     it('should use custom base URL when provided', async () => {
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue([])
 
       await listTodos('https://api.example.com')
@@ -69,7 +67,6 @@ describe('todos resource', () => {
         },
       ]
 
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockImplementation((_, options) => {
         const schema = options?.schema
         return Promise.resolve(
@@ -95,7 +92,6 @@ describe('todos resource', () => {
         createdAt: '2024-01-01T00:00:00Z',
       }
 
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue(mockResponse)
 
       const result = await createTodo(input)
@@ -114,7 +110,6 @@ describe('todos resource', () => {
 
     it('should use custom base URL when provided', async () => {
       const input = { title: 'Test', completed: false }
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({
         id: '1',
         title: 'Test',
@@ -139,7 +134,6 @@ describe('todos resource', () => {
         createdAt: '2024-01-01T00:00:00Z',
       }
 
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockImplementation((_, options) => {
         const schema = options?.schema
         return Promise.resolve(

@@ -1,6 +1,6 @@
-import { fetchJson } from '@atlas/query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApi, qs } from '../client'
+import { mockFetchJson } from './setup'
 
 describe('createApi', () => {
   beforeEach(() => {
@@ -10,7 +10,6 @@ describe('createApi', () => {
   describe('base URL joining', () => {
     it('should correctly join base URL with path', async () => {
       const api = createApi({ baseUrl: '/v1' })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -25,7 +24,6 @@ describe('createApi', () => {
 
     it('should handle trailing slash in base URL', async () => {
       const api = createApi({ baseUrl: '/v1/' })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -40,7 +38,6 @@ describe('createApi', () => {
 
     it('should handle path without leading slash', async () => {
       const api = createApi({ baseUrl: '/v1' })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('todos')
@@ -55,7 +52,6 @@ describe('createApi', () => {
 
     it('should work without base URL', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -70,7 +66,6 @@ describe('createApi', () => {
 
     it('should handle absolute URLs by ignoring base URL', async () => {
       const api = createApi({ baseUrl: '/v1' })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('https://external-api.com/data')
@@ -89,7 +84,6 @@ describe('createApi', () => {
       const api = createApi({
         getAuthToken: () => 'test-token',
       })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -113,7 +107,6 @@ describe('createApi', () => {
           return 'async-token'
         },
       })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -126,7 +119,6 @@ describe('createApi', () => {
       const api = createApi({
         getAuthToken: () => null,
       })
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -137,7 +129,6 @@ describe('createApi', () => {
 
     it('should not include auth header when getAuthToken is not provided', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       await api.get('/todos')
@@ -150,7 +141,6 @@ describe('createApi', () => {
   describe('HTTP methods', () => {
     it('should support POST with body', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ id: '1' })
 
       const body = { title: 'Test todo' }
@@ -167,7 +157,6 @@ describe('createApi', () => {
 
     it('should support PUT with body', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ id: '1' })
 
       const body = { title: 'Updated todo' }
@@ -184,7 +173,6 @@ describe('createApi', () => {
 
     it('should support PATCH with body', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ id: '1' })
 
       const body = { completed: true }
@@ -201,7 +189,6 @@ describe('createApi', () => {
 
     it('should support DELETE', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue(null)
 
       await api.del('/todos/1')
@@ -218,7 +205,6 @@ describe('createApi', () => {
   describe('query parameters', () => {
     it('should append query params to URL', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue([])
 
       await api.get('/todos', {
@@ -233,7 +219,6 @@ describe('createApi', () => {
 
     it('should handle existing query params in URL', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue([])
 
       await api.get('/todos?sort=date', {
@@ -248,7 +233,6 @@ describe('createApi', () => {
 
     it('should skip undefined and null params', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue([])
 
       await api.get('/todos', {
@@ -268,7 +252,6 @@ describe('createApi', () => {
 
     it('should handle boolean params', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue([])
 
       await api.get('/todos', {
@@ -285,7 +268,6 @@ describe('createApi', () => {
   describe('abort signal', () => {
     it('should pass abort signal to fetchJson', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       const controller = new AbortController()
@@ -301,7 +283,6 @@ describe('createApi', () => {
 
     it('should propagate abort errors', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
 
       const abortError = new DOMException('Aborted', 'AbortError')
       mockFetchJson.mockRejectedValue(abortError)
@@ -318,7 +299,6 @@ describe('createApi', () => {
   describe('retry behavior (via fetchJson)', () => {
     it('should not retry on 4xx errors', async () => {
       const api = createApi()
-      const mockFetchJson = vi.mocked(fetchJson)
 
       const error = new Error('Not Found')
       Object.assign(error, { status: 404 })
