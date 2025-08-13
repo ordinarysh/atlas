@@ -1,0 +1,1 @@
+- Use pnpm clean:templates to clean template artifacts before commiting
