@@ -1,0 +1,183 @@
+name: Merge Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  version-check:
+    name: Version Jump Analysis
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Analyze version jump
+        id: version-check
+        run: |
+          echo "🔍 Analyzing version changes from develop to main..."
+
+          # Get current main version
+          git checkout origin/main -- package.json 2>/dev/null || echo "No package.json on main yet"
+          MAIN_VERSION="0.0.0"
+          if [ -f package.json ]; then
+            MAIN_VERSION=$(cat package.json | grep '"version"' | sed 's/.*"version": "\([^"]*\)".*/\1/')
+          fi
+          mv package.json package.json.main 2>/dev/null || true
+
+          # Get PR version (develop version)
+          git checkout HEAD -- package.json
+          PR_VERSION=$(cat package.json | grep '"version"' | sed 's/.*"version": "\([^"]*\)".*/\1/')
+
+          echo "📊 Version Analysis:"
+          echo "  Main branch: v$MAIN_VERSION"
+          echo "  This PR: v$PR_VERSION"
+
+          # Parse versions
+          IFS='.' read -r MAIN_MAJOR MAIN_MINOR MAIN_PATCH <<< "$MAIN_VERSION"
+          IFS='.' read -r PR_MAJOR PR_MINOR PR_PATCH <<< "$PR_VERSION"
+
+          # Remove any pre-release suffixes for comparison
+          PR_MAJOR_CLEAN=$(echo $PR_MAJOR | cut -d'-' -f1)
+          PR_MINOR_CLEAN=$(echo $PR_MINOR | cut -d'-' -f1)
+          PR_PATCH_CLEAN=$(echo $PR_PATCH | cut -d'-' -f1)
+
+          # Calculate differences
+          MAJOR_DIFF=$((PR_MAJOR_CLEAN - MAIN_MAJOR))
+          MINOR_DIFF=$((PR_MINOR_CLEAN - MAIN_MINOR))
+          PATCH_DIFF=$((PR_PATCH_CLEAN - MAIN_PATCH))
+
+          echo "version_jump_major=$MAJOR_DIFF" >> $GITHUB_OUTPUT
+          echo "version_jump_minor=$MINOR_DIFF" >> $GITHUB_OUTPUT  
+          echo "version_jump_patch=$PATCH_DIFF" >> $GITHUB_OUTPUT
+          echo "main_version=$MAIN_VERSION" >> $GITHUB_OUTPUT
+          echo "pr_version=$PR_VERSION" >> $GITHUB_OUTPUT
+
+          # Determine jump type
+          JUMP_TYPE="patch"
+          JUMP_EMOJI="🔧"
+          if [ $MAJOR_DIFF -gt 0 ]; then
+            JUMP_TYPE="major"
+            JUMP_EMOJI="💥"
+          elif [ $MINOR_DIFF -gt 0 ]; then
+            JUMP_TYPE="minor" 
+            JUMP_EMOJI="✨"
+          fi
+
+          echo "jump_type=$JUMP_TYPE" >> $GITHUB_OUTPUT
+          echo "jump_emoji=$JUMP_EMOJI" >> $GITHUB_OUTPUT
+
+          # Generate analysis message
+          if [ $MAJOR_DIFF -gt 1 ] || [ $MINOR_DIFF -gt 5 ]; then
+            echo "large_jump=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Large version jump detected!"
+          else
+            echo "large_jump=false" >> $GITHUB_OUTPUT
+            echo "✅ Version jump looks reasonable"
+          fi
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { version_jump_major, version_jump_minor, main_version, pr_version, jump_type, jump_emoji, large_jump } = process.env;
+
+            let message = `${jump_emoji} **Version Jump Analysis**\n\n`;
+            message += `| | Version |\n`;
+            message += `|---|---|\n`;
+            message += `| Main branch | \`v${main_version}\` |\n`;
+            message += `| This PR | \`v${pr_version}\` |\n`;
+            message += `| Jump type | ${jump_type} release |\n\n`;
+
+            if (large_jump === 'true') {
+              message += `⚠️ **Large Version Jump Detected**\n\n`;
+              message += `This PR will jump ${version_jump_major} major version(s). Consider:\n`;
+              message += `- Are all intermediate features properly tested?\n`;
+              message += `- Should develop be merged to main more frequently?\n`;
+              message += `- Is this intentional for a major stable release?\n\n`;
+            } else {
+              message += `✅ **Version jump looks reasonable**\n\n`;
+            }
+
+            message += `> **Note**: Version jumps are normal and expected. This is just informational.\n`;
+            message += `> Semantic-release will handle the versioning automatically based on commit history.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
+        env:
+          version_jump_major: ${{ steps.version-check.outputs.version_jump_major }}
+          version_jump_minor: ${{ steps.version-check.outputs.version_jump_minor }}
+          main_version: ${{ steps.version-check.outputs.main_version }}
+          pr_version: ${{ steps.version-check.outputs.pr_version }}
+          jump_type: ${{ steps.version-check.outputs.jump_type }}
+          jump_emoji: ${{ steps.version-check.outputs.jump_emoji }}
+          large_jump: ${{ steps.version-check.outputs.large_jump }}
+
+  commit-analysis:
+    name: Commit Impact Preview
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install semantic-release
+        run: npm install -D semantic-release@24
+
+      - name: Preview release impact
+        run: |
+          echo "🔮 Previewing what semantic-release will do..."
+
+          # Run semantic-release in dry-run mode to see what would happen
+          npx semantic-release --dry-run --branches main | tee release-preview.log || true
+
+          # Extract key information
+          if grep -q "There is no previous release" release-preview.log; then
+            echo "📦 This will be the **first release** on main branch"
+          elif grep -q "The next release version is" release-preview.log; then
+            VERSION=$(grep "The next release version is" release-preview.log | awk '{print $NF}')
+            echo "📦 Next release version: **$VERSION**"
+          else
+            echo "📦 No release will be created (no relevant changes)"
+          fi
+
+      - name: Summarize changes
+        run: |
+          echo "📝 **Changes in this PR:**"
+          git log --oneline origin/main..HEAD | head -10 | while read line; do
+            echo "  - $line"
+          done
+
+          echo ""
+          FEAT_COUNT=$(git log --oneline origin/main..HEAD --grep="^feat" | wc -l)
+          FIX_COUNT=$(git log --oneline origin/main..HEAD --grep="^fix" | wc -l) 
+          BREAK_COUNT=$(git log origin/main..HEAD --grep="BREAKING CHANGE" | wc -l)
+
+          echo "📊 **Change Summary:**"
+          echo "  - 🆕 Features: $FEAT_COUNT"
+          echo "  - 🐛 Fixes: $FIX_COUNT"
+          echo "  - 💥 Breaking Changes: $BREAK_COUNT"
