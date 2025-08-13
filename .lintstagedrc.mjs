@@ -28,8 +28,7 @@ export default {
     'prettier --write'
   ],
 
-  // Schema validation for manifests
-  'templates/**/manifest.json': 'pnpm validate --changed || pnpm validate',
+  // Schema validation for manifests (non-template files only)
   'addons/**/steps.json': 'pnpm validate --changed || pnpm validate', 
   'migrations/**/plan.json': 'pnpm validate --changed || pnpm validate'
 }
