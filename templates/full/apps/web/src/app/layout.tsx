@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { envPublic, envServer } from '@/env'
-import { themeScript } from '@/lib/theme-script'
 import { Header } from '@/components/header'
+import { themeScript } from '@/lib/theme-script'
+import { envPublic, envServer } from '@/env'
 import { Providers } from './providers'
 import './globals.css'
 

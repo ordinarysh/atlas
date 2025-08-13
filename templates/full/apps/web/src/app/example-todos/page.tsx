@@ -7,21 +7,21 @@ import TodoList from './todo-list'
 export default function TodosPage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
-        <header className="mb-8">
-          <h1 className="mb-2 text-4xl font-bold">Todo List</h1>
-          <p className="text-gray-600">
-            Example of React Query with SSR prefetching and optimistic updates
-          </p>
-        </header>
+      <header className="mb-8">
+        <h1 className="mb-2 text-4xl font-bold">Todo List</h1>
+        <p className="text-gray-600">
+          Example of React Query with SSR prefetching and optimistic updates
+        </p>
+      </header>
 
-        <div className="mb-8">
-          <CreateTodo />
-        </div>
-
-        <Suspense fallback={<TodoListSkeleton />}>
-          <TodoList />
-        </Suspense>
+      <div className="mb-8">
+        <CreateTodo />
       </div>
+
+      <Suspense fallback={<TodoListSkeleton />}>
+        <TodoList />
+      </Suspense>
+    </div>
   )
 }
 

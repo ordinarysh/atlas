@@ -17,11 +17,13 @@ interface ThemeProviderState {
   resolvedTheme: 'light' | 'dark'
 }
 
-const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined)
+const ThemeProviderContext = createContext<ThemeProviderState | undefined>(
+  undefined
+)
 
 /**
  * Theme Provider - App-level theme management
- * 
+ *
  * Handles runtime theme switching, persistence, and system preferences.
  * Updates the data-theme attribute on the root element to trigger
  * CSS variable changes defined in @atlas/design-system.
@@ -36,7 +38,7 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<Theme>(() => {
     // SSR-safe initialization
     if (typeof window === 'undefined') return defaultTheme
-    
+
     try {
       return (localStorage.getItem(storageKey) as Theme) || defaultTheme
     } catch {
@@ -51,17 +53,19 @@ export function ThemeProvider({
 
     // Remove any existing theme attribute
     root.removeAttribute(attribute)
-    
+
     // Determine resolved theme
     let resolved: 'light' | 'dark' = 'light'
-    
+
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const systemTheme = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      ).matches
       resolved = systemTheme ? 'dark' : 'light'
     } else {
       resolved = theme
     }
-    
+
     // Apply theme via attribute (triggers CSS variable changes)
     root.setAttribute(attribute, resolved)
     setResolvedTheme(resolved)
@@ -72,7 +76,7 @@ export function ThemeProvider({
     if (theme !== 'system') return
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       const resolved = e.matches ? 'dark' : 'light'
       window.document.documentElement.setAttribute(attribute, resolved)
