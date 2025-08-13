@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-12T19:08:14.041Z",
+  "generated": "2025-08-13T18:45:21.715Z",
   "structure": [
     {
       "type": "directory",
@@ -843,6 +843,10 @@
     },
     {
       "type": "directory",
+      "name": "test-artifacts"
+    },
+    {
+      "type": "directory",
       "name": "tooling",
       "children": [
         {
@@ -920,6 +924,10 @@
     {
       "type": "file",
       "name": "theme-validation.json"
+    },
+    {
+      "type": "file",
+      "name": "TOOLING.md"
     },
     {
       "type": "file",
