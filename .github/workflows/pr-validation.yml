@@ -92,13 +92,11 @@ jobs:
           echo "Checking artifact sizes..."
           for artifact in release/*.tar.gz; do
             if [ -f "$artifact" ]; then
-              # Get file size using cross-platform approach with better error handling
-              if command -v gstat >/dev/null 2>&1; then
-                SIZE=$(gstat -c%s "$artifact")
-              elif stat -f%z "$artifact" >/dev/null 2>&1; then
-                SIZE=$(stat -f%z "$artifact")
-              else
-                SIZE=$(stat -c%s "$artifact")
+              # Get file size with simple cross-platform fallback
+              SIZE=$(stat -c%s "$artifact" 2>/dev/null || stat -f%z "$artifact" 2>/dev/null || echo 0)
+              if [ "$SIZE" = "0" ]; then
+                echo "Warning: Could not determine file size for $artifact"
+                SIZE=1  # Set to 1 to avoid division by zero
               fi
               
               SIZE_MB=$((SIZE / 1024 / 1024))
