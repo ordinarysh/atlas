@@ -5,14 +5,22 @@
  * Removes all build artifacts and machine-specific files from template directories
  * before packaging for release. This ensures templates are clean and portable.
  *
- * Usage: pnpm clean:templates
+ * Usage: 
+ *   pnpm clean:templates          # Clean all templates
+ *   pnpm clean:templates --dry-run  # Preview what would be removed
+ *
+ * Environment variables:
+ *   DRY_RUN=1 pnpm clean:templates  # Also enables dry run mode
  */
 
 import { rm, readdir, stat } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
-import pc from "picocolors";
-import glob from "fast-glob";
+import * as pc from "picocolors";
+import { glob } from "fast-glob";
+
+// Global configuration
+const isDryRun = process.argv.includes("--dry-run") || process.env.DRY_RUN === "1";
 
 // Artifacts to remove from templates
 const ARTIFACTS_TO_REMOVE = {
@@ -61,7 +69,7 @@ interface CleanupStats {
 }
 
 /**
- * Calculate directory size recursively
+ * Calculate directory size recursively with better handling
  */
 async function getDirectorySize(dir: string): Promise<number> {
   let size = 0;
@@ -72,7 +80,7 @@ async function getDirectorySize(dir: string): Promise<number> {
       dot: true,
       onlyFiles: true,
       followSymbolicLinks: false,
-      ignore: ["**/node_modules/**"], // Avoid deep recursion in node_modules
+      // Don't ignore anything when calculating size - we want accurate measurements
     });
 
     for (const file of files) {
@@ -80,35 +88,92 @@ async function getDirectorySize(dir: string): Promise<number> {
         const stats = await stat(join(dir, file));
         size += stats.size;
       } catch {
-        // Ignore inaccessible files
+        // Ignore inaccessible files (permission issues, broken symlinks)
       }
     }
   } catch {
-    // Return 0 if directory is inaccessible
+    // If glob fails, try to get directory stats directly
+    try {
+      const dirStats = await stat(dir);
+      if (dirStats.isDirectory()) {
+        // For very large directories, approximate size
+        size = 1024; // 1KB placeholder
+      }
+    } catch {
+      // Return 0 if completely inaccessible
+    }
   }
 
   return size;
 }
 
 /**
- * Remove a directory and track stats
+ * Remove a directory and track stats with enhanced error handling
  */
 async function removeDirectory(path: string, stats: CleanupStats): Promise<void> {
   if (!existsSync(path)) return;
 
   try {
     const size = await getDirectorySize(path);
-    await rm(path, { recursive: true, force: true });
+    
+    if (isDryRun) {
+      console.log(pc.blue(`  [DRY RUN] Would remove directory: ${path} (${formatBytes(size)})`));
+      stats.directoriesRemoved++;
+      stats.spaceFreed += size;
+      return;
+    }
+    
+    // Try multiple removal strategies for robustness
+    try {
+      await rm(path, { recursive: true, force: true, maxRetries: 3 });
+    } catch (firstError) {
+      // On Windows or with permission issues, try alternative approach
+      try {
+        await rm(path, { recursive: true, force: true, maxRetries: 0 });
+      } catch (secondError) {
+        throw new Error(`Both removal attempts failed: ${firstError}; ${secondError}`);
+      }
+    }
+    
     stats.directoriesRemoved++;
     stats.spaceFreed += size;
     console.log(pc.yellow(`  ✗ Removed directory: ${path} (${formatBytes(size)})`));
   } catch (error) {
     console.error(pc.red(`  ⚠ Failed to remove ${path}: ${error}`));
+    
+    // Try to provide helpful error context
+    try {
+      const pathStats = await stat(path);
+      if (pathStats.isDirectory()) {
+        console.error(pc.red(`    Directory still exists, may have permission issues`));
+      }
+    } catch {
+      // Path might have been partially removed
+    }
   }
 }
 
 /**
- * Remove files matching a pattern
+ * Check if a file should be whitelisted (kept)
+ */
+function isWhitelisted(filePath: string): boolean {
+  const fileName = filePath.split("/").pop() || "";
+  return ARTIFACTS_TO_REMOVE.whitelist.some(whitelistItem => {
+    // Exact match
+    if (fileName === whitelistItem) return true;
+    
+    // Pattern match for extensions
+    if (whitelistItem.includes("*")) {
+      const pattern = whitelistItem.replace("*", ".*");
+      return new RegExp(pattern).test(fileName);
+    }
+    
+    return false;
+  });
+}
+
+/**
+ * Remove files matching a pattern with improved whitelist handling
  */
 async function removeFiles(
   templatePath: string,
@@ -119,13 +184,26 @@ async function removeFiles(
     cwd: templatePath,
     dot: true,
     absolute: true,
-    ignore: ARTIFACTS_TO_REMOVE.whitelist,
+    // Don't rely on glob ignore for complex whitelist logic
   });
 
   for (const file of files) {
+    // Check whitelist before removal
+    if (isWhitelisted(file)) {
+      continue;
+    }
+    
     try {
       const fileStats = await stat(file);
-      await rm(file, { force: true });
+      
+      if (isDryRun) {
+        console.log(pc.blue(`  [DRY RUN] Would remove file: ${file} (${formatBytes(fileStats.size)})`));
+        stats.filesRemoved++;
+        stats.spaceFreed += fileStats.size;
+        continue;
+      }
+      
+      await rm(file, { force: true, maxRetries: 2 });
       stats.filesRemoved++;
       stats.spaceFreed += fileStats.size;
       console.log(pc.yellow(`  ✗ Removed file: ${file} (${formatBytes(fileStats.size)})`));
@@ -188,10 +266,16 @@ async function cleanTemplate(templatePath: string): Promise<CleanupStats> {
       if (artifactStats.isDirectory()) {
         await removeDirectory(artifactPath, stats);
       } else {
-        await rm(artifactPath, { force: true });
-        stats.filesRemoved++;
-        stats.spaceFreed += artifactStats.size;
-        console.log(pc.yellow(`  ✗ Removed: ${artifact}`));
+        if (isDryRun) {
+          console.log(pc.blue(`  [DRY RUN] Would remove: ${artifact} (${formatBytes(artifactStats.size)})`));
+          stats.filesRemoved++;
+          stats.spaceFreed += artifactStats.size;
+        } else {
+          await rm(artifactPath, { force: true });
+          stats.filesRemoved++;
+          stats.spaceFreed += artifactStats.size;
+          console.log(pc.yellow(`  ✗ Removed: ${artifact} (${formatBytes(artifactStats.size)})`));
+        }
       }
     }
   }
@@ -222,21 +306,19 @@ async function validateTemplate(templatePath: string): Promise<boolean> {
     }
   }
 
-  // Check for forbidden files
+  // Check for forbidden files with improved whitelist logic
   for (const filePattern of ARTIFACTS_TO_REMOVE.files) {
-    if (ARTIFACTS_TO_REMOVE.whitelist.some((w) => filePattern.includes(w.replace(".", "")))) {
-      continue;
-    }
-
     const found = await glob(`**/${filePattern}`, {
       cwd: templatePath,
       dot: true,
-      ignore: ARTIFACTS_TO_REMOVE.whitelist,
     });
 
-    if (found.length > 0) {
+    // Filter out whitelisted files
+    const forbiddenFiles = found.filter(file => !isWhitelisted(join(templatePath, file)));
+
+    if (forbiddenFiles.length > 0) {
       isClean = false;
-      issues.push(`Found ${found.length} files matching ${filePattern}`);
+      issues.push(`Found ${forbiddenFiles.length} files matching ${filePattern} (excluding whitelisted)`);
     }
   }
 
@@ -255,7 +337,13 @@ async function validateTemplate(templatePath: string): Promise<boolean> {
  */
 async function main() {
   console.log(pc.bold("\n🧹 Atlas Template Cleanup\n"));
-  console.log(pc.gray("This will remove all build artifacts from template directories.\n"));
+  
+  if (isDryRun) {
+    console.log(pc.blue("🔍 DRY RUN MODE: No files will be actually removed\n"));
+    console.log(pc.gray("This will show what build artifacts would be removed from template directories.\n"));
+  } else {
+    console.log(pc.gray("This will remove all build artifacts from template directories.\n"));
+  }
 
   const templatesDir = join(process.cwd(), "templates");
 
@@ -308,12 +396,14 @@ async function main() {
   }
 
   // Summary
-  console.log(pc.bold("\n📊 Cleanup Summary:"));
-  console.log(pc.cyan(`  • Directories removed: ${totalStats.directoriesRemoved}`));
-  console.log(pc.cyan(`  • Files removed: ${totalStats.filesRemoved}`));
-  console.log(pc.cyan(`  • Space freed: ${formatBytes(totalStats.spaceFreed)}`));
+  console.log(pc.bold(`\n📊 ${isDryRun ? "Dry Run " : ""}Cleanup Summary:`));
+  console.log(pc.cyan(`  • Directories ${isDryRun ? "would be " : ""}removed: ${totalStats.directoriesRemoved}`));
+  console.log(pc.cyan(`  • Files ${isDryRun ? "would be " : ""}removed: ${totalStats.filesRemoved}`));
+  console.log(pc.cyan(`  • Space ${isDryRun ? "would be " : ""}freed: ${formatBytes(totalStats.spaceFreed)}`));
 
-  if (allClean) {
+  if (isDryRun) {
+    console.log(pc.bold(pc.blue("\n🔍 Dry run complete. Run without --dry-run to actually remove files.\n")));
+  } else if (allClean) {
     console.log(pc.bold(pc.green("\n✅ All templates are clean and ready for packaging!\n")));
   } else {
     console.log(
