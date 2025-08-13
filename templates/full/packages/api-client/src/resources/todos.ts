@@ -47,7 +47,7 @@ export type CreateTodoInput = z.infer<typeof CreateTodoInputSchema>
  * })
  * ```
  */
-export async function listTodos(baseUrl = ''): Promise<TodosResponse> {
+export function listTodos(baseUrl = ''): Promise<TodosResponse> {
   const url = baseUrl ? `${baseUrl}/api/todos` : '/api/todos'
   return fetchJson(url, {
     method: 'GET',
@@ -75,7 +75,7 @@ export async function listTodos(baseUrl = ''): Promise<TodosResponse> {
  * })
  * ```
  */
-export async function createTodo(
+export function createTodo(
   input: CreateTodoInput,
   baseUrl = ''
 ): Promise<Todo> {
