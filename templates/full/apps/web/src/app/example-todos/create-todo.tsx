@@ -32,7 +32,9 @@ export default function CreateTodo() {
       <input
         type="text"
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          setTitle(e.target.value)
+        }}
         placeholder="What needs to be done?"
         disabled={createTodo.isPending}
         className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
