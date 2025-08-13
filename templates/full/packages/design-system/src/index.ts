@@ -1,6 +1,6 @@
 /**
  * Atlas Design System - Main Export
- * 
+ *
  * Provides semantic tokens and Tailwind preset for the Atlas template
  */
 
@@ -30,12 +30,12 @@ export const tokens = {
   typography: {
     '3xl': { fontSize: '1.802rem', lineHeight: '1.2' },
     '2xl': { fontSize: '1.602rem', lineHeight: '1.2' },
-    'xl': { fontSize: '1.424rem', lineHeight: '1.2' },
-    'lg': { fontSize: '1.266rem', lineHeight: '1.3' },
-    'md': { fontSize: '1.125rem', lineHeight: '1.4' },
-    'base': { fontSize: '1rem', lineHeight: '1.4' },
-    'sm': { fontSize: '0.889rem', lineHeight: '1.5' },
-    'xs': { fontSize: '0.790rem', lineHeight: '1.5' },
+    xl: { fontSize: '1.424rem', lineHeight: '1.2' },
+    lg: { fontSize: '1.266rem', lineHeight: '1.3' },
+    md: { fontSize: '1.125rem', lineHeight: '1.4' },
+    base: { fontSize: '1rem', lineHeight: '1.4' },
+    sm: { fontSize: '0.889rem', lineHeight: '1.5' },
+    xs: { fontSize: '0.790rem', lineHeight: '1.5' },
   },
   fontWeight: {
     normal: 400,
