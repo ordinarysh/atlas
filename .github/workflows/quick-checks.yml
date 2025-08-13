@@ -1,0 +1,60 @@
+name: Quick Checks
+
+on:
+  push:
+    branches:
+      - "**" # All branches
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - ".github/CODEOWNERS"
+      - "LICENSE"
+      - ".gitignore"
+      - "**.drawio"
+      - "**.svg"
+      - "**.png"
+      - "**.jpg"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quick-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-type:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version-file: .nvmrc
+          cache: "pnpm"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      # Root-only operations (exclude templates)
+      - name: Run ESLint
+        run: pnpm -w lint
+
+      - name: Run TypeScript type checking
+        run: pnpm -w typecheck
+
+      - name: Run validation
+        run: pnpm -w validate

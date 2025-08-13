@@ -1,0 +1,97 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
+  merge_group:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@5bbc3ba658137598168acb2ab73b21c432dd411b # v4.3.4
+        with:
+          fail-on-severity: high
+
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Fetch dependencies
+        run: pnpm fetch --prod
+
+      - name: Install dependencies (offline)
+        run: pnpm install --frozen-lockfile --offline
+
+      # Test root only (exclude templates)
+      - name: Run tests
+        run: BUILD_SMOKE=skip pnpm -w test:ci
+
+      - name: Build release artifacts
+        run: pnpm -w build:release
+
+      - name: Verify artifact sizes
+        run: |
+          echo "Checking artifact sizes..."
+          for artifact in release/*.tar.gz; do
+            if [ -f "$artifact" ]; then
+              SIZE=$(stat -f%z "$artifact" 2>/dev/null || stat -c%s "$artifact")
+              SIZE_MB=$((SIZE / 1024 / 1024))
+              ARTIFACT_NAME=$(basename "$artifact")
+              
+              if [ $SIZE -gt $((25 * 1024 * 1024)) ]; then
+                echo "❌ $ARTIFACT_NAME exceeds 25MB: ${SIZE_MB}MB"
+                exit 1
+              else
+                echo "✅ $ARTIFACT_NAME size: ${SIZE_MB}MB"
+              fi
+            fi
+          done
