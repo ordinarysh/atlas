@@ -43,6 +43,7 @@ jobs:
 
       - name: Real tarball installation test
         run: |
+          set -euo pipefail
           echo "Testing actual CLI consumption flow..."
 
           # Create temporary workspace
@@ -72,6 +73,7 @@ jobs:
 
       - name: Verify checksums
         run: |
+          set -euo pipefail
           cd release
           if [ -f SHA256SUMS ]; then
             echo "✅ SHA256SUMS file exists"
@@ -91,6 +93,7 @@ jobs:
 
       - name: Report artifact details
         run: |
+          set -euo pipefail
           echo "## Release Artifact Report" >> $GITHUB_STEP_SUMMARY
           echo "| File | Size | SHA256 (first 8) |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|------------------|" >> $GITHUB_STEP_SUMMARY

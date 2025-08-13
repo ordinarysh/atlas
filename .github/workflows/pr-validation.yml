@@ -59,7 +59,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: "pnpm"
 
       - name: Enable Corepack
@@ -80,10 +80,19 @@ jobs:
 
       - name: Verify artifact sizes
         run: |
+          set -euo pipefail
           echo "Checking artifact sizes..."
           for artifact in release/*.tar.gz; do
             if [ -f "$artifact" ]; then
-              SIZE=$(stat -f%z "$artifact" 2>/dev/null || stat -c%s "$artifact")
+              # Get file size using cross-platform approach with better error handling
+              if command -v gstat >/dev/null 2>&1; then
+                SIZE=$(gstat -c%s "$artifact")
+              elif stat -f%z "$artifact" >/dev/null 2>&1; then
+                SIZE=$(stat -f%z "$artifact")
+              else
+                SIZE=$(stat -c%s "$artifact")
+              fi
+              
               SIZE_MB=$((SIZE / 1024 / 1024))
               ARTIFACT_NAME=$(basename "$artifact")
               
