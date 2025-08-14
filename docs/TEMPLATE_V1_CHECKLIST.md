@@ -16,9 +16,9 @@ Phase 3: [░░░░░░░░░░] 0/6 - Could Improve
 
 ### Error Boundaries & Recovery
 
-- [ ] Create `apps/web/src/app/error.tsx` with retry functionality
-- [ ] Create `apps/web/src/app/not-found.tsx` with proper 404 page
-- [ ] Create `apps/web/src/app/global-error.tsx` for root-level errors
+- [x] Create `apps/web/src/app/error.tsx` with retry functionality
+- [x] Create `apps/web/src/app/not-found.tsx` with proper 404 page
+- [x] Create `apps/web/src/app/global-error.tsx` for root-level errors
 
 ### Testing Infrastructure
 
