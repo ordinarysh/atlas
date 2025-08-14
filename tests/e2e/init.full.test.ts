@@ -50,11 +50,14 @@ describe("Full Template E2E", () => {
           return { type: "file" as const, name };
         } else {
           const children = treeToSnapshot(value as Record<string, unknown>);
-          return {
+          const result: SnapshotItem = {
             type: "directory" as const,
-            name,
-            children: children.length > 0 ? children : undefined
+            name
           };
+          if (children.length > 0) {
+            result.children = children;
+          }
+          return result;
         }
       }).sort((a, b) => {
         if (a.type !== b.type) {
