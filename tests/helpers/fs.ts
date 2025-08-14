@@ -26,7 +26,7 @@ interface DirectoryTree {
 
 export async function getDirectoryTree(
   dirPath: string,
-  ignore: string[] = ["node_modules", ".git", ".DS_Store", ".env.example", ".env", ".env.*", ".next", "dist", "build", ".turbo", "coverage", "pnpm-lock.yaml", ".tsbuildinfo"]
+  ignore: string[] = ["node_modules", ".git", ".DS_Store", ".env.example", ".env", ".env.*", ".next", "dist", "build", ".turbo", "coverage", "pnpm-lock.yaml", ".tsbuildinfo", ".gitkeep"]
 ): Promise<DirectoryTree> {
   const tree: DirectoryTree = {};
   
