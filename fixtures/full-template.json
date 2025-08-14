@@ -1,18 +1,8 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-12T19:08:14.041Z",
+  "generated": "2025-08-14T03:03:46.272Z",
   "structure": [
-    {
-      "type": "directory",
-      "name": ".claude",
-      "children": [
-        {
-          "type": "file",
-          "name": "settings.local.json"
-        }
-      ]
-    },
     {
       "type": "directory",
       "name": ".github",
@@ -262,10 +252,6 @@
             {
               "type": "file",
               "name": "eslint.config.mjs"
-            },
-            {
-              "type": "file",
-              "name": "next-env.d.ts"
             },
             {
               "type": "file",
@@ -843,6 +829,10 @@
     },
     {
       "type": "directory",
+      "name": "test-artifacts"
+    },
+    {
+      "type": "directory",
       "name": "tooling",
       "children": [
         {
@@ -903,10 +893,6 @@
     },
     {
       "type": "file",
-      "name": "next-env.d.ts"
-    },
-    {
-      "type": "file",
       "name": "package.json"
     },
     {
@@ -920,6 +906,10 @@
     {
       "type": "file",
       "name": "theme-validation.json"
+    },
+    {
+      "type": "file",
+      "name": "TOOLING.md"
     },
     {
       "type": "file",

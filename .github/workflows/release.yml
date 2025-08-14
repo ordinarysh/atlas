@@ -2,32 +2,134 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*.*.*"
+    branches:
+      - main
+      - develop
   workflow_dispatch:
     inputs:
-      version:
-        description: "Version to release (e.g., v1.0.0)"
-        required: true
-        type: string
+      dry_run:
+        description: "Run in dry-run mode (no actual release)"
+        type: boolean
+        default: false
 
 # Prevent concurrent releases
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
 jobs:
+  semantic-release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      version: ${{ steps.release.outputs.version }}
+      channel: ${{ steps.release.outputs.channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify commit compliance
+        run: |
+          # Only check the last commit to avoid failing on old commits
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            pnpm exec commitlint --from HEAD~1 --to HEAD --verbose
+          fi
+
+      - name: Run semantic-release
+        id: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: "github-actions[bot]"
+          GIT_AUTHOR_EMAIL: "github-actions[bot]@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "github-actions[bot]"
+          GIT_COMMITTER_EMAIL: "github-actions[bot]@users.noreply.github.com"
+        run: |
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "🔍 Running semantic-release in dry-run mode..."
+            npx semantic-release --dry-run
+          else
+            echo "🚀 Running semantic-release..."
+            npx semantic-release
+          fi
+
+          # Check if a release was created
+          if [[ -f ".VERSION" ]]; then
+            VERSION=$(cat .VERSION)
+            echo "released=true" >> $GITHUB_OUTPUT
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+              echo "channel=beta" >> $GITHUB_OUTPUT
+            else
+              echo "channel=latest" >> $GITHUB_OUTPUT
+            fi
+            echo "✅ Released version: $VERSION"
+          else
+            echo "released=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No release created"
+          fi
+
+      - name: Clean up artifacts
+        if: always()
+        run: |
+          # Remove version file to avoid conflicts
+          rm -f .VERSION
   validate-versions:
     name: Validate Runtime Versions
+    needs: semantic-release
+    if: needs.semantic-release.outputs.released == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       # Node setup using node-version-file per Context 7
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version-file: .nvmrc
 
@@ -60,15 +162,18 @@ jobs:
 
   pre-flight-check:
     name: Pre-flight Checks
-    needs: validate-versions
+    needs: [semantic-release, validate-versions]
+    if: needs.semantic-release.outputs.released == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version-file: .nvmrc
 
@@ -83,7 +188,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
@@ -142,17 +247,20 @@ jobs:
 
   build-artifacts:
     name: Build Release Artifacts
-    needs: pre-flight-check
+    needs: [semantic-release, pre-flight-check]
+    if: needs.semantic-release.outputs.released == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     outputs:
-      version: ${{ steps.version.outputs.version }}
+      version: ${{ needs.semantic-release.outputs.version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version-file: .nvmrc
 
@@ -166,7 +274,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
@@ -177,16 +285,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Extract version
-        id: version
+      - name: Set version from semantic-release
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            VERSION="${GITHUB_REF#refs/tags/}"
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Building for version: $VERSION"
+          VERSION="${{ needs.semantic-release.outputs.version }}"
+          echo "Building artifacts for version: $VERSION"
+          echo "$VERSION" > .VERSION
 
       - name: Build release artifacts
         run: |
@@ -196,12 +299,17 @@ jobs:
           echo "Artifacts built:"
           ls -lah release/
 
-      - name: Generate SHA256 checksums
+      - name: Verify SHA256 checksums were generated
         run: |
           cd release
-          sha256sum *.tar.gz *.tgz 2>/dev/null > SHA256SUMS || sha256sum *.tar.gz 2>/dev/null > SHA256SUMS || true
-          echo "Checksums generated:"
-          cat SHA256SUMS
+          if [ -f SHA256SUMS ]; then
+            echo "✅ SHA256SUMS file exists"
+            echo "Checksums:"
+            cat SHA256SUMS
+          else
+            echo "❌ SHA256SUMS file not found"
+            exit 1
+          fi
 
       - name: Verify artifact sizes
         run: |
@@ -210,7 +318,11 @@ jobs:
 
           for artifact in release/*.tar.gz release/*.tgz; do
             if [ -f "$artifact" ]; then
-              SIZE=$(stat -f%z "$artifact" 2>/dev/null || stat -c%s "$artifact")
+              SIZE=$(stat -c%s "$artifact" 2>/dev/null || stat -f%z "$artifact" 2>/dev/null || echo 0)
+              if [ "$SIZE" = "0" ]; then
+                echo "Warning: Could not determine file size for $artifact"
+                continue
+              fi
               SIZE_MB=$((SIZE / 1024 / 1024))
               ARTIFACT_NAME=$(basename "$artifact")
               
@@ -224,7 +336,7 @@ jobs:
           done
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.3.1
         with:
           name: release-artifacts
           path: release/
@@ -232,16 +344,19 @@ jobs:
 
   determinism-probe:
     name: Determinism Probe (Optional)
-    needs: build-artifacts
+    needs: [semantic-release, build-artifacts]
+    if: needs.semantic-release.outputs.released == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     continue-on-error: true
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version-file: .nvmrc
 
@@ -255,7 +370,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/package.json') }}
@@ -267,7 +382,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download first build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: release-artifacts
           path: release-first/
@@ -280,47 +395,42 @@ jobs:
       - name: Compare SHA256 checksums
         run: |
           echo "Comparing checksums for determinism..."
-          cd release
-          sha256sum *.tar.gz *.tgz 2>/dev/null > SHA256SUMS-rebuild || sha256sum *.tar.gz 2>/dev/null > SHA256SUMS-rebuild || true
 
-          cd ../release-first
-          sha256sum *.tar.gz *.tgz 2>/dev/null > SHA256SUMS-first || sha256sum *.tar.gz 2>/dev/null > SHA256SUMS-first || true
-
-          if diff SHA256SUMS-first ../release/SHA256SUMS-rebuild; then
+          if diff release-first/SHA256SUMS release/SHA256SUMS; then
             echo "✅ Build is deterministic - SHA256 checksums match!"
           else
             echo "⚠️ Build is non-deterministic - SHA256 checksums differ"
             echo "First build:"
-            cat SHA256SUMS-first
+            cat release-first/SHA256SUMS
             echo "Rebuild:"
-            cat ../release/SHA256SUMS-rebuild
+            cat release/SHA256SUMS
           fi
 
   create-release:
     name: Create GitHub Release
-    needs: [build-artifacts, determinism-probe]
-    if: always() && needs.build-artifacts.result == 'success'
+    needs: [semantic-release, build-artifacts, determinism-probe]
+    if: always() && needs.semantic-release.outputs.released == 'true' && needs.build-artifacts.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: release-artifacts
           path: release/
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
         with:
-          tag_name: ${{ needs.build-artifacts.outputs.version }}
-          name: Atlas Templates ${{ needs.build-artifacts.outputs.version }}
+          tag_name: ${{ needs.semantic-release.outputs.version }}
+          name: Atlas Templates ${{ needs.semantic-release.outputs.version }}
           draft: false
-          prerelease: ${{ contains(needs.build-artifacts.outputs.version, '-') }}
+          prerelease: ${{ contains(needs.semantic-release.outputs.version, '-') || needs.semantic-release.outputs.channel == 'beta' }}
           generate_release_notes: true
           files: |
             release/*.tar.gz
@@ -328,7 +438,7 @@ jobs:
             release/index.json
             release/SHA256SUMS
           body: |
-            ## Atlas Templates ${{ needs.build-artifacts.outputs.version }}
+            ## Atlas Templates ${{ needs.semantic-release.outputs.version }}
 
             ### Release Artifacts
             - Core templates package
@@ -339,7 +449,7 @@ jobs:
             ### Installation
             ```bash
             # Download and verify checksums
-            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ needs.build-artifacts.outputs.version }}/SHA256SUMS
+            curl -LO https://github.com/${{ github.repository }}/releases/download/${{ needs.semantic-release.outputs.version }}/SHA256SUMS
             sha256sum -c SHA256SUMS
             ```
 
@@ -355,6 +465,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: always()
+    permissions:
+      contents: read
     steps:
       - name: Calculate workflow duration
         run: |

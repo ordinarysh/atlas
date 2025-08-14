@@ -129,23 +129,40 @@ interface ArtifactInfo {
 }
 
 async function getVersion(): Promise<string> {
-  // Try to get version from git tag or describe
+  // First priority: Check for .VERSION file (created by semantic-release)
+  try {
+    const versionFile = await readFile(".VERSION", "utf-8");
+    const version = versionFile.trim();
+    if (version) {
+      console.log(pc.cyan(`Using version from .VERSION file: ${version}`));
+      return version;
+    }
+  } catch {
+    // .VERSION file doesn't exist, continue to other methods
+  }
+
+  // Second priority: Try to get version from git tag
   try {
     const gitTag = execSync("git describe --tags --abbrev=0 2>/dev/null", {
       encoding: "utf-8",
     }).trim();
-    if (gitTag.startsWith("v")) {
-      return gitTag.substring(1);
-    }
-    return gitTag;
+    const version = gitTag.startsWith("v") ? gitTag.substring(1) : gitTag;
+    console.log(pc.cyan(`Using version from git tag: ${version}`));
+    return version;
   } catch {
-    // Fallback to package.json version or default
-    try {
-      const pkg = JSON.parse(await readFile("package.json", "utf-8"));
-      return pkg.version || "0.0.0";
-    } catch {
-      return "0.0.0";
-    }
+    // No git tags found, continue to package.json
+  }
+
+  // Third priority: Fallback to package.json version
+  try {
+    const pkg = JSON.parse(await readFile("package.json", "utf-8"));
+    const version = pkg.version || "0.0.0";
+    console.log(pc.yellow(`Using version from package.json: ${version}`));
+    return version;
+  } catch {
+    // Last resort: default version
+    console.log(pc.red(`No version found, using default: 0.0.0`));
+    return "0.0.0";
   }
 }
 
@@ -594,7 +611,7 @@ async function main() {
       node: process.version,
       platform: process.platform,
       arch: process.arch,
-      timestamp: FIXED_TIMESTAMP.toISOString(),
+      timestamp: new Date().toISOString(),
     },
     templates: {},
     addons: {},

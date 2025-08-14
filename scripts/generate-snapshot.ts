@@ -22,6 +22,9 @@ const EXCLUDE_PATTERNS = [
   "package-lock.json",
   "yarn.lock",
   ".tsbuildinfo",
+  ".claude",
+  ".gitkeep",
+  "next-env.d.ts",
 ];
 
 interface FileNode {
@@ -66,11 +69,14 @@ async function generateSnapshot(dirPath: string, basePath: string = ""): Promise
 
     if (entry.isDirectory()) {
       const children = await generateSnapshot(fullPath, relativePath);
-      nodes.push({
+      const result: FileNode = {
         type: "directory",
         name: entry.name,
-        children: children.length > 0 ? children : undefined,
-      });
+      };
+      if (children.length > 0) {
+        result.children = children;
+      }
+      nodes.push(result);
     } else {
       nodes.push({
         type: "file",
