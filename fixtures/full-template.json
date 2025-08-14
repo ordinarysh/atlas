@@ -1,18 +1,8 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-13T18:45:21.715Z",
+  "generated": "2025-08-14T03:03:46.272Z",
   "structure": [
-    {
-      "type": "directory",
-      "name": ".claude",
-      "children": [
-        {
-          "type": "file",
-          "name": "settings.local.json"
-        }
-      ]
-    },
     {
       "type": "directory",
       "name": ".github",
@@ -262,10 +252,6 @@
             {
               "type": "file",
               "name": "eslint.config.mjs"
-            },
-            {
-              "type": "file",
-              "name": "next-env.d.ts"
             },
             {
               "type": "file",
@@ -904,10 +890,6 @@
     {
       "type": "file",
       "name": "eslint.config.mjs"
-    },
-    {
-      "type": "file",
-      "name": "next-env.d.ts"
     },
     {
       "type": "file",
