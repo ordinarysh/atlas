@@ -1,5 +1,15 @@
+import { RATE_LIMIT_DEFAULTS, RATE_LIMIT_WINDOWS, RATE_LIMIT_ENV_VARS } from "./constants.js";
+
+// Re-export constants
+export {
+  RATE_LIMIT_DEFAULTS,
+  RATE_LIMIT_PRESETS,
+  RATE_LIMIT_WINDOWS,
+  RATE_LIMIT_ENV_VARS,
+} from "./constants.js";
+
 /**
- * Rate limiting configuration with environment variable support
+ * Rate limiting configuration
  */
 export interface RateLimitConfig {
   /** Maximum requests allowed per window */
@@ -15,42 +25,16 @@ export interface RateLimitConfig {
 }
 
 /**
- * Default rate limiting configuration
+ * Parse environment variable as integer with fallback and validation
  */
-const DEFAULT_CONFIG: RateLimitConfig = {
-  max: 60,
-  windowMs: 60_000, // 1 minute
-  prefix: "api",
-  provider: "memory",
-  trustProxy: false,
-};
-
-// Module-scoped flag for one-time Redis warning
-let redisWarningShown = false;
-
-/**
- * Reset the Redis warning flag (for testing only)
- * @internal
- */
-export function __resetRedisWarningForTesting(): void {
-  if (process.env.NODE_ENV === "test") {
-    redisWarningShown = false;
-  }
-}
-
-/**
- * Parse and validate environment variable as integer
- */
-function parseIntEnv(
-  value: string | undefined,
-  fallback: number,
-): { value: number; isValid: boolean } {
-  if (!value) return { value: fallback, isValid: true };
+function parseIntEnv(value: string | undefined, fallback: number, envVarName: string): number {
+  if (!value) return fallback;
   const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed)) {
-    return { value: fallback, isValid: false };
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    console.warn(`Invalid ${envVarName}: "${value}". Using default: ${String(fallback)}`);
+    return fallback;
   }
-  return { value: parsed, isValid: true };
+  return parsed;
 }
 
 /**
@@ -60,82 +44,55 @@ function parseIntEnv(
  * - RATE_LIMIT_MAX: number (default: 60)
  * - RATE_LIMIT_WINDOW_MS: number (default: 60000)
  * - RATE_LIMIT_PREFIX: string (default: "api")
- * - RATE_LIMIT_PROVIDER: "memory" | "redis" (default: "memory")
+ * - RATE_LIMIT_STORE: "memory" | "redis" (default: "memory")
  * - TRUST_PROXY: boolean (default: false)
  *
  * @returns Rate limit configuration object
  */
 export function getRateLimitConfig(): RateLimitConfig {
-  const providerEnv = process.env.RATE_LIMIT_PROVIDER as "memory" | "redis" | undefined;
-  const trustProxy = process.env.TRUST_PROXY === "true";
+  const provider = process.env[RATE_LIMIT_ENV_VARS.STORE] === "redis" ? "redis" : "memory";
+  const trustProxy = process.env[RATE_LIMIT_ENV_VARS.TRUST_PROXY] === "true";
 
-  // Parse and validate numeric values
-  const maxResult = parseIntEnv(process.env.RATE_LIMIT_MAX, DEFAULT_CONFIG.max);
-  const windowMsResult = parseIntEnv(process.env.RATE_LIMIT_WINDOW_MS, DEFAULT_CONFIG.windowMs);
-
-  let max = maxResult.value;
-  let windowMs = windowMsResult.value;
-
-  // Validation warnings
-  if (!maxResult.isValid || max <= 0) {
-    console.warn(
-      `Invalid RATE_LIMIT_MAX: ${process.env.RATE_LIMIT_MAX ?? "undefined"}. Using default: ${DEFAULT_CONFIG.max.toString()}`,
-    );
-    max = DEFAULT_CONFIG.max;
-  }
-
-  if (!windowMsResult.isValid || windowMs <= 0) {
-    console.warn(
-      `Invalid RATE_LIMIT_WINDOW_MS: ${process.env.RATE_LIMIT_WINDOW_MS ?? "undefined"}. Using default: ${DEFAULT_CONFIG.windowMs.toString()}`,
-    );
-    windowMs = DEFAULT_CONFIG.windowMs;
-  }
-
-  const config: RateLimitConfig = {
-    max,
-    windowMs,
-    prefix: process.env.RATE_LIMIT_PREFIX ?? DEFAULT_CONFIG.prefix,
-    provider: providerEnv === "redis" ? "redis" : DEFAULT_CONFIG.provider,
+  return {
+    max: parseIntEnv(
+      process.env[RATE_LIMIT_ENV_VARS.MAX],
+      RATE_LIMIT_DEFAULTS.MAX_REQUESTS,
+      RATE_LIMIT_ENV_VARS.MAX,
+    ),
+    windowMs: parseIntEnv(
+      process.env[RATE_LIMIT_ENV_VARS.WINDOW_MS],
+      RATE_LIMIT_DEFAULTS.WINDOW_MS,
+      RATE_LIMIT_ENV_VARS.WINDOW_MS,
+    ),
+    prefix: process.env[RATE_LIMIT_ENV_VARS.PREFIX] ?? RATE_LIMIT_DEFAULTS.PREFIX,
+    provider,
     trustProxy,
   };
-
-  // One-time Redis warning
-  if (config.provider === "redis" && !redisWarningShown) {
-    redisWarningShown = true;
-    console.warn(
-      "Redis rate limiting provider is an opt-in add-on not included in this template. " +
-        "Falling back to memory provider. To use Redis, install the add-on package.",
-    );
-    config.provider = "memory";
-  }
-
-  return config;
 }
 
 /**
  * Create environment-specific rate limit configurations
  */
-export const createRateLimitPresets = (): {
+export function createRateLimitPresets(): {
   standard: RateLimitConfig;
   strict: RateLimitConfig;
   auth: RateLimitConfig;
   upload: RateLimitConfig;
   admin: RateLimitConfig;
-} => {
+} {
   const baseConfig = getRateLimitConfig();
 
   return {
     /** Standard API rate limiting */
     standard: {
       ...baseConfig,
-      max: baseConfig.max,
       prefix: `${baseConfig.prefix}-std`,
     },
 
     /** Strict rate limiting for sensitive operations */
     strict: {
       ...baseConfig,
-      max: Math.floor(baseConfig.max / 3), // 1/3 of standard limit
+      max: Math.floor(baseConfig.max / 3),
       prefix: `${baseConfig.prefix}-strict`,
     },
 
@@ -143,7 +100,7 @@ export const createRateLimitPresets = (): {
     auth: {
       ...baseConfig,
       max: 5,
-      windowMs: 15 * 60 * 1000, // 15 minutes
+      windowMs: RATE_LIMIT_WINDOWS.FIFTEEN_MINUTES,
       prefix: `${baseConfig.prefix}-auth`,
     },
 
@@ -151,15 +108,15 @@ export const createRateLimitPresets = (): {
     upload: {
       ...baseConfig,
       max: 10,
-      windowMs: 60 * 1000, // 1 minute
+      windowMs: RATE_LIMIT_WINDOWS.ONE_MINUTE,
       prefix: `${baseConfig.prefix}-upload`,
     },
 
     /** Admin operations */
     admin: {
       ...baseConfig,
-      max: Math.floor(baseConfig.max / 2), // Half of standard limit
+      max: Math.floor(baseConfig.max / 2),
       prefix: `${baseConfig.prefix}-admin`,
     },
   };
-};
+}

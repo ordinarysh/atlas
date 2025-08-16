@@ -72,8 +72,6 @@ export const COMMON_SCOPES = {
   // Resource-specific (examples)
   READ_PROJECTS: "read:projects",
   WRITE_PROJECTS: "write:projects",
-  READ_TODOS: "read:todos",
-  WRITE_TODOS: "write:todos",
 
   // System operations
   HEALTH: "system:health",

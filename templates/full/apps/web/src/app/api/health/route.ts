@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server'
 import { z, type ZodTypeAny } from 'zod'
 import { apiResponse, withErrorHandling } from '@/lib/api-utils'
 import { config } from '@/lib/config'
+import { createCorsPreflightResponse } from '@/lib/cors'
 import { checkMemoryHealth, nodeRuntime } from '@/lib/node-runtime'
 import { registerRouteDoc } from '@/lib/openapi'
 import { requireRateLimit } from '@/server/rate-limit'
@@ -205,14 +206,10 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
  * OPTIONS /api/health
  * Handle preflight requests
  */
-export function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Max-Age': '86400',
-    },
+export function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  return createCorsPreflightResponse(origin, {
+    allowedMethods: ['GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
   })
 }

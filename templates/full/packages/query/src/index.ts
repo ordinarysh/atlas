@@ -11,8 +11,8 @@ export { createKeys, createQueryKeys, invalidate, commonPatterns } from "./keys"
 // Custom hooks
 export { useOptimisticMutation, useInvalidatingMutation, usePaginatedQuery } from "./hooks";
 
-// Todos hooks
-export { useTodos, useCreateTodo, useUpdateTodo, useDeleteTodo } from "./todos";
+// Example hooks (optional)
+export * from "./examples";
 
 // Re-export fetch utilities from api-client for backward compatibility
 export { fetchJson, createFetch, ApiError } from "@atlas/api-client";

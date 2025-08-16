@@ -6,8 +6,8 @@ import {
 import {
   createMemoryStore,
   createRateLimiter,
-  type RateLimiter,
-} from '@atlas/rate-limit'
+  type RateLimiterAdapter,
+} from '@atlas/services-rate-limit'
 import { API_ERROR_CODES } from '@/lib/api-utils'
 import { logger } from '@/lib/logger'
 
@@ -261,7 +261,9 @@ export async function requireRateLimit(
 /**
  * Get rate limiter for specific use case
  */
-export function getRateLimiter(type: keyof typeof limiters): RateLimiter {
+export function getRateLimiter(
+  type: keyof typeof limiters
+): RateLimiterAdapter {
   return limiters[type]
 }
 

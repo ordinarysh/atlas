@@ -11,7 +11,7 @@ export {
 export { fetchJson, createFetch, ApiError } from './fetch'
 
 // Note: Resource functions are not exported directly to maintain clean API surface
-// Import them directly from './todos' if needed
+// Domain-specific functions should be added as needed
 
 // Common types
 export interface PaginatedResponse<T> {

@@ -10,7 +10,7 @@
       "@atlas/query": ["../../packages/query/src"],
       "@atlas/api-client": ["../../packages/api-client/src"],
       "@atlas/design-system": ["../../packages/design-system/src"],
-      "@atlas/todos-domain": ["../../domains/todos"]
+      "@atlas/services-rate-limit": ["../../services/rate-limit/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/types/**/*.d.ts"],

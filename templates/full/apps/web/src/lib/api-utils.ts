@@ -513,63 +513,6 @@ export function parseSortParams(
 }
 
 /**
- * Permission checking utilities
- *
- * @deprecated Use requireApiKey(scope) directly in route handlers for better performance
- * This function is kept for backward compatibility but will be removed in future versions
- */
-export async function requirePermission(
-  request: NextRequest,
-  permission: string
-): Promise<void> {
-  // Import dynamically to avoid circular dependencies
-  const { requireApiKey } = await import('@/server/auth')
-  const { NextResponse } = await import('next/server')
-
-  const authResult = await requireApiKey(permission)
-
-  if (authResult instanceof NextResponse) {
-    // Convert NextResponse to ApiError for consistency
-    const status = authResult.status
-    if (status === 401) {
-      throw ApiError.unauthorized('Authentication required')
-    } else if (status === 403) {
-      throw ApiError.forbidden(`Missing required permission: ${permission}`)
-    } else {
-      throw ApiError.internal('Authentication service error')
-    }
-  }
-}
-
-/**
- * @deprecated Use requireApiKey() with specific scopes directly in route handlers
- * This function is kept for backward compatibility but will be removed in future versions
- */
-export async function requireAnyPermission(
-  request: NextRequest,
-  permissions: string[]
-): Promise<void> {
-  // For backward compatibility, try the first permission
-  // In practice, routes should use requireApiKey() directly
-  await requirePermission(request, permissions[0])
-}
-
-/**
- * @deprecated Use requireApiKey() with specific scopes directly in route handlers
- * This function is kept for backward compatibility but will be removed in future versions
- */
-export async function requireAllPermissions(
-  request: NextRequest,
-  permissions: string[]
-): Promise<void> {
-  // For backward compatibility, check all permissions sequentially
-  // In practice, routes should use requireApiKey() directly
-  for (const permission of permissions) {
-    await requirePermission(request, permission)
-  }
-}
-
-/**
  * Input sanitization utilities
  */
 export function sanitizeString(input: string): string {

@@ -28,7 +28,7 @@ describe("MemoryApiKeyStore", () => {
     it("should create API key with custom options", async () => {
       const options = {
         id: "custom-key-001",
-        scopes: ["read:projects", "write:todos"],
+        scopes: ["read:projects", "write:projects"],
         expiresAt: new Date("2025-01-01"),
         metadata: testUtils.createTestMetadata({ team: "backend" }),
       };
@@ -36,7 +36,7 @@ describe("MemoryApiKeyStore", () => {
       const result = await store.create(options);
 
       expect(result.record.id).toBe("custom-key-001");
-      expect(result.record.scopes).toEqual(["read:projects", "write:todos"]);
+      expect(result.record.scopes).toEqual(["read:projects", "write:projects"]);
       expect(result.record.expiresAt).toEqual(new Date("2025-01-01"));
       expect(result.record.metadata).toEqual(expect.objectContaining({ team: "backend" }));
     });
@@ -445,7 +445,7 @@ describe("Store integration tests", () => {
     // Create key with all optional fields
     const fullOptions = {
       id: "full-test-key",
-      scopes: ["read:projects", "write:todos", "admin"],
+      scopes: ["read:projects", "write:projects", "admin"],
       expiresAt: new Date("2025-12-31"),
       metadata: {
         name: "Full Test Key",
@@ -468,7 +468,7 @@ describe("Store integration tests", () => {
     expect(found).not.toBeNull();
     if (found) {
       expect(found.id).toBe("full-test-key");
-      expect(found.scopes).toEqual(["read:projects", "write:todos", "admin"]);
+      expect(found.scopes).toEqual(["read:projects", "write:projects", "admin"]);
       expect(found.expiresAt).toEqual(new Date("2025-12-31"));
       expect(found.active).toBe(true);
       expect(found.metadata).toBeDefined();

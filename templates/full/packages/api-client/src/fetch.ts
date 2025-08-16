@@ -129,18 +129,18 @@ async function processResponse<T>(
  * @example
  * ```ts
  * // Simple GET
- * const data = await fetchJson('/api/todos')
+ * const data = await fetchJson('/api/items')
  *
  * // With Zod validation
- * const todos = await fetchJson('/api/todos', {
- *   schema: z.array(TodoSchema)
+ * const items = await fetchJson('/api/items', {
+ *   schema: z.array(ItemSchema)
  * })
  *
  * // POST with body
- * const newTodo = await fetchJson('/api/todos', {
+ * const newItem = await fetchJson('/api/items', {
  *   method: 'POST',
- *   body: { title: 'New todo' },
- *   schema: TodoSchema
+ *   body: { title: 'New item' },
+ *   schema: ItemSchema
  * })
  * ```
  */
@@ -243,7 +243,7 @@ export async function fetchJson<T = unknown>(
  *   headers: { 'X-API-Key': 'secret' }
  * })
  *
- * const todos = await api('/api/todos')
+ * const items = await api('/api/items')
  * ```
  */
 export function createFetch(defaultOptions: Partial<FetchOptions> = {}) {

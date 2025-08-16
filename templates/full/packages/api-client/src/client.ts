@@ -99,12 +99,12 @@ function buildUrl(base: string, path: string): string {
  * })
  *
  * // GET request with query params
- * const todos = await api.get<Todo[]>('/todos', {
+ * const items = await api.get<Item[]>('/items', {
  *   params: { status: 'active', limit: 10 }
  * })
  *
  * // POST with body
- * const newTodo = await api.post<Todo>('/todos', {
+ * const newItem = await api.post<Item>('/items', {
  *   title: 'New task',
  *   completed: false
  * })

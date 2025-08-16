@@ -13,7 +13,7 @@
  *
  * Usage:
  *   pnpm mint:key
- *   pnpm mint:key --id dev-frontend --scopes read:projects,write:todos
+ *   pnpm mint:key --id dev-frontend --scopes read:projects,write:projects
  *   pnpm mint:key --admin
  */
 
@@ -93,13 +93,12 @@ Options:
 Examples:
   pnpm mint:key
   pnpm mint:key --id dev-frontend --name "Frontend Development"
-  pnpm mint:key --scopes read:projects,write:todos
+  pnpm mint:key --scopes read:projects,write:projects
   pnpm mint:key --admin --expires 2024-12-31T23:59:59Z
   
 Available Scopes:
   Basic:     read, write, delete
   Projects:  read:projects, write:projects  
-  Todos:     read:todos, write:todos
   System:    system:health, system:metrics
   Admin:     admin (bypasses all scope checks)
 

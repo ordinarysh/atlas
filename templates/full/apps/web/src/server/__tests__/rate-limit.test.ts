@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server'
-import * as RateLimitModule from '@atlas/rate-limit'
+import * as RateLimitModule from '@atlas/services-rate-limit'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // Import after mocking
 import { getClientKey, requireRateLimit } from '../rate-limit'
 
 // Mock the rate limiter module with factory functions
-vi.mock('@atlas/rate-limit', () => {
+vi.mock('@atlas/services-rate-limit', () => {
   const mockCheck = vi.fn()
   const mockSetErrorHandler = vi.fn()
 

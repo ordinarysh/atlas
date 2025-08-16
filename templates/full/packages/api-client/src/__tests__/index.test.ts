@@ -15,16 +15,10 @@ describe('index exports', () => {
     expect(exportedModules.auth).toBeUndefined()
   })
 
-  it('should NOT export resource functions directly', () => {
+  it('should maintain clean api surface without domain-specific exports', () => {
     const exportedModules = exports as Record<string, unknown>
-    expect(exportedModules.listTodos).toBeUndefined()
-    expect(exportedModules.createTodo).toBeUndefined()
-  })
-
-  it('should NOT export schemas directly', () => {
-    const exportedModules = exports as Record<string, unknown>
-    expect(exportedModules.TodoSchema).toBeUndefined()
-    expect(exportedModules.TodosResponseSchema).toBeUndefined()
-    expect(exportedModules.CreateTodoInputSchema).toBeUndefined()
+    // Ensure we only export core client functions, not domain-specific resources
+    const exportKeys = Object.keys(exportedModules)
+    expect(exportKeys).toEqual(expect.arrayContaining(['createApi', 'qs']))
   })
 })

@@ -76,14 +76,7 @@ export const testData = {
     "atlas_invalid/chars+", // Invalid chars for base64url
     "_" + "a".repeat(43), // Invalid: no prefix before underscore
   ],
-  testScopes: [
-    "read:projects",
-    "write:projects",
-    "read:todos",
-    "write:todos",
-    "admin",
-    "system:health",
-  ],
+  testScopes: ["read:projects", "write:projects", "admin", "system:health"],
   testPayload: JSON.stringify({
     test: "data",
     timestamp: "2024-01-01T00:00:00Z",

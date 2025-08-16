@@ -15,7 +15,7 @@ export interface ApiKeyRecord {
   /** Argon2 hash of the raw API key (never store raw keys) */
   hash: string;
 
-  /** Array of scope strings (e.g., ['read:projects', 'write:todos']) */
+  /** Array of scope strings (e.g., ['read:projects', 'write:projects']) */
   scopes: string[];
 
   /** Whether the key is active and can be used for authentication */

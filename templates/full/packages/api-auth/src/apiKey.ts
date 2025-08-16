@@ -127,7 +127,7 @@ export function headerToKey(
  * ```typescript
  * const result = await createApiKey(store, {
  *   id: 'dev-001',
- *   scopes: ['read:projects', 'write:todos'],
+ *   scopes: ['read:projects', 'write:projects'],
  *   metadata: { name: 'Development Key' }
  * })
  *

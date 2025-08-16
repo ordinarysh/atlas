@@ -24,16 +24,16 @@ export function HydrateClient({
  *
  * @example
  * ```tsx
- * // In app/todos/page.tsx
- * export default async function TodosPage() {
+ * // In app/items/page.tsx
+ * export default async function ItemsPage() {
  *   const { dehydratedState } = await prefetchQuery({
- *     queryKey: ['todos'],
- *     queryFn: fetchTodos,
+ *     queryKey: ['items'],
+ *     queryFn: fetchItems,
  *   })
  *
  *   return (
  *     <HydrateClient state={dehydratedState}>
- *       <TodosList />
+ *       <ItemsList />
  *     </HydrateClient>
  *   )
  * }
@@ -61,7 +61,7 @@ export async function prefetchQuery<T = unknown>(options: {
  * @example
  * ```tsx
  * const { dehydratedState } = await prefetchQueries([
- *   { queryKey: ['todos'], queryFn: fetchTodos },
+ *   { queryKey: ['items'], queryFn: fetchItems },
  *   { queryKey: ['user'], queryFn: fetchUser },
  * ])
  * ```
