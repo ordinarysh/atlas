@@ -1,7 +1,8 @@
-import { mkdir, rm, readFile, writeFile, readdir } from "fs/promises";
+import { mkdir, rm, readFile, writeFile } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
 import { randomBytes } from "crypto";
+import { execSync } from "child_process";
 
 export async function createTempDir(): Promise<string> {
   const tempPath = join(tmpdir(), `atlas-test-${randomBytes(8).toString("hex")}`);
@@ -22,6 +23,22 @@ export async function extractTarball(tarballPath: string, destPath: string): Pro
 // Directory tree structure types
 interface DirectoryTree {
   [key: string]: DirectoryTree | "file";
+}
+
+function shouldIgnore(filePath: string, ignore: string[]): boolean {
+  const fileName = filePath.split("/").pop() || "";
+  
+  for (const pattern of ignore) {
+    if (pattern.includes("*")) {
+      const regex = new RegExp("^" + pattern.replace(/\*/g, ".*") + "$");
+      if (regex.test(fileName)) {
+        return true;
+      }
+    } else if (fileName === pattern) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export async function getDirectoryTree(
@@ -45,42 +62,44 @@ export async function getDirectoryTree(
     "next-env.d.ts",
   ],
 ): Promise<DirectoryTree> {
+  // Use git to get tracked files instead of filesystem
+  const gitOutput = execSync(
+    `git ls-tree -r HEAD --name-only`,
+    { encoding: "utf-8", cwd: process.cwd() }
+  );
+  
+  const templateRelativePath = "templates/full/";
+  const allFiles = gitOutput
+    .split("\n")
+    .filter(file => file.startsWith(templateRelativePath))
+    .map(file => file.substring(templateRelativePath.length))
+    .filter(file => file.length > 0)
+    .filter(file => !shouldIgnore(file, ignore));
+
+  // Build tree structure from file paths
   const tree: DirectoryTree = {};
-
-  async function scan(currentPath: string, currentTree: DirectoryTree) {
-    const entries = await readdir(currentPath, { withFileTypes: true });
-
-    for (const entry of entries) {
-      // Check if should ignore
-      let shouldIgnore = false;
-      for (const pattern of ignore) {
-        if (pattern.includes("*")) {
-          const regex = new RegExp("^" + pattern.replace(/\*/g, ".*") + "$");
-          if (regex.test(entry.name)) {
-            shouldIgnore = true;
-            break;
-          }
-        } else if (entry.name === pattern) {
-          shouldIgnore = true;
-          break;
-        }
-      }
-
-      if (shouldIgnore) continue;
-
-      const fullPath = join(currentPath, entry.name);
-
-      if (entry.isDirectory()) {
-        const subTree: DirectoryTree = {};
-        currentTree[entry.name] = subTree;
-        await scan(fullPath, subTree);
+  
+  for (const filePath of allFiles) {
+    const parts = filePath.split("/");
+    let current = tree;
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLastPart = i === parts.length - 1;
+      
+      if (isLastPart) {
+        // It's a file
+        current[part] = "file";
       } else {
-        currentTree[entry.name] = "file";
+        // It's a directory
+        if (!current[part]) {
+          current[part] = {};
+        }
+        current = current[part] as DirectoryTree;
       }
     }
   }
-
-  await scan(dirPath, tree);
+  
   return tree;
 }
 

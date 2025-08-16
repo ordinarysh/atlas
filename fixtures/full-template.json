@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-16T01:59:24.162Z",
+  "generated": "2025-08-16T02:26:26.279Z",
   "structure": [
     {
       "type": "directory",
@@ -32,10 +32,6 @@
           "name": "pre-commit"
         }
       ]
-    },
-    {
-      "type": "directory",
-      "name": ".vscode"
     },
     {
       "type": "directory",
@@ -436,10 +432,6 @@
                   ]
                 },
                 {
-                  "type": "directory",
-                  "name": "utils"
-                },
-                {
                   "type": "file",
                   "name": "env.client.ts"
                 },
@@ -511,18 +503,6 @@
       "children": [
         {
           "type": "directory",
-          "name": "api"
-        },
-        {
-          "type": "directory",
-          "name": "auth"
-        },
-        {
-          "type": "directory",
-          "name": "data"
-        },
-        {
-          "type": "directory",
           "name": "development",
           "children": [
             {
@@ -538,10 +518,6 @@
               "name": "WORKFLOW.md"
             }
           ]
-        },
-        {
-          "type": "directory",
-          "name": "devops"
         },
         {
           "type": "directory",
@@ -584,10 +560,6 @@
               "name": "MONOREPO_LAYOUTS.md"
             }
           ]
-        },
-        {
-          "type": "directory",
-          "name": "testing"
         },
         {
           "type": "file",
@@ -678,24 +650,6 @@
         {
           "type": "file",
           "name": "README.md"
-        }
-      ]
-    },
-    {
-      "type": "directory",
-      "name": "infra",
-      "children": [
-        {
-          "type": "directory",
-          "name": "environments"
-        },
-        {
-          "type": "directory",
-          "name": "secrets"
-        },
-        {
-          "type": "directory",
-          "name": "terraform"
         }
       ]
     },
@@ -1345,20 +1299,8 @@
     },
     {
       "type": "directory",
-      "name": "test-artifacts"
-    },
-    {
-      "type": "directory",
       "name": "tooling",
       "children": [
-        {
-          "type": "directory",
-          "name": "ci"
-        },
-        {
-          "type": "directory",
-          "name": "generators"
-        },
         {
           "type": "directory",
           "name": "scripts",

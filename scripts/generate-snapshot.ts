@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
-import { readdir } from "fs/promises";
 import { join } from "path";
 import { writeFile } from "fs/promises";
+import { execSync } from "child_process";
 import pc from "picocolors";
 
 // Files and directories to exclude from snapshots
@@ -57,41 +57,78 @@ function shouldExclude(path: string): boolean {
   return false;
 }
 
-async function generateSnapshot(dirPath: string, basePath: string = ""): Promise<FileNode[]> {
-  const entries = await readdir(dirPath, { withFileTypes: true });
-  const nodes: FileNode[] = [];
+async function generateSnapshotFromGit(_templatePath: string): Promise<FileNode[]> {
+  // Get all tracked files in the template from git
+  const gitOutput = execSync(
+    `git ls-tree -r HEAD --name-only`,
+    { encoding: "utf-8", cwd: process.cwd() }
+  );
+  
+  const templateRelativePath = "templates/full/";
+  const allFiles = gitOutput
+    .split("\n")
+    .filter(file => file.startsWith(templateRelativePath))
+    .map(file => file.substring(templateRelativePath.length))
+    .filter(file => file.length > 0)
+    .filter(file => !shouldExclude(file));
 
-  for (const entry of entries) {
-    const fullPath = join(dirPath, entry.name);
-    const relativePath = basePath ? join(basePath, entry.name) : entry.name;
-
-    if (shouldExclude(relativePath)) continue;
-
-    if (entry.isDirectory()) {
-      const children = await generateSnapshot(fullPath, relativePath);
-      const result: FileNode = {
-        type: "directory",
-        name: entry.name,
-      };
-      if (children.length > 0) {
-        result.children = children;
+  // Build tree structure from file paths
+  const tree: Record<string, unknown> = {};
+  
+  for (const filePath of allFiles) {
+    const parts = filePath.split("/");
+    let current = tree;
+    
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      const isLastPart = i === parts.length - 1;
+      
+      if (isLastPart) {
+        // It's a file
+        current[part] = "file";
+      } else {
+        // It's a directory
+        if (!current[part]) {
+          current[part] = {};
+        }
+        current = current[part] as Record<string, unknown>;
       }
-      nodes.push(result);
-    } else {
-      nodes.push({
-        type: "file",
-        name: entry.name,
-      });
     }
   }
-
-  return nodes.sort((a, b) => {
-    // Directories first, then files
-    if (a.type !== b.type) {
-      return a.type === "directory" ? -1 : 1;
+  
+  // Convert tree to FileNode array
+  function treeToNodes(tree: Record<string, unknown>): FileNode[] {
+    const nodes: FileNode[] = [];
+    
+    for (const [name, value] of Object.entries(tree)) {
+      if (value === "file") {
+        nodes.push({
+          type: "file",
+          name,
+        });
+      } else {
+        const children = treeToNodes(value as Record<string, unknown>);
+        const result: FileNode = {
+          type: "directory",
+          name,
+        };
+        if (children.length > 0) {
+          result.children = children;
+        }
+        nodes.push(result);
+      }
     }
-    return a.name.localeCompare(b.name);
-  });
+    
+    return nodes.sort((a, b) => {
+      // Directories first, then files
+      if (a.type !== b.type) {
+        return a.type === "directory" ? -1 : 1;
+      }
+      return a.name.localeCompare(b.name);
+    });
+  }
+  
+  return treeToNodes(tree);
 }
 
 async function main() {
@@ -103,7 +140,7 @@ async function main() {
   console.log(pc.cyan(`Output: ${outputPath}\n`));
 
   try {
-    const snapshot = await generateSnapshot(templatePath);
+    const snapshot = await generateSnapshotFromGit(templatePath);
 
     const snapshotData = {
       name: "full-template",
