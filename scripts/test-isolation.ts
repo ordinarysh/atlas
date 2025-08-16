@@ -44,12 +44,12 @@ function execCommand(cmd: string, cwd: string = ROOT_DIR): string {
 }
 
 console.log("🔍 Testing Template Isolation\n");
-console.log("=" .repeat(50));
+console.log("=".repeat(50));
 
 // Test 1: Verify root ESLint ignores templates
 runTest("Root ESLint ignores templates/**", () => {
   const eslintConfig = readFileSync(join(ROOT_DIR, "eslint.config.mjs"), "utf-8");
-  return eslintConfig.includes('ignores: [') && eslintConfig.includes('"templates/**"')
+  return eslintConfig.includes("ignores: [") && eslintConfig.includes('"templates/**"')
     ? true
     : "templates/** not found in eslint ignores";
 });
@@ -90,9 +90,7 @@ runTest("Pre-commit hook skips template-only commits", () => {
 // Test 6: Verify pnpm workspace doesn't include templates
 runTest("Root pnpm workspace excludes templates", () => {
   const workspace = readFileSync(join(ROOT_DIR, "pnpm-workspace.yaml"), "utf-8");
-  return !workspace.includes("templates")
-    ? true
-    : "templates found in pnpm-workspace.yaml";
+  return !workspace.includes("templates") ? true : "templates found in pnpm-workspace.yaml";
 });
 
 // Test 7: Verify template has its own configs
@@ -104,7 +102,7 @@ runTest("Template has independent configs", () => {
     "tsconfig.json",
     "pnpm-workspace.yaml",
   ];
-  
+
   for (const config of configs) {
     if (!existsSync(join(TEMPLATE_DIR, config))) {
       return `Missing ${config} in template`;
@@ -115,18 +113,18 @@ runTest("Template has independent configs", () => {
 
 // Test 8: Mock root lint command
 runTest("Root lint runs only on root files", () => {
-  const output = execCommand("npx eslint . --max-warnings 0 --debug 2>&1 | grep 'Linting\\|Ignore' | head -20");
-  return !output.includes("templates/full")
-    ? true
-    : "Root ESLint is processing template files";
+  const output = execCommand(
+    "npx eslint . --max-warnings 0 --debug 2>&1 | grep 'Linting\\|Ignore' | head -20",
+  );
+  return !output.includes("templates/full") ? true : "Root ESLint is processing template files";
 });
 
 // Test 9: Mock root typecheck
 runTest("Root typecheck excludes templates", () => {
-  const output = execCommand("npx tsc -p tsconfig.json --listFiles 2>&1 | grep 'templates/' || echo 'No template files'");
-  return output.includes("No template files")
-    ? true
-    : "TypeScript is including template files";
+  const output = execCommand(
+    "npx tsc -p tsconfig.json --listFiles 2>&1 | grep 'templates/' || echo 'No template files'",
+  );
+  return output.includes("No template files") ? true : "TypeScript is including template files";
 });
 
 // Test 10: Verify CI workflow configuration
@@ -135,11 +133,11 @@ runTest("CI workflow properly configured", () => {
   const hasLintExclusion = ci.includes("Run ESLint (excluding templates)");
   const hasTypecheckExclusion = ci.includes("Run TypeScript type checking (excluding templates)");
   const hasSmokeTest = ci.includes("Extract and test full template");
-  
+
   if (!hasLintExclusion) return "Missing lint exclusion comment in CI";
   if (!hasTypecheckExclusion) return "Missing typecheck exclusion comment in CI";
   if (!hasSmokeTest) return "Missing template smoke test in CI";
-  
+
   return true;
 });
 
@@ -160,14 +158,12 @@ runTest("Template configs are valid", () => {
 // Test 12: Check for config file conflicts
 runTest("No .tpl files remaining", () => {
   const output = execCommand("find templates -name '*.tpl' 2>/dev/null | head -5");
-  return output.trim() === ""
-    ? true
-    : `Found .tpl files: ${output.trim()}`;
+  return output.trim() === "" ? true : `Found .tpl files: ${output.trim()}`;
 });
 
 // Print results
 console.log("\n📊 Test Results:\n");
-console.log("=" .repeat(50));
+console.log("=".repeat(50));
 
 let passed = 0;
 let failed = 0;
@@ -182,7 +178,7 @@ for (const result of results) {
   }
 }
 
-console.log("\n" + "=" .repeat(50));
+console.log("\n" + "=".repeat(50));
 console.log(`Summary: ${passed} passed, ${failed} failed`);
 
 if (failed > 0) {

@@ -19,11 +19,7 @@ import { getQueryClient } from "./client";
  * todoKeys.byId('123') // ['todos', 'byId', { id: '123' }]
  * ```
  */
-export function createKeys<
-  TScope extends string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TBuilders extends Record<string, (...args: any[]) => any>,
->(
+export function createKeys<TScope extends string, TBuilders>(
   scope: TScope,
   builders: TBuilders,
 ): {
@@ -38,25 +34,32 @@ export function createKeys<
   } & { all: () => readonly [TScope] };
 
   // Build the dynamic methods
-  Object.entries(builders).forEach(([operation, builder]) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (result as any)[operation] = (...args: unknown[]): readonly unknown[] => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const params = builder(...args);
-      // Only add params if they have values
-      const hasParams =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        Object.keys(params).length > 0 &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        Object.values(params).some((v) => v !== undefined);
+  for (const [operation, builderFn] of Object.entries(builders as Record<string, unknown>)) {
+    // Runtime validation that the builder is a function
+    if (typeof builderFn !== "function") {
+      throw new TypeError(`Builder for operation "${operation}" must be a function`);
+    }
 
-      return hasParams ? ([scope, operation, params] as const) : ([scope, operation] as const);
-    };
-  });
+    Object.assign(result, {
+      [operation]: (...args: unknown[]) => {
+        const params = (builderFn as (...args: unknown[]) => unknown)(...args);
+        // Only add params if they have meaningful values
+        const hasParams =
+          typeof params === "object" &&
+          params !== null &&
+          !Array.isArray(params) &&
+          Object.keys(params as Record<string, unknown>).length > 0 &&
+          Object.values(params as Record<string, unknown>).some((v) => v !== undefined);
+
+        return hasParams ? ([scope, operation, params] as const) : ([scope, operation] as const);
+      },
+    });
+  }
 
   // Add root key
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-  (result as any).all = (): readonly [TScope] => [scope] as const;
+  Object.assign(result, {
+    all: () => [scope] as const,
+  });
 
   return result;
 }
@@ -141,8 +144,18 @@ export const commonPatterns = {
   /**
    * CRUD resource pattern
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-  resource: (resource: string) =>
+  resource: (
+    resource: string,
+  ): {
+    list: (
+      params?: Record<string, unknown>,
+    ) => readonly [string, "list", { params: Record<string, unknown> | undefined }];
+    byId: (id: string | number) => readonly [string, "byId", { id: string | number }];
+    create: () => readonly [string, "create", Record<string, never>];
+    update: (id: string | number) => readonly [string, "update", { id: string | number }];
+    delete: (id: string | number) => readonly [string, "delete", { id: string | number }];
+    all: () => readonly [string];
+  } =>
     createKeys(resource, {
       list: (params?: Record<string, unknown>) => ({ params }),
       byId: (id: string | number) => ({ id }),
@@ -154,8 +167,16 @@ export const commonPatterns = {
   /**
    * Paginated resource pattern
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-  paginated: (resource: string) =>
+  paginated: (
+    resource: string,
+  ): {
+    page: (
+      page: number,
+      size?: number,
+    ) => readonly [string, "page", { page: number; size: number | undefined }];
+    infinite: () => readonly [string, "infinite", Record<string, never>];
+    all: () => readonly [string];
+  } =>
     createKeys(resource, {
       page: (page: number, size?: number) => ({ page, size }),
       infinite: () => ({}),
@@ -164,8 +185,13 @@ export const commonPatterns = {
   /**
    * User-scoped pattern
    */
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/explicit-module-boundary-types
-  userScoped: (resource: string) =>
+  userScoped: (
+    resource: string,
+  ): {
+    byUser: (userId: string) => readonly [string, "byUser", { userId: string }];
+    currentUser: () => readonly [string, "currentUser", Record<string, never>];
+    all: () => readonly [string];
+  } =>
     createKeys(resource, {
       byUser: (userId: string) => ({ userId }),
       currentUser: () => ({}),

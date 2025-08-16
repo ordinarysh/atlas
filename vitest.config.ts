@@ -6,11 +6,7 @@ export default defineConfig({
     environment: "node",
     testTimeout: 30000,
     hookTimeout: 30000,
-    exclude: [
-      "**/node_modules/**",
-      "**/templates/**",
-      "**/dist/**",
-    ],
+    exclude: ["**/node_modules/**", "**/templates/**", "**/dist/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

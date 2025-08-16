@@ -7,7 +7,7 @@ import {
   type UseMutationOptions,
   type UseQueryOptions,
 } from "@tanstack/react-query";
-import { fetchJson } from "../fetch";
+import { fetchJson } from "@atlas/api-client";
 import { invalidate } from "../keys";
 import { todoKeys } from "./keys";
 import {
@@ -63,7 +63,7 @@ export function useTodos(
 
       const url = params.toString() ? `/api/todos?${params.toString()}` : "/api/todos";
 
-      return fetchJson(url, {
+      return fetchJson<TodosResponse>(url, {
         schema: TodosResponseSchema,
       });
     },
@@ -81,7 +81,7 @@ export function useTodo(
   return useQuery({
     queryKey: todoKeys.byId(id),
     queryFn: () =>
-      fetchJson(`/api/todos/${id}`, {
+      fetchJson<Todo>(`/api/todos/${id}`, {
         schema: TodoSchema,
       }),
     enabled: !!id,
@@ -127,7 +127,7 @@ export function useCreateTodo(
 
   return useMutation<Todo, Error, CreateTodoInput>({
     mutationFn: (data: CreateTodoInput) =>
-      fetchJson("/api/todos", {
+      fetchJson<Todo>("/api/todos", {
         method: "POST",
         body: data,
         schema: TodoSchema,
@@ -199,7 +199,7 @@ export function useUpdateTodo(
 
   return useMutation<Todo, Error, { id: string; data: UpdateTodoInput }>({
     mutationFn: ({ id, data }) =>
-      fetchJson(`/api/todos/${id}`, {
+      fetchJson<Todo>(`/api/todos/${id}`, {
         method: "PATCH",
         body: data,
         schema: TodoSchema,
@@ -257,7 +257,7 @@ export function useDeleteTodo(
 
   return useMutation<undefined, Error, string>({
     mutationFn: async (id: string) => {
-      await fetchJson(`/api/todos/${id}`, {
+      await fetchJson<{ success: boolean }>(`/api/todos/${id}`, {
         method: "DELETE",
       });
     },

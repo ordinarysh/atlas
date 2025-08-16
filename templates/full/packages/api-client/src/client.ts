@@ -1,4 +1,4 @@
-import { fetchJson } from '@atlas/query'
+import { fetchJson } from './fetch'
 
 /**
  * Configuration options for the API client
@@ -176,13 +176,13 @@ export function createApi(config: ApiConfig = {}): ApiClient {
       const baseUrlPath = buildUrl(baseUrl, path)
       const url = appendParams(baseUrlPath, params)
 
-      return await fetchJson(url, {
+      return (await fetchJson(url, {
         ...cleanedOptions,
         method: 'GET',
         headers: await buildHeaders(
           cleanedOptions.headers as HeadersInit | undefined
         ),
-      }) as T
+      })) as T
     },
 
     post: async <T = unknown>(
@@ -194,14 +194,14 @@ export function createApi(config: ApiConfig = {}): ApiClient {
       const baseUrlPath = buildUrl(baseUrl, path)
       const url = appendParams(baseUrlPath, params)
 
-      return await fetchJson(url, {
+      return (await fetchJson(url, {
         ...cleanedOptions,
         method: 'POST',
         body,
         headers: await buildHeaders(
           cleanedOptions.headers as HeadersInit | undefined
         ),
-      }) as T
+      })) as T
     },
 
     put: async <T = unknown>(
@@ -213,14 +213,14 @@ export function createApi(config: ApiConfig = {}): ApiClient {
       const baseUrlPath = buildUrl(baseUrl, path)
       const url = appendParams(baseUrlPath, params)
 
-      return await fetchJson(url, {
+      return (await fetchJson(url, {
         ...cleanedOptions,
         method: 'PUT',
         body,
         headers: await buildHeaders(
           cleanedOptions.headers as HeadersInit | undefined
         ),
-      }) as T
+      })) as T
     },
 
     patch: async <T = unknown>(
@@ -232,14 +232,14 @@ export function createApi(config: ApiConfig = {}): ApiClient {
       const baseUrlPath = buildUrl(baseUrl, path)
       const url = appendParams(baseUrlPath, params)
 
-      return await fetchJson(url, {
+      return (await fetchJson(url, {
         ...cleanedOptions,
         method: 'PATCH',
         body,
         headers: await buildHeaders(
           cleanedOptions.headers as HeadersInit | undefined
         ),
-      }) as T
+      })) as T
     },
 
     del: async <T = unknown>(
@@ -250,13 +250,13 @@ export function createApi(config: ApiConfig = {}): ApiClient {
       const baseUrlPath = buildUrl(baseUrl, path)
       const url = appendParams(baseUrlPath, params)
 
-      return await fetchJson(url, {
+      return (await fetchJson(url, {
         ...cleanedOptions,
         method: 'DELETE',
         headers: await buildHeaders(
           cleanedOptions.headers as HeadersInit | undefined
         ),
-      }) as T
+      })) as T
     },
   }
 }

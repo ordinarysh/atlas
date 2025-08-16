@@ -239,10 +239,12 @@ async function validateTemplateStructure() {
       onlyDirectories: true,
       absolute: false,
     });
-    
+
     if (nextPaths.length > 0) {
       allValid = false;
-      console.error(pc.red(`  ✗ Found .next/ directories - Next.js build output should not be committed`));
+      console.error(
+        pc.red(`  ✗ Found .next/ directories - Next.js build output should not be committed`),
+      );
     }
 
     // Guard against dist directories
@@ -251,7 +253,7 @@ async function validateTemplateStructure() {
       onlyDirectories: true,
       absolute: false,
     });
-    
+
     if (distPaths.length > 0) {
       allValid = false;
       console.error(pc.red(`  ✗ Found dist/ directories - build outputs should not be committed`));
@@ -262,11 +264,13 @@ async function validateTemplateStructure() {
       cwd: templateDir,
       absolute: false,
     });
-    
+
     if (tsBuildInfoFiles.length > 0) {
       allValid = false;
       console.error(
-        pc.red(`  ✗ Found .tsbuildinfo files: ${tsBuildInfoFiles.join(", ")} - TypeScript build cache should not be committed`),
+        pc.red(
+          `  ✗ Found .tsbuildinfo files: ${tsBuildInfoFiles.join(", ")} - TypeScript build cache should not be committed`,
+        ),
       );
     }
 

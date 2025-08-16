@@ -15,6 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      '@atlas/todos-domain': resolve(__dirname, '../../domains/todos'),
     },
   },
 })

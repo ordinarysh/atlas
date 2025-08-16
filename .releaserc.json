@@ -60,6 +60,13 @@
         "assets": ["templates/*/package.json", "templates/*/atlas.json", ".VERSION"],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": ["release/*.tar.gz", "release/*.tgz", "release/index.json", "release/SHA256SUMS"],
+        "successComment": false
+      }
     ]
   ],
   "preset": "conventionalcommits",

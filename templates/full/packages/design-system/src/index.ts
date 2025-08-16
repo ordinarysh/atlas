@@ -5,7 +5,7 @@
  */
 
 // Re-export the preset function
-export { atlasPreset } from './preset.js'
+export { atlasPreset } from './preset'
 
 // Export the resolved path to styles.css for importing
 export const atlasStylesPath = new URL('styles.css', import.meta.url).pathname

@@ -5,7 +5,7 @@
  * Removes all build artifacts and machine-specific files from template directories
  * before packaging for release. This ensures templates are clean and portable.
  *
- * Usage: 
+ * Usage:
  *   pnpm clean:templates          # Clean all templates
  *   pnpm clean:templates --dry-run  # Preview what would be removed
  *
@@ -25,41 +25,136 @@ const isDryRun = process.argv.includes("--dry-run") || process.env.DRY_RUN === "
 // Artifacts to remove from templates
 const ARTIFACTS_TO_REMOVE = {
   directories: [
+    // Package managers
     "node_modules",
     ".pnpm-store",
+    ".npm",
+    ".yarn",
+    ".bun",
+
+    // Build outputs
     "dist",
-    ".next",
-    ".turbo",
-    "coverage",
-    "playwright-report",
-    ".vite",
-    ".cache",
     "build",
+    "out",
+
+    // Framework-specific
+    ".next",
+    ".nuxt",
+    ".vite",
+    ".turbo",
+    ".nx",
+    ".rush",
+
+    // Bundler caches
+    ".cache",
+    ".swc",
+    ".esbuild",
+    ".parcel-cache",
+    ".rollup.cache",
+    ".webpack",
+    ".rspack",
+    ".rsbuild",
+
+    // Testing
+    "coverage",
+    "test-results",
+    "playwright-report",
+    "storybook-static",
+
+    // Development tools
+    ".vscode/settings.json.backup",
+    ".idea",
+    ".tscache",
+
+    // Deployment
     ".vercel",
     ".netlify",
-    "out",
+
+    // Temp directories
+    ".tmp",
+    ".temp",
+    "tmp",
+    "temp",
   ],
   files: [
+    // TypeScript build info
     "*.tsbuildinfo",
+    "tsconfig.tsbuildinfo",
+
+    // Lock files (templates shouldn't include these)
     "pnpm-lock.yaml",
     "package-lock.json",
     "yarn.lock",
+    "bun.lockb",
+
+    // Environment files (except examples)
     ".env",
     ".env.local",
     ".env.production",
     ".env.development",
+    ".env.staging",
+    ".env.test",
+
+    // Cache files
+    ".eslintcache",
+    ".prettiercache",
+    ".stylelintcache",
+
+    // Vite timestamp files
+    "vite.config.ts.timestamp-*",
+    "vite.config.js.timestamp-*",
+
+    // Log files
     "*.log",
+    "npm-debug.log*",
+    "yarn-debug.log*",
+    "yarn-error.log*",
+    ".pnpm-debug.log*",
+    "lerna-debug.log*",
+    "turbo-*.log",
+    "next-*.log",
+    "vite-*.log",
+
+    // Process files
     "*.pid",
     "*.seed",
     "*.pid.lock",
+
+    // Analysis files
+    "build-analysis.json",
+    "analyze-bundle.html",
+    "webpack-stats.json",
+
+    // OS files
     ".DS_Store",
+    ".DS_Store?",
+    "._*",
+    ".Spotlight-V100",
+    ".Trashes",
     "Thumbs.db",
+    "ehthumbs.db",
+    "Desktop.ini",
+    ".directory",
+
+    // Editor files
     "*.swp",
     "*.swo",
     "*~",
+    ".sublime-workspace",
+    "*.code-workspace",
+    ".brackets.json",
   ],
   // Files that should be kept
-  whitelist: [".env.example", ".env.sample"],
+  whitelist: [
+    ".env.example",
+    ".env.sample",
+    ".vscode/extensions.json",
+    ".vscode/settings.json.example",
+    ".gitignore",
+    ".gitattributes",
+    ".nvmrc", // Version manager files should typically be kept
+    ".node-version",
+  ],
 };
 
 interface CleanupStats {
@@ -115,14 +210,14 @@ async function removeDirectory(path: string, stats: CleanupStats): Promise<void>
 
   try {
     const size = await getDirectorySize(path);
-    
+
     if (isDryRun) {
       console.log(pc.blue(`  [DRY RUN] Would remove directory: ${path} (${formatBytes(size)})`));
       stats.directoriesRemoved++;
       stats.spaceFreed += size;
       return;
     }
-    
+
     // Try multiple removal strategies for robustness
     try {
       await rm(path, { recursive: true, force: true, maxRetries: 3 });
@@ -134,13 +229,13 @@ async function removeDirectory(path: string, stats: CleanupStats): Promise<void>
         throw new Error(`Both removal attempts failed: ${firstError}; ${secondError}`);
       }
     }
-    
+
     stats.directoriesRemoved++;
     stats.spaceFreed += size;
     console.log(pc.yellow(`  ✗ Removed directory: ${path} (${formatBytes(size)})`));
   } catch (error) {
     console.error(pc.red(`  ⚠ Failed to remove ${path}: ${error}`));
-    
+
     // Try to provide helpful error context
     try {
       const pathStats = await stat(path);
@@ -158,16 +253,16 @@ async function removeDirectory(path: string, stats: CleanupStats): Promise<void>
  */
 function isWhitelisted(filePath: string): boolean {
   const fileName = filePath.split("/").pop() || "";
-  return ARTIFACTS_TO_REMOVE.whitelist.some(whitelistItem => {
+  return ARTIFACTS_TO_REMOVE.whitelist.some((whitelistItem) => {
     // Exact match
     if (fileName === whitelistItem) return true;
-    
+
     // Pattern match for extensions
     if (whitelistItem.includes("*")) {
       const pattern = whitelistItem.replace("*", ".*");
       return new RegExp(pattern).test(fileName);
     }
-    
+
     return false;
   });
 }
@@ -192,17 +287,19 @@ async function removeFiles(
     if (isWhitelisted(file)) {
       continue;
     }
-    
+
     try {
       const fileStats = await stat(file);
-      
+
       if (isDryRun) {
-        console.log(pc.blue(`  [DRY RUN] Would remove file: ${file} (${formatBytes(fileStats.size)})`));
+        console.log(
+          pc.blue(`  [DRY RUN] Would remove file: ${file} (${formatBytes(fileStats.size)})`),
+        );
         stats.filesRemoved++;
         stats.spaceFreed += fileStats.size;
         continue;
       }
-      
+
       await rm(file, { force: true, maxRetries: 2 });
       stats.filesRemoved++;
       stats.spaceFreed += fileStats.size;
@@ -257,17 +354,45 @@ async function cleanTemplate(templatePath: string): Promise<CleanupStats> {
     await removeFiles(templatePath, `**/${filePattern}`, stats);
   }
 
-  // Special handling for root-level artifacts
-  const rootArtifacts = ["node_modules", ".turbo", "dist", ".next", "pnpm-lock.yaml"];
-  for (const artifact of rootArtifacts) {
+  // Special handling for root-level artifacts (ensure these are always checked)
+  const criticalRootArtifacts = [
+    // Most common build artifacts that must be removed
+    "node_modules",
+    ".turbo",
+    "dist",
+    ".next",
+    ".vite",
+    ".cache",
+    // Lock files that shouldn't be in templates
+    "pnpm-lock.yaml",
+    "package-lock.json",
+    "yarn.lock",
+    "bun.lockb",
+    // Common caches
+    ".eslintcache",
+    ".prettiercache",
+    ".stylelintcache",
+    // Build info
+    "tsconfig.tsbuildinfo",
+    ".tsbuildinfo",
+  ];
+
+  for (const artifact of criticalRootArtifacts) {
     const artifactPath = join(templatePath, artifact);
     if (existsSync(artifactPath)) {
+      // Check whitelist before removal
+      if (isWhitelisted(artifactPath)) {
+        continue;
+      }
+
       const artifactStats = await stat(artifactPath);
       if (artifactStats.isDirectory()) {
         await removeDirectory(artifactPath, stats);
       } else {
         if (isDryRun) {
-          console.log(pc.blue(`  [DRY RUN] Would remove: ${artifact} (${formatBytes(artifactStats.size)})`));
+          console.log(
+            pc.blue(`  [DRY RUN] Would remove: ${artifact} (${formatBytes(artifactStats.size)})`),
+          );
           stats.filesRemoved++;
           stats.spaceFreed += artifactStats.size;
         } else {
@@ -314,11 +439,13 @@ async function validateTemplate(templatePath: string): Promise<boolean> {
     });
 
     // Filter out whitelisted files
-    const forbiddenFiles = found.filter(file => !isWhitelisted(join(templatePath, file)));
+    const forbiddenFiles = found.filter((file) => !isWhitelisted(join(templatePath, file)));
 
     if (forbiddenFiles.length > 0) {
       isClean = false;
-      issues.push(`Found ${forbiddenFiles.length} files matching ${filePattern} (excluding whitelisted)`);
+      issues.push(
+        `Found ${forbiddenFiles.length} files matching ${filePattern} (excluding whitelisted)`,
+      );
     }
   }
 
@@ -337,10 +464,12 @@ async function validateTemplate(templatePath: string): Promise<boolean> {
  */
 async function main() {
   console.log(pc.bold("\n🧹 Atlas Template Cleanup\n"));
-  
+
   if (isDryRun) {
     console.log(pc.blue("🔍 DRY RUN MODE: No files will be actually removed\n"));
-    console.log(pc.gray("This will show what build artifacts would be removed from template directories.\n"));
+    console.log(
+      pc.gray("This will show what build artifacts would be removed from template directories.\n"),
+    );
   } else {
     console.log(pc.gray("This will remove all build artifacts from template directories.\n"));
   }
@@ -397,12 +526,22 @@ async function main() {
 
   // Summary
   console.log(pc.bold(`\n📊 ${isDryRun ? "Dry Run " : ""}Cleanup Summary:`));
-  console.log(pc.cyan(`  • Directories ${isDryRun ? "would be " : ""}removed: ${totalStats.directoriesRemoved}`));
-  console.log(pc.cyan(`  • Files ${isDryRun ? "would be " : ""}removed: ${totalStats.filesRemoved}`));
-  console.log(pc.cyan(`  • Space ${isDryRun ? "would be " : ""}freed: ${formatBytes(totalStats.spaceFreed)}`));
+  console.log(
+    pc.cyan(
+      `  • Directories ${isDryRun ? "would be " : ""}removed: ${totalStats.directoriesRemoved}`,
+    ),
+  );
+  console.log(
+    pc.cyan(`  • Files ${isDryRun ? "would be " : ""}removed: ${totalStats.filesRemoved}`),
+  );
+  console.log(
+    pc.cyan(`  • Space ${isDryRun ? "would be " : ""}freed: ${formatBytes(totalStats.spaceFreed)}`),
+  );
 
   if (isDryRun) {
-    console.log(pc.bold(pc.blue("\n🔍 Dry run complete. Run without --dry-run to actually remove files.\n")));
+    console.log(
+      pc.bold(pc.blue("\n🔍 Dry run complete. Run without --dry-run to actually remove files.\n")),
+    );
   } else if (allClean) {
     console.log(pc.bold(pc.green("\n✅ All templates are clean and ready for packaging!\n")));
   } else {
