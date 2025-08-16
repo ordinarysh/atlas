@@ -1,0 +1,49 @@
+{
+  "id": "redis-rate-limit-addon",
+  "name": "Redis Rate Limiting Addon",
+  "version": "1.0.0",
+  "description": "Adds Redis-based distributed rate limiting support",
+  "steps": [
+    {
+      "type": "package",
+      "action": "install",
+      "target": "redis@^4.6.0"
+    },
+    {
+      "type": "package",
+      "action": "install-dev",
+      "target": "@types/redis@^4.0.0"
+    },
+    {
+      "type": "file",
+      "action": "create",
+      "target": "services/rate-limit/src/redis-store.ts",
+      "content": {
+        "template": "redis-store"
+      }
+    },
+    {
+      "type": "file",
+      "action": "update",
+      "target": "services/rate-limit/src/factory.ts",
+      "content": {
+        "action": "register-adapter",
+        "adapter": "redis",
+        "import": "import { createClient } from 'redis';\nimport { createRedisStore } from './redis-store';",
+        "factory": "() => { const redis = createClient({ url: process.env.REDIS_URL }); return createRedisStore(redis); }"
+      }
+    },
+    {
+      "type": "config",
+      "action": "update",
+      "target": ".env.example",
+      "content": {
+        "append": [
+          "# Redis Rate Limiting",
+          "REDIS_URL=redis://localhost:6379",
+          "RATE_LIMIT_STORE=redis"
+        ]
+      }
+    }
+  ]
+}
