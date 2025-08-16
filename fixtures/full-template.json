@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-15T15:11:33.687Z",
+  "generated": "2025-08-16T01:59:24.162Z",
   "structure": [
     {
       "type": "directory",
@@ -80,6 +80,16 @@
                   "name": "__tests__",
                   "children": [
                     {
+                      "type": "directory",
+                      "name": "helpers",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "next-request.ts"
+                        }
+                      ]
+                    },
+                    {
                       "type": "file",
                       "name": "env.client.test.ts"
                     },
@@ -90,6 +100,10 @@
                     {
                       "type": "file",
                       "name": "env.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "security.test.ts"
                     },
                     {
                       "type": "file",
@@ -116,6 +130,10 @@
                             {
                               "type": "file",
                               "name": "health.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "projects.integration.test.ts"
                             },
                             {
                               "type": "file",
@@ -355,6 +373,10 @@
                     },
                     {
                       "type": "file",
+                      "name": "cors.ts"
+                    },
+                    {
+                      "type": "file",
                       "name": "logger.ts"
                     },
                     {
@@ -432,6 +454,10 @@
                 {
                   "type": "file",
                   "name": "middleware.example.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "middleware.ts"
                 }
               ]
             },
@@ -574,6 +600,10 @@
         {
           "type": "file",
           "name": "README.md"
+        },
+        {
+          "type": "file",
+          "name": "SECURITY.md"
         }
       ]
     },
@@ -687,39 +717,7 @@
                   "children": [
                     {
                       "type": "file",
-                      "name": "apiKey.test.d.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "apiKey.test.d.ts.map"
-                    },
-                    {
-                      "type": "file",
-                      "name": "apiKey.test.js"
-                    },
-                    {
-                      "type": "file",
-                      "name": "apiKey.test.js.map"
-                    },
-                    {
-                      "type": "file",
                       "name": "apiKey.test.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "contract.test.d.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "contract.test.d.ts.map"
-                    },
-                    {
-                      "type": "file",
-                      "name": "contract.test.js"
-                    },
-                    {
-                      "type": "file",
-                      "name": "contract.test.js.map"
                     },
                     {
                       "type": "file",
@@ -727,59 +725,11 @@
                     },
                     {
                       "type": "file",
-                      "name": "hmac.test.d.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "hmac.test.d.ts.map"
-                    },
-                    {
-                      "type": "file",
-                      "name": "hmac.test.js"
-                    },
-                    {
-                      "type": "file",
-                      "name": "hmac.test.js.map"
-                    },
-                    {
-                      "type": "file",
                       "name": "hmac.test.ts"
                     },
                     {
                       "type": "file",
-                      "name": "setup.d.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "setup.d.ts.map"
-                    },
-                    {
-                      "type": "file",
-                      "name": "setup.js"
-                    },
-                    {
-                      "type": "file",
-                      "name": "setup.js.map"
-                    },
-                    {
-                      "type": "file",
                       "name": "setup.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "store.test.d.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "store.test.d.ts.map"
-                    },
-                    {
-                      "type": "file",
-                      "name": "store.test.js"
-                    },
-                    {
-                      "type": "file",
-                      "name": "store.test.js.map"
                     },
                     {
                       "type": "file",
@@ -789,39 +739,7 @@
                 },
                 {
                   "type": "file",
-                  "name": "apiKey.d.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "apiKey.d.ts.map"
-                },
-                {
-                  "type": "file",
-                  "name": "apiKey.js"
-                },
-                {
-                  "type": "file",
-                  "name": "apiKey.js.map"
-                },
-                {
-                  "type": "file",
                   "name": "apiKey.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "contract.d.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "contract.d.ts.map"
-                },
-                {
-                  "type": "file",
-                  "name": "contract.js"
-                },
-                {
-                  "type": "file",
-                  "name": "contract.js.map"
                 },
                 {
                   "type": "file",
@@ -829,39 +747,7 @@
                 },
                 {
                   "type": "file",
-                  "name": "hmac.d.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "hmac.d.ts.map"
-                },
-                {
-                  "type": "file",
-                  "name": "hmac.js"
-                },
-                {
-                  "type": "file",
-                  "name": "hmac.js.map"
-                },
-                {
-                  "type": "file",
                   "name": "hmac.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "index.d.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "index.d.ts.map"
-                },
-                {
-                  "type": "file",
-                  "name": "index.js"
-                },
-                {
-                  "type": "file",
-                  "name": "index.js.map"
                 },
                 {
                   "type": "file",
@@ -869,39 +755,7 @@
                 },
                 {
                   "type": "file",
-                  "name": "store.d.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "store.d.ts.map"
-                },
-                {
-                  "type": "file",
-                  "name": "store.js"
-                },
-                {
-                  "type": "file",
-                  "name": "store.js.map"
-                },
-                {
-                  "type": "file",
                   "name": "store.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "types.d.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "types.d.ts.map"
-                },
-                {
-                  "type": "file",
-                  "name": "types.js"
-                },
-                {
-                  "type": "file",
-                  "name": "types.js.map"
                 },
                 {
                   "type": "file",
@@ -1025,7 +879,7 @@
         },
         {
           "type": "directory",
-          "name": "configs",
+          "name": "config",
           "children": [
             {
               "type": "directory",
@@ -1088,6 +942,48 @@
                 {
                   "type": "file",
                   "name": "README.md"
+                }
+              ]
+            },
+            {
+              "type": "directory",
+              "name": "rate-limit",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "src",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "__tests__",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "index.test.ts"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "index.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                },
+                {
+                  "type": "file",
+                  "name": "README.md"
+                },
+                {
+                  "type": "file",
+                  "name": "tsconfig.json"
+                },
+                {
+                  "type": "file",
+                  "name": "vitest.config.ts"
                 }
               ]
             },
@@ -1336,48 +1232,6 @@
             {
               "type": "file",
               "name": "vitest.config.ts"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "runtime-config",
-          "children": [
-            {
-              "type": "directory",
-              "name": "src",
-              "children": [
-                {
-                  "type": "directory",
-                  "name": "__tests__",
-                  "children": [
-                    {
-                      "type": "file",
-                      "name": "rateLimit.test.ts"
-                    }
-                  ]
-                },
-                {
-                  "type": "file",
-                  "name": "index.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "rateLimit.ts"
-                }
-              ]
-            },
-            {
-              "type": "file",
-              "name": "package.json"
-            },
-            {
-              "type": "file",
-              "name": "README.md"
-            },
-            {
-              "type": "file",
-              "name": "tsconfig.json"
             }
           ]
         },
