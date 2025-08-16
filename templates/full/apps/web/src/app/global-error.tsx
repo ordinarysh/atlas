@@ -54,9 +54,10 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 lineHeight: '1.5',
               }}
             >
-              A critical error occurred. Please try refreshing the page or contact support if the problem persists.
+              A critical error occurred. Please try refreshing the page or
+              contact support if the problem persists.
             </p>
-            
+
             {process.env.NODE_ENV === 'development' && error.message && (
               <div
                 style={{
@@ -73,14 +74,22 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
               >
                 {error.message}
                 {error.digest && (
-                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#9ca3af' }}>
+                  <div
+                    style={{
+                      marginTop: '8px',
+                      fontSize: '12px',
+                      color: '#9ca3af',
+                    }}
+                  >
                     Error ID: {error.digest}
                   </div>
                 )}
               </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
               <button
                 onClick={reset}
                 style={{
@@ -105,7 +114,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 Try again
               </button>
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={() => (window.location.href = '/')}
                 style={{
                   width: '100%',
                   padding: '10px 16px',

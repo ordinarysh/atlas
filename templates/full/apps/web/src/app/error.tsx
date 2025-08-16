@@ -1,9 +1,14 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Button } from '@atlas/ui'
-import { Card, CardContent, CardHeader, CardTitle } from '@atlas/ui'
-import { Text } from '@atlas/ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Text,
+} from '@atlas/ui'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -27,14 +32,14 @@ export default function Error({ error, reset }: ErrorProps) {
           <Text className="text-fg-muted">
             An unexpected error occurred while loading this page.
           </Text>
-          
+
           {isDev && error.message && (
-            <div className="rounded-lg border border-danger/20 bg-danger/5 p-3">
-              <Text size="sm" className="font-mono text-danger">
+            <div className="border-danger/20 bg-danger/5 rounded-lg border p-3">
+              <Text size="sm" className="text-danger font-mono">
                 {error.message}
               </Text>
               {error.digest && (
-                <Text size="xs" className="mt-1 text-fg-muted">
+                <Text size="xs" className="text-fg-muted mt-1">
                   Error ID: {error.digest}
                 </Text>
               )}
@@ -47,7 +52,7 @@ export default function Error({ error, reset }: ErrorProps) {
             </Button>
             <Button
               variant="ghost"
-              onClick={() => window.location.href = '/'}
+              onClick={() => (window.location.href = '/')}
               className="w-full"
             >
               Go home

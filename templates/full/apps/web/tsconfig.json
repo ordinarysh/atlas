@@ -9,7 +9,8 @@
       "@atlas/ui": ["../../packages/ui/src"],
       "@atlas/query": ["../../packages/query/src"],
       "@atlas/api-client": ["../../packages/api-client/src"],
-      "@atlas/design-system": ["../../packages/design-system/src"]
+      "@atlas/design-system": ["../../packages/design-system/src"],
+      "@atlas/todos-domain": ["../../domains/todos"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/types/**/*.d.ts"],
