@@ -21,18 +21,35 @@ export async function extractTarball(tarballPath: string, destPath: string): Pro
 
 // Directory tree structure types
 interface DirectoryTree {
-  [key: string]: DirectoryTree | 'file';
+  [key: string]: DirectoryTree | "file";
 }
 
 export async function getDirectoryTree(
   dirPath: string,
-  ignore: string[] = ["node_modules", ".git", ".DS_Store", ".env.example", ".env", ".env.*", ".next", "dist", "build", ".turbo", "coverage", "pnpm-lock.yaml", ".tsbuildinfo", ".gitkeep", ".claude", "next-env.d.ts"]
+  ignore: string[] = [
+    "node_modules",
+    ".git",
+    ".DS_Store",
+    ".env.example",
+    ".env",
+    ".env.*",
+    ".next",
+    "dist",
+    "build",
+    ".turbo",
+    "coverage",
+    "pnpm-lock.yaml",
+    ".tsbuildinfo",
+    ".gitkeep",
+    ".claude",
+    "next-env.d.ts",
+  ],
 ): Promise<DirectoryTree> {
   const tree: DirectoryTree = {};
-  
+
   async function scan(currentPath: string, currentTree: DirectoryTree) {
     const entries = await readdir(currentPath, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       // Check if should ignore
       let shouldIgnore = false;
@@ -48,11 +65,11 @@ export async function getDirectoryTree(
           break;
         }
       }
-      
+
       if (shouldIgnore) continue;
-      
+
       const fullPath = join(currentPath, entry.name);
-      
+
       if (entry.isDirectory()) {
         const subTree: DirectoryTree = {};
         currentTree[entry.name] = subTree;
@@ -62,7 +79,7 @@ export async function getDirectoryTree(
       }
     }
   }
-  
+
   await scan(dirPath, tree);
   return tree;
 }

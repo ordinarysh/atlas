@@ -16,9 +16,10 @@ export async function runSmokeTests(templatePath: string) {
   console.log("  → Installing dependencies...");
   const installResult = await runCommand("pnpm install --frozen-lockfile", templatePath);
   results.install.success = installResult.exitCode === 0;
-  results.install.message = installResult.exitCode === 0 
-    ? "Dependencies installed" 
-    : `Install failed: ${installResult.stderr}`;
+  results.install.message =
+    installResult.exitCode === 0
+      ? "Dependencies installed"
+      : `Install failed: ${installResult.stderr}`;
 
   if (!results.install.success) {
     return results; // Can't continue without dependencies
@@ -28,17 +29,19 @@ export async function runSmokeTests(templatePath: string) {
   console.log("  → Running lint...");
   const lintResult = await runCommand("pnpm run lint", templatePath);
   results.lint.success = lintResult.exitCode === 0;
-  results.lint.message = lintResult.exitCode === 0
-    ? "Lint passed"
-    : `Lint failed: ${lintResult.stderr || lintResult.stdout}`;
+  results.lint.message =
+    lintResult.exitCode === 0
+      ? "Lint passed"
+      : `Lint failed: ${lintResult.stderr || lintResult.stdout}`;
 
   // Run typecheck
   console.log("  → Running typecheck...");
   const typecheckResult = await runCommand("pnpm run type-check", templatePath);
   results.typecheck.success = typecheckResult.exitCode === 0;
-  results.typecheck.message = typecheckResult.exitCode === 0
-    ? "Type check passed"
-    : `Type check failed: ${typecheckResult.stderr || typecheckResult.stdout}`;
+  results.typecheck.message =
+    typecheckResult.exitCode === 0
+      ? "Type check passed"
+      : `Type check failed: ${typecheckResult.stderr || typecheckResult.stdout}`;
 
   // Run build (skip if BUILD_SMOKE is set)
   if (process.env.BUILD_SMOKE === "skip") {
@@ -49,15 +52,16 @@ export async function runSmokeTests(templatePath: string) {
     console.log("  → Running build smoke test...");
     // Run with timeout for smoke test
     const buildResult = await runCommand(
-      "timeout 60 pnpm run build 2>&1 | head -100", 
-      templatePath
+      "timeout 60 pnpm run build 2>&1 | head -100",
+      templatePath,
     );
     results.build.success = buildResult.exitCode === 0 || buildResult.exitCode === 124; // 124 = timeout
-    results.build.message = buildResult.exitCode === 124
-      ? "Build started successfully (timed out as expected)"
-      : buildResult.exitCode === 0
-      ? "Build completed"
-      : `Build failed: ${buildResult.stderr || buildResult.stdout}`;
+    results.build.message =
+      buildResult.exitCode === 124
+        ? "Build started successfully (timed out as expected)"
+        : buildResult.exitCode === 0
+          ? "Build completed"
+          : `Build failed: ${buildResult.stderr || buildResult.stdout}`;
   }
 
   return results;
@@ -78,7 +82,7 @@ type SnapshotData = SnapshotItem[] | SnapshotItem | unknown;
 export function compareSnapshot(
   actual: SnapshotData,
   expected: SnapshotData,
-  path: string = ""
+  path: string = "",
 ): { match: boolean; differences: string[] } {
   const differences: string[] = [];
 
@@ -91,38 +95,34 @@ export function compareSnapshot(
     if (Array.isArray(a) && Array.isArray(b)) {
       const aItems = a as SnapshotItem[];
       const bItems = b as SnapshotItem[];
-      
-      const aNames = aItems.map(item => item.name).sort();
-      const bNames = bItems.map(item => item.name).sort();
-      
-      const missing = bNames.filter(name => !aNames.includes(name));
-      const extra = aNames.filter(name => !bNames.includes(name));
-      
+
+      const aNames = aItems.map((item) => item.name).sort();
+      const bNames = bItems.map((item) => item.name).sort();
+
+      const missing = bNames.filter((name) => !aNames.includes(name));
+      const extra = aNames.filter((name) => !bNames.includes(name));
+
       if (missing.length > 0) {
         differences.push(`Missing at ${currentPath}: ${missing.join(", ")}`);
       }
       if (extra.length > 0) {
         differences.push(`Extra at ${currentPath}: ${extra.join(", ")}`);
       }
-      
+
       // Compare children recursively
       for (const item of aItems) {
         const expectedItem = bItems.find((i: SnapshotItem) => i.name === item.name);
         if (expectedItem && item.children && expectedItem.children) {
-          compare(
-            item.children, 
-            expectedItem.children, 
-            `${currentPath}/${item.name}`
-          );
+          compare(item.children, expectedItem.children, `${currentPath}/${item.name}`);
         }
       }
     }
   }
 
   compare(actual, expected, path || "root");
-  
+
   return {
     match: differences.length === 0,
-    differences
+    differences,
   };
 }

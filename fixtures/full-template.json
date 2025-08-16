@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-14T03:03:46.272Z",
+  "generated": "2025-08-15T15:11:33.687Z",
   "structure": [
     {
       "type": "directory",
@@ -103,6 +103,110 @@
                   "children": [
                     {
                       "type": "directory",
+                      "name": "api",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "__tests__",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "api-utils.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "health.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "todos.test.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "docs",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "health",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "metrics",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "projects",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "ready",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "todos",
+                          "children": [
+                            {
+                              "type": "directory",
+                              "name": "[id]",
+                              "children": [
+                                {
+                                  "type": "file",
+                                  "name": "route.ts"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "docs",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "page.tsx"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
                       "name": "example-todos",
                       "children": [
                         {
@@ -120,8 +224,32 @@
                       ]
                     },
                     {
+                      "type": "directory",
+                      "name": "examples",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "todos",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "page.tsx"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "error.tsx"
+                    },
+                    {
                       "type": "file",
                       "name": "favicon.ico"
+                    },
+                    {
+                      "type": "file",
+                      "name": "global-error.tsx"
                     },
                     {
                       "type": "file",
@@ -130,6 +258,10 @@
                     {
                       "type": "file",
                       "name": "layout.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "not-found.tsx"
                     },
                     {
                       "type": "file",
@@ -196,8 +328,42 @@
                   "name": "lib",
                   "children": [
                     {
+                      "type": "directory",
+                      "name": "auth",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "api-key-store.ts"
+                        },
+                        {
+                          "type": "file",
+                          "name": "api-keys.ts"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "api-utils.ts"
+                    },
+                    {
                       "type": "file",
                       "name": "api.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "config.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "logger.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "node-runtime.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "openapi.ts"
                     },
                     {
                       "type": "file",
@@ -206,6 +372,30 @@
                     {
                       "type": "file",
                       "name": "utils.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "server",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "__tests__",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "rate-limit.test.ts"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "auth.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "rate-limit.ts"
                     }
                   ]
                 },
@@ -238,6 +428,10 @@
                 {
                   "type": "file",
                   "name": "env.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "middleware.example.ts"
                 }
               ]
             },
@@ -264,6 +458,10 @@
             {
               "type": "file",
               "name": "postcss.config.mjs"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             },
             {
               "type": "file",
@@ -371,13 +569,87 @@
         },
         {
           "type": "file",
+          "name": "MIDDLEWARE_EXTENSIBILITY.md"
+        },
+        {
+          "type": "file",
           "name": "README.md"
         }
       ]
     },
     {
       "type": "directory",
-      "name": "domains"
+      "name": "domains",
+      "children": [
+        {
+          "type": "directory",
+          "name": "todos",
+          "children": [
+            {
+              "type": "directory",
+              "name": "components",
+              "children": [
+                {
+                  "type": "file",
+                  "name": "TodoEmpty.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "TodoError.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "TodoItem.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "TodoList.tsx"
+                },
+                {
+                  "type": "file",
+                  "name": "TodoSkeleton.tsx"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "fixtures.ts"
+            },
+            {
+              "type": "file",
+              "name": "index.ts"
+            },
+            {
+              "type": "file",
+              "name": "keys.ts"
+            },
+            {
+              "type": "file",
+              "name": "logic.ts"
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "schemas.ts"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "types.ts"
+            }
+          ]
+        },
+        {
+          "type": "file",
+          "name": "README.md"
+        }
+      ]
     },
     {
       "type": "directory",
@@ -401,6 +673,276 @@
       "type": "directory",
       "name": "packages",
       "children": [
+        {
+          "type": "directory",
+          "name": "api-auth",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "apiKey.test.d.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "apiKey.test.d.ts.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "apiKey.test.js"
+                    },
+                    {
+                      "type": "file",
+                      "name": "apiKey.test.js.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "apiKey.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "contract.test.d.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "contract.test.d.ts.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "contract.test.js"
+                    },
+                    {
+                      "type": "file",
+                      "name": "contract.test.js.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "contract.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "hmac.test.d.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "hmac.test.d.ts.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "hmac.test.js"
+                    },
+                    {
+                      "type": "file",
+                      "name": "hmac.test.js.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "hmac.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.d.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.d.ts.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.js"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.js.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "store.test.d.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "store.test.d.ts.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "store.test.js"
+                    },
+                    {
+                      "type": "file",
+                      "name": "store.test.js.map"
+                    },
+                    {
+                      "type": "file",
+                      "name": "store.test.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "apiKey.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "apiKey.d.ts.map"
+                },
+                {
+                  "type": "file",
+                  "name": "apiKey.js"
+                },
+                {
+                  "type": "file",
+                  "name": "apiKey.js.map"
+                },
+                {
+                  "type": "file",
+                  "name": "apiKey.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "contract.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "contract.d.ts.map"
+                },
+                {
+                  "type": "file",
+                  "name": "contract.js"
+                },
+                {
+                  "type": "file",
+                  "name": "contract.js.map"
+                },
+                {
+                  "type": "file",
+                  "name": "contract.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "hmac.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "hmac.d.ts.map"
+                },
+                {
+                  "type": "file",
+                  "name": "hmac.js"
+                },
+                {
+                  "type": "file",
+                  "name": "hmac.js.map"
+                },
+                {
+                  "type": "file",
+                  "name": "hmac.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.d.ts.map"
+                },
+                {
+                  "type": "file",
+                  "name": "index.js"
+                },
+                {
+                  "type": "file",
+                  "name": "index.js.map"
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "store.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "store.d.ts.map"
+                },
+                {
+                  "type": "file",
+                  "name": "store.js"
+                },
+                {
+                  "type": "file",
+                  "name": "store.js.map"
+                },
+                {
+                  "type": "file",
+                  "name": "store.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "types.d.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "types.d.ts.map"
+                },
+                {
+                  "type": "file",
+                  "name": "types.js"
+                },
+                {
+                  "type": "file",
+                  "name": "types.js.map"
+                },
+                {
+                  "type": "file",
+                  "name": "types.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.d.ts"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.d.ts.map"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.js"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.js.map"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
+            }
+          ]
+        },
         {
           "type": "directory",
           "name": "api-client",
@@ -447,7 +989,15 @@
                 },
                 {
                   "type": "file",
+                  "name": "fetch.ts"
+                },
+                {
+                  "type": "file",
                   "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "todos.ts"
                 }
               ]
             },
@@ -689,10 +1239,6 @@
                 },
                 {
                   "type": "file",
-                  "name": "fetch.ts"
-                },
-                {
-                  "type": "file",
                   "name": "hooks.ts"
                 },
                 {
@@ -713,6 +1259,10 @@
                 },
                 {
                   "type": "file",
+                  "name": "todos.ts"
+                },
+                {
+                  "type": "file",
                   "name": "utils.ts"
                 }
               ]
@@ -728,6 +1278,106 @@
             {
               "type": "file",
               "name": "vitest.config.ts"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "rate-limit",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "memoryStore.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "rateLimiter.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "memoryStore.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "types.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "runtime-config",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "rateLimit.test.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "rateLimit.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
             }
           ]
         },
@@ -825,7 +1475,19 @@
     },
     {
       "type": "directory",
-      "name": "services"
+      "name": "services",
+      "children": [
+        {
+          "type": "directory",
+          "name": "repository",
+          "children": [
+            {
+              "type": "file",
+              "name": "todos-repo.ts"
+            }
+          ]
+        }
+      ]
     },
     {
       "type": "directory",
@@ -850,6 +1512,10 @@
             {
               "type": "file",
               "name": "copy-fonts.js"
+            },
+            {
+              "type": "file",
+              "name": "mint-api-key.ts"
             }
           ]
         }
