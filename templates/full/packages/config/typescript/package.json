@@ -18,6 +18,9 @@
     "./react-library": "./react-library.json",
     "./package.json": "./package.json"
   },
+  "dependencies": {
+    "@atlas/config-prettier": "workspace:*"
+  },
   "engines": {
     "node": ">=22.18.0"
   },
