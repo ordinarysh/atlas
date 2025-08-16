@@ -1,110 +1,85 @@
-# 📚 Documentation Hub
+# Documentation Hub
 
-Welcome to the comprehensive documentation for your modern monorepo boilerplate! Everything you need to build production-ready applications.
+Enterprise-grade monorepo template with Next.js, TypeScript, and production-ready patterns.
 
-## 🚀 Quick Start
+## Quick Start
 
-New to this boilerplate? Start here:
+New to Atlas? Start here:
 
-1. **[📖 Getting Started](./setup/GETTING_STARTED.md)** - First steps and overview
-2. **[🏗️ Project Structure](./setup/PROJECT_STRUCTURE.md)** - Understanding the monorepo
-3. **[🎨 Styling Guide](./frontend/TAILWIND.md)** - Tailwind CSS setup
-4. **[🔧 Development Workflow](./development/WORKFLOW.md)** - Day-to-day development
+1. **[Getting Started](./getting-started.md)** - Setup and first steps
+2. **[Architecture](./architecture.md)** - System overview and design
+3. **[Conventions](./conventions.md)** - Code standards and practices
+4. **[API Overview](./api-overview.md)** - API development patterns
 
-## 📁 Documentation Structure
+## Central Documentation
 
-### 🏗️ **Setup & Architecture**
-- **[Getting Started](./setup/GETTING_STARTED.md)** - Initial setup and overview
-- **[Project Structure](./setup/PROJECT_STRUCTURE.md)** - Monorepo architecture explained  
-- **[Environment Variables](./setup/ENVIRONMENT.md)** - dotenv configuration
-- **[Font Setup](./setup/FONT_SETUP.md)** - Adding custom fonts
+### System Design
+- **[Architecture](./architecture.md)** - Modular monorepo architecture and request lifecycle
+- **[Conventions](./conventions.md)** - Naming, TypeScript patterns, testing, and PR standards
+- **[API Overview](./api-overview.md)** - Route handlers, controller patterns, and response envelopes
 
-### 🎨 **Frontend & UI**
-- **[Tailwind CSS](./frontend/TAILWIND.md)** - Styling system and customization
-- **[Animations](./frontend/MOTION.md)** - Motion/Framer Motion setup
-- **[TypeScript](./frontend/TYPESCRIPT.md)** - Type safety best practices
-- **[Components](./frontend/COMPONENTS.md)** - UI component patterns
+### Security & Infrastructure  
+- **[Authentication & Security](./auth-and-security.md)** - API keys, HMAC validation, and security patterns
+- **[Addons & Extensions](./addons.md)** - Redis, Sentry, and middleware integration patterns
+- **[CI & Automation](./ci-and-automation.md)** - Template validation, quality checks, and build processes
 
-### 🔒 **Authentication & Security**  
-- **[BetterAuth Setup](./auth/BETTER_AUTH.md)** - Complete auth implementation
-- **[OAuth Integration](./auth/OAUTH.md)** - Social login configuration
-- **[MFA Setup](./auth/MFA.md)** - Multi-factor authentication
-- **[Security Best Practices](./auth/SECURITY.md)** - Security guidelines
+### Project Management
+- **[Getting Started](./getting-started.md)** - Installation, setup, and project structure overview
+- **[Release Notes](./release-notes.md)** - Version history and migration guides
 
-### 📊 **Data & State Management**
-- **[React Query](./data/REACT_QUERY.md)** - Data fetching and caching
-- **[Schema Validation](./data/ZOD.md)** - Zod validation patterns
-- **[Redis Caching](./data/REDIS.md)** - Upstash Redis integration
-- **[State Patterns](./data/STATE_MANAGEMENT.md)** - State architecture
+## Colocated Documentation
 
-### 🧪 **Testing & Quality**
-- **[Unit Testing](./testing/VITEST.md)** - Vitest setup and patterns
-- **[E2E Testing](./testing/PLAYWRIGHT.md)** - Playwright configuration  
-- **[Testing Strategy](./testing/STRATEGY.md)** - Overall testing approach
-- **[Code Quality](./testing/QUALITY.md)** - ESLint, Prettier, Husky
+### Application Layer
+- **[Web App](../apps/web/README.md)** - Next.js application with API routes and frontend
 
-### 🚀 **DevOps & Deployment**
-- **[CI/CD Pipeline](./devops/GITHUB_ACTIONS.md)** - GitHub Actions setup
-- **[Error Monitoring](./devops/SENTRY.md)** - Sentry integration
-- **[Performance](./devops/PERFORMANCE.md)** - Optimization strategies
-- **[Deployment](./devops/DEPLOYMENT.md)** - Production deployment
+### Domain Layer
+- **[Domains](../domains/README.md)** - Business logic, validation, and feature modules
 
-### 🛠️ **Development**
-- **[Development Workflow](./development/WORKFLOW.md)** - Day-to-day development
-- **[Git Conventions](./development/GIT.md)** - Commit standards and hooks
-- **[Code Style](./development/CODE_STYLE.md)** - Formatting and standards
-- **[Debugging](./development/DEBUGGING.md)** - Debug tools and techniques
+### Service Layer
+- **[Rate Limiting](../services/rate-limit/README.md)** - Provider-agnostic rate limiting service
+- **[Repository](../services/repository/README.md)** - Data access patterns and persistence
 
-### 📖 **Guides & Examples**
-- **[Common Patterns](./guides/PATTERNS.md)** - Reusable code patterns
-- **[Recipes](./guides/RECIPES.md)** - Step-by-step implementations
-- **[Migration Guide](./guides/MIGRATION.md)** - Upgrading and migrating
-- **[Troubleshooting](./guides/TROUBLESHOOTING.md)** - Common issues and solutions
+### Package Layer
+- **[API Client](../packages/api-client/README.md)** - Type-safe HTTP client with validation
+- **[API Auth](../packages/api-auth/README.md)** - Authentication and authorization
+- **[Config](../packages/config/README.md)** - Shared ESLint, TypeScript, and Prettier configs
+- **[Query](../packages/query/README.md)** - React Query utilities and caching patterns
+- **[Design System](../packages/design-system/README.md)** - Tailwind CSS preset and design tokens
+- **[UI Components](../packages/ui/README.md)** - Base UI component library
 
-### 🔧 **API Reference**
-- **[Configuration](./api/CONFIGURATION.md)** - All config options
-- **[Scripts](./api/SCRIPTS.md)** - Available npm/pnpm scripts
-- **[Utilities](./api/UTILITIES.md)** - Helper functions and utilities
+## Technology Stack
 
-## 🎯 Technology Coverage
-
-This documentation covers the complete tech stack:
-
-**Core Stack:**
+**Core Framework:**
 - ⚡ Next.js 15 + React + TypeScript
-- 🎨 Tailwind CSS + Motion/Framer Motion
-- 🔒 BetterAuth (OAuth, MFA, User Management)
-- 📊 React Query + Zod + Upstash Redis
+- 🎨 Tailwind CSS v4 + Design System
+- 🔐 HMAC API Authentication + Rate Limiting
 
-**Development & Testing:**
-- 🧪 Vitest + Playwright + ESLint + Prettier
-- 🪝 Husky + Commitlint + dotenv
-- 🔍 Sentry + React Query DevTools
+**Data & State:**
+- 📊 React Query + Type-safe API Client
+- ✅ Zod Validation + Domain-Driven Design
+- 🗄️ Repository Pattern + Transaction Support
 
-**Infrastructure:**
-- 🚀 GitHub Actions CI/CD
-- 🏗️ Turborepo Monorepo
-- 📦 pnpm Workspaces
+**Development:**
+- 🧪 Vitest + TypeScript Strict Mode
+- 🔍 ESLint + Prettier + Pre-commit Hooks
+- 🏗️ Turborepo + pnpm Workspaces
 
-## 🔍 Find What You Need
+## Navigation Guide
 
-**Looking to...**
-- **Set up the project?** → [Getting Started](./setup/GETTING_STARTED.md)
-- **Style components?** → [Tailwind Guide](./frontend/TAILWIND.md)
-- **Add authentication?** → [BetterAuth Setup](./auth/BETTER_AUTH.md)
-- **Fetch data?** → [React Query Guide](./data/REACT_QUERY.md)
-- **Write tests?** → [Testing Strategy](./testing/STRATEGY.md)
-- **Deploy to production?** → [Deployment Guide](./devops/DEPLOYMENT.md)
-- **Debug an issue?** → [Troubleshooting](./guides/TROUBLESHOOTING.md)
+**Setting up the project?** → [Getting Started](./getting-started.md)
+**Understanding the codebase?** → [Architecture](./architecture.md)
+**Building APIs?** → [API Overview](./api-overview.md)
+**Adding authentication?** → [Authentication & Security](./auth-and-security.md)
+**Extending functionality?** → [Addons & Extensions](./addons.md)
+**Setting up CI/CD?** → [CI & Automation](./ci-and-automation.md)
 
-## 🤝 Contributing to Docs
+## Documentation Principles
 
-Found something missing or incorrect? 
-
-1. Check [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines
-2. Create an issue or PR with improvements
-3. Follow the existing documentation patterns
+- **Colocated Truth**: Each folder has a README with extension points
+- **Central Cross-cutting**: Shared patterns documented centrally
+- **Tarball Portable**: All links are relative, no external dependencies
+- **Enterprise Ready**: Production patterns with security and performance focus
 
 ---
 
-**Built for modern development teams who value quality, speed, and maintainability.** 🚀
+*Atlas Template v2.0.0 | Last updated: 2025-08-16*
