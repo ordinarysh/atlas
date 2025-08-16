@@ -1,337 +1,277 @@
-# @atlas/services-rate-limit
+# Purpose
 
-Provider-agnostic rate limiting service implementation using Hexagonal Architecture (Port & Adapter pattern).
+Provider-agnostic rate limiting service with Redis and in-memory storage adapters for API protection and traffic management.
 
-## Overview
+## Public Surface
 
-This package provides a production-ready rate limiting service that can be used with different storage backends:
+- **Rate Limiter Factory**: `createRateLimiter()`, `createRateLimiterFromConfig()`
+- **Storage Adapters**: `InMemoryStore`, `RedisStore` implementations
+- **Rate Limit Interface**: `RateLimitStore` contract for custom adapters
+- **Configuration Types**: `RateLimitConfig`, `RateLimitResult` interfaces
+- **Middleware Integration**: Express/Next.js rate limiting utilities
 
-- **In-Memory Store** (default) - For development and single-instance deployments
-- **Redis Store** (via addon) - For distributed production deployments
+## Responsibilities
 
-## Architecture
+- **Request Counting**: Track API requests per key (IP, user ID, API key)
+- **Window Management**: Time-based sliding/fixed windows with automatic expiration
+- **Storage Abstraction**: Provider-agnostic storage with graceful degradation
+- **Performance Optimization**: Memory management and automatic cleanup
+- **Error Handling**: Fail-open behavior on storage errors
 
-The package follows **Hexagonal Architecture** principles:
+**What doesn't belong here:**
+- Authentication logic (belongs in packages/api-auth)
+- Request routing (belongs in apps/web)
+- Business logic validation (belongs in domains/)
 
-- **Port**: `RateLimitStore` interface defines the contract for storage adapters
-- **Adapters**: Concrete implementations (`InMemoryStore`, `RedisStore`) that plug into the port
-- **Service**: `RateLimiter` class that orchestrates rate limiting logic
+## Extension Points
 
-```
-┌─────────────────────┐
-│    Application      │
-│   (RateLimiter)     │
-└─────────┬───────────┘
-          │
-    ┌─────▼─────┐     Port
-    │RateLimitStore│  (Interface)
-    └─────┬─────────┘
-          │
-    ┌─────▼─────┐ ┌─────────┐
-    │InMemoryStore RedisStore│  Adapters
-    └───────────┘ └─────────┘
-```
+### Adding a New Storage Adapter
 
-## Features
+1. **Implement RateLimitStore Interface**
+   ```typescript
+   // src/adapters/custom-store.ts
+   import { RateLimitStore, RateLimitEntry } from '../types'
+   
+   export class CustomStore implements RateLimitStore {
+     async get(key: string): Promise<RateLimitEntry | null> {
+       // Retrieve rate limit data for key
+       return { count: 1, resetAt: Date.now() + 60000 }
+     }
+     
+     async set(key: string, entry: RateLimitEntry): Promise<void> {
+       // Store rate limit data
+     }
+     
+     async increment(key: string, windowMs: number): Promise<RateLimitEntry> {
+       // Atomic increment with expiration
+       return { count: 1, resetAt: Date.now() + windowMs }
+     }
+     
+     async cleanup?(): Promise<void> {
+       // Optional: cleanup expired entries
+     }
+   }
+   ```
 
-- **Provider-agnostic**: Easy to swap between storage backends
-- **Windowed rate limiting**: Time-based windows with automatic expiration
-- **Graceful degradation**: Fail-open behavior on storage errors
-- **Production warnings**: Alerts for suboptimal configurations
-- **Memory management**: Automatic cleanup for in-memory store
-- **TypeScript first**: Full type safety and IntelliSense support
+2. **Register Adapter**
+   ```typescript
+   // src/factory.ts
+   import { registerStoreAdapter } from './registry'
+   import { CustomStore } from './adapters/custom-store'
+   
+   registerStoreAdapter('custom', (config) => {
+     return new CustomStore(config.customOptions)
+   })
+   ```
 
-## Usage
+3. **Usage**
+   ```typescript
+   const limiter = createRateLimiterFromConfig({
+     adapter: 'custom',
+     limit: 100,
+     windowMs: 60000,
+     customOptions: { /* adapter config */ }
+   })
+   ```
 
-### Basic Usage
+### Adding Rate Limit Presets
 
 ```typescript
-import { createRateLimiter, createMemoryStore } from '@atlas/services-rate-limit';
-
-// Create rate limiter with in-memory store
-const limiter = createRateLimiter({
-  limit: 100,           // 100 requests
-  windowMs: 60000,      // per minute
-  prefix: 'api',        // key prefix
-});
-
-// Check rate limit
-const result = await limiter.check('user-123');
-
-if (result.allowed) {
-  // Process request
-  console.log(`Remaining: ${result.remaining}`);
-} else {
-  // Reject request
-  console.log(`Rate limited. Reset at: ${new Date(result.resetAt)}`);
+// src/presets.ts
+export const rateLimitPresets = {
+  strict: { limit: 10, windowMs: 60000 },      // 10/min for sensitive ops
+  standard: { limit: 100, windowMs: 60000 },   // 100/min for normal API
+  permissive: { limit: 1000, windowMs: 60000 } // 1000/min for public endpoints
 }
+
+// Usage in API routes
+const limiter = createRateLimiter(rateLimitPresets.strict)
 ```
 
-### Factory Pattern
+### Middleware Integration
 
 ```typescript
-import { createRateLimiterFromConfig } from '@atlas/services-rate-limit';
+// src/middleware.ts
+import { NextRequest, NextResponse } from 'next/server'
+import { createRateLimiter } from './factory'
 
-// Use environment-based configuration
-const limiter = createRateLimiterFromConfig({
-  limit: 100,
-  windowMs: 60000,
-});
-
-// Or with explicit configuration
-const limiter = createRateLimiterFromConfig(
-  { limit: 100, windowMs: 60000 },
-  { 
-    adapter: customStoreInstance,
-    logger: console 
-  }
-);
-```
-
-### Custom Store Adapters
-
-```typescript
-import { registerStoreAdapter, createRateLimiterFromConfig } from '@atlas/services-rate-limit';
-
-// Register custom adapter
-registerStoreAdapter('redis', () => {
-  return new RedisStore(redisClient);
-});
-
-// Use via environment variable
-process.env.RATE_LIMIT_STORE = 'redis';
-const limiter = createRateLimiterFromConfig({ limit: 100, windowMs: 60000 });
-```
-
-## API Reference
-
-### RateLimiter
-
-Main service class for rate limiting operations.
-
-```typescript
-class RateLimiter implements RateLimiterAdapter {
-  constructor(options: RateLimiterOptions);
+export function createRateLimitMiddleware(config: RateLimitConfig) {
+  const limiter = createRateLimiter(config)
   
-  async check(rawKey: string): Promise<RateLimiterResult>;
-  async reset(rawKey: string): Promise<void>;
-  setErrorHandler(handler: (error: Error) => void): void;
-}
-```
-
-### RateLimitStore (Interface)
-
-Port interface that storage adapters must implement.
-
-```typescript
-interface RateLimitStore {
-  incr(key: string, windowMs: number): Promise<RateLimitResult>;
-  reset(key: string): Promise<void>;
-  cleanup?(): void | Promise<void>;
-}
-```
-
-### InMemoryStore
-
-Default in-memory storage adapter.
-
-```typescript
-class InMemoryStore implements RateLimitStore {
-  constructor(options?: { cleanupIntervalMs?: number });
-  
-  // Store-specific methods
-  getStats(): { totalKeys: number; memoryUsage: number };
-  getActiveKeys(): string[];
-  clear(): void;
-}
-```
-
-### Factory Functions
-
-```typescript
-// Create rate limiter directly
-function createRateLimiter(options: RateLimiterOptions): RateLimiterAdapter;
-
-// Create with configuration and adapter registry
-function createRateLimiterFromConfig(
-  options: RateLimiterOptions,
-  config?: RateLimiterConfig
-): RateLimiterAdapter;
-
-// Create memory store
-function createMemoryStore(options?: { cleanupIntervalMs?: number }): InMemoryStore;
-
-// Register custom adapter
-function registerStoreAdapter(name: string, factory: () => RateLimitStore): void;
-
-// Get available adapters
-function getAvailableStoreAdapters(): string[];
-```
-
-## Types
-
-### Core Types
-
-```typescript
-interface RateLimiterOptions {
-  limit: number;           // Max requests per window
-  windowMs: number;        // Window size in milliseconds
-  store?: RateLimitStore;  // Storage adapter
-  prefix?: string;         // Key prefix (default: "api")
-  onError?: (error: Error) => void; // Error handler
-}
-
-interface RateLimiterResult {
-  allowed: boolean;    // Whether request is allowed
-  remaining: number;   // Requests remaining in window
-  resetAt: number;     // Unix timestamp when window resets
-  limit: number;       // Maximum requests per window
-  count: number;       // Current count in window
-}
-
-interface RateLimitResult {
-  count: number;       // Current count in window
-  resetAt: number;     // Unix timestamp when window resets
-}
-```
-
-## Error Handling
-
-The service implements **fail-open** behavior to maintain availability:
-
-```typescript
-const limiter = createRateLimiter({
-  limit: 100,
-  windowMs: 60000,
-  onError: (error) => {
-    // Log error but don't block requests
-    logger.error('Rate limit store error', error);
+  return async (request: NextRequest) => {
+    const key = getClientKey(request) // IP, user ID, API key
+    const result = await limiter.check(key)
+    
+    if (!result.allowed) {
+      return NextResponse.json(
+        { error: 'RATE_LIMIT_EXCEEDED', message: 'Too many requests' },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': config.limit.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(result.resetAt).toISOString()
+          }
+        }
+      )
+    }
+    
+    return null // Allow request to proceed
   }
-});
-
-// If store fails, requests are allowed
-const result = await limiter.check('user-123');
-// result.allowed will be true even if store is down
+}
 ```
 
-## Environment Variables
-
-The factory supports environment-based configuration:
-
-```bash
-RATE_LIMIT_STORE=memory  # or 'redis' (requires addon)
-```
-
-## Production Considerations
-
-### Memory Store Warnings
-
-The in-memory store will warn when used in production:
-
-```
-⚠️  WARNING: Using in-memory rate limiting in production.
-This will not work correctly with multiple server instances.
-Use a Redis-based store for production deployments.
-```
-
-### Redis Integration
-
-For distributed rate limiting, install the Redis addon:
-
-```bash
-# Add Redis addon (when available)
-npx atlas add redis-rate-limit
-```
-
-This will:
-- Install Redis dependencies
-- Add `RedisStore` implementation
-- Register Redis adapter in factory
-- Provide environment configuration
-
-### Cleanup and Memory Management
-
-The in-memory store automatically cleans up expired entries:
+### Custom Algorithms
 
 ```typescript
-const store = createMemoryStore({
-  cleanupIntervalMs: 30000  // Clean up every 30 seconds
-});
-
-// Monitor memory usage
-const stats = store.getStats();
-console.log(`Active keys: ${stats.totalKeys}, Memory: ${stats.memoryUsage} bytes`);
+// src/algorithms/token-bucket.ts
+export class TokenBucketLimiter implements RateLimiter {
+  async check(key: string): Promise<RateLimitResult> {
+    const bucket = await this.store.get(key) || this.createBucket()
+    
+    // Refill tokens based on time elapsed
+    const now = Date.now()
+    const tokensToAdd = Math.floor((now - bucket.lastRefill) / this.refillInterval)
+    bucket.tokens = Math.min(bucket.capacity, bucket.tokens + tokensToAdd)
+    bucket.lastRefill = now
+    
+    if (bucket.tokens > 0) {
+      bucket.tokens--
+      await this.store.set(key, bucket)
+      return { allowed: true, remaining: bucket.tokens, resetAt: bucket.lastRefill + this.windowMs }
+    }
+    
+    return { allowed: false, remaining: 0, resetAt: bucket.lastRefill + this.windowMs }
+  }
+}
 ```
 
 ## Testing
 
-Run the test suite:
+### Unit Testing
+```typescript
+// __tests__/rate-limiter.test.ts
+import { createRateLimiter, createMemoryStore } from '../src'
 
+describe('RateLimiter', () => {
+  let limiter: RateLimiter
+  
+  beforeEach(() => {
+    limiter = createRateLimiter({
+      limit: 3,
+      windowMs: 60000,
+      store: createMemoryStore()
+    })
+  })
+  
+  it('allows requests within limit', async () => {
+    const result1 = await limiter.check('user-1')
+    const result2 = await limiter.check('user-1')
+    const result3 = await limiter.check('user-1')
+    
+    expect(result1.allowed).toBe(true)
+    expect(result2.allowed).toBe(true)
+    expect(result3.allowed).toBe(true)
+    expect(result3.remaining).toBe(0)
+  })
+  
+  it('blocks requests over limit', async () => {
+    // Exhaust limit
+    await limiter.check('user-1')
+    await limiter.check('user-1')
+    await limiter.check('user-1')
+    
+    // Should be blocked
+    const result = await limiter.check('user-1')
+    expect(result.allowed).toBe(false)
+    expect(result.remaining).toBe(0)
+  })
+  
+  it('isolates different keys', async () => {
+    // Exhaust limit for user-1
+    await limiter.check('user-1')
+    await limiter.check('user-1')
+    await limiter.check('user-1')
+    
+    // user-2 should still be allowed
+    const result = await limiter.check('user-2')
+    expect(result.allowed).toBe(true)
+  })
+})
+```
+
+### Integration Testing
+```typescript
+// __tests__/integration/redis-store.test.ts
+import { createRateLimiter, createRedisStore } from '../src'
+import Redis from 'ioredis'
+
+describe('Redis Store Integration', () => {
+  let redis: Redis
+  let limiter: RateLimiter
+  
+  beforeAll(() => {
+    redis = new Redis(process.env.REDIS_URL)
+    limiter = createRateLimiter({
+      limit: 5,
+      windowMs: 60000,
+      store: createRedisStore(redis)
+    })
+  })
+  
+  afterAll(() => {
+    redis.disconnect()
+  })
+  
+  it('persists rate limit data across checks', async () => {
+    const result1 = await limiter.check('integration-test')
+    const result2 = await limiter.check('integration-test')
+    
+    expect(result2.remaining).toBe(result1.remaining - 1)
+  })
+})
+```
+
+### Performance Testing
+```typescript
+// __tests__/performance/load.test.ts
+describe('Rate Limiter Performance', () => {
+  it('handles concurrent requests', async () => {
+    const limiter = createRateLimiter({ limit: 1000, windowMs: 60000 })
+    
+    const promises = Array.from({ length: 100 }, (_, i) => 
+      limiter.check(`user-${i % 10}`)
+    )
+    
+    const results = await Promise.all(promises)
+    const allowed = results.filter(r => r.allowed).length
+    
+    expect(allowed).toBeGreaterThan(0)
+    expect(allowed).toBeLessThanOrEqual(100)
+  })
+})
+```
+
+### Commands
 ```bash
+# Run all tests
 pnpm test
+
+# Run with Redis integration
+REDIS_URL=redis://localhost:6379 pnpm test
+
+# Performance tests
+pnpm test:performance
+
+# Specific test file
+pnpm test rate-limiter.test.ts
 ```
 
-Coverage report:
+## Links
 
-```bash
-pnpm test --coverage
-```
+- **Architecture**: [../../docs/architecture.md](../../docs/architecture.md)
+- **API Integration**: [../../apps/web/README.md](../../apps/web/README.md)
+- **Auth & Security**: [../../docs/auth-and-security.md](../../docs/auth-and-security.md)
+- **Addons Guide**: [../../docs/addons.md](../../docs/addons.md)
 
-## Performance
-
-### Windowed Keys
-
-The service uses windowed keys for efficient time-based rate limiting:
-
-```typescript
-// Key format: {prefix}:{windowId}:{rawKey}
-// Example: "api:1234567:user-123"
-
-const windowId = Math.floor(Date.now() / windowMs);
-```
-
-This approach:
-- Eliminates need for TTL management
-- Provides natural expiration
-- Optimizes memory usage
-- Simplifies Redis operations
-
-### Memory Usage
-
-For in-memory store:
-- ~64 bytes per active key (estimated)
-- Automatic cleanup of expired entries
-- Configurable cleanup intervals
-- Production monitoring via `getStats()`
-
-## Migration Guide
-
-### From Express Rate Limit
-
-```typescript
-// Before (express-rate-limit)
-import rateLimit from 'express-rate-limit';
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-});
-
-// After (@atlas/services-rate-limit)
-import { createRateLimiter } from '@atlas/services-rate-limit';
-
-const limiter = createRateLimiter({
-  windowMs: 15 * 60 * 1000,
-  limit: 100
-});
-
-// Usage in middleware
-const result = await limiter.check(clientKey);
-if (!result.allowed) {
-  return res.status(429).json({ error: 'Too Many Requests' });
-}
-```
-
-## License
-
-MIT
+*Last reviewed: 2025-08-16*
