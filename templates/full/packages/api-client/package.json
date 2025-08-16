@@ -4,12 +4,16 @@
   "private": true,
   "description": "Unified API client SDK for all services",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./resources/todos": {
+      "import": "./src/resources/todos.ts",
+      "types": "./src/resources/todos.ts"
     }
   },
   "scripts": {
@@ -22,7 +26,7 @@
     "test:run": "vitest run"
   },
   "dependencies": {
-    "@atlas/query": "workspace:*",
+    "@atlas/todos-domain": "workspace:*",
     "zod": "^4.0.17"
   },
   "devDependencies": {

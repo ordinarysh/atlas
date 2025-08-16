@@ -1,22 +1,18 @@
+import type { Todo } from '@atlas/todos-domain'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { z } from 'zod'
-import {
-  createTodo,
-  CreateTodoInputSchema,
-  listTodos,
-  TodoSchema,
-  TodosResponseSchema,
-} from '../resources/todos'
-import { mockFetchJson } from './setup'
+import { createTodo, deleteTodo, getTodos, updateTodo } from '../todos'
+
+// Mock fetch globally
+global.fetch = vi.fn()
 
 describe('todos resource', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  describe('listTodos', () => {
-    it('should fetch and validate todos response', async () => {
-      const mockTodos = [
+  describe('getTodos', () => {
+    it('should fetch and return todos', async () => {
+      const mockTodos: Todo[] = [
         {
           id: '1',
           title: 'Test todo',
@@ -29,36 +25,27 @@ describe('todos resource', () => {
           title: 'Another todo',
           completed: true,
           createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z',
         },
       ]
 
-      mockFetchJson.mockResolvedValue(mockTodos)
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: mockTodos }), { status: 200 })
+      )
 
-      const result = await listTodos()
+      const result = await getTodos()
 
-      expect(mockFetchJson).toHaveBeenCalledWith(
+      expect(global.fetch).toHaveBeenCalledWith(
         '/api/todos',
         expect.objectContaining({
           method: 'GET',
-          schema: TodosResponseSchema,
         })
       )
 
       expect(result).toEqual(mockTodos)
     })
 
-    it('should use custom base URL when provided', async () => {
-      mockFetchJson.mockResolvedValue([])
-
-      await listTodos('https://api.example.com')
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        'https://api.example.com/api/todos',
-        expect.any(Object)
-      )
-    })
-
-    it('should throw validation error on malformed response', async () => {
+    it('should throw error on invalid response', async () => {
       const invalidResponse = [
         {
           id: 123, // Should be string
@@ -67,130 +54,110 @@ describe('todos resource', () => {
         },
       ]
 
-      mockFetchJson.mockImplementation((_, options) => {
-        const schema = options?.schema
-        return Promise.resolve(
-          schema?.parse(invalidResponse) ?? invalidResponse
-        )
-      })
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: invalidResponse }), { status: 200 })
+      )
 
-      await expect(listTodos()).rejects.toThrow(z.ZodError)
+      try {
+        await getTodos()
+        expect.fail('Expected getTodos to throw an error')
+      } catch (error: unknown) {
+        expect(error).toHaveProperty('name', 'ZodError')
+        expect(error).toHaveProperty('issues')
+      }
     })
   })
 
   describe('createTodo', () => {
-    it('should create todo and validate response', async () => {
+    it('should create todo and return result', async () => {
       const input = {
         title: 'New todo',
-        completed: false,
       }
 
-      const mockResponse = {
+      const mockResponse: Todo = {
         id: '3',
         title: 'New todo',
         completed: false,
         createdAt: '2024-01-01T00:00:00Z',
+        updatedAt: '2024-01-01T00:00:00Z',
       }
 
-      mockFetchJson.mockResolvedValue(mockResponse)
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: mockResponse }), { status: 201 })
+      )
 
       const result = await createTodo(input)
 
-      expect(mockFetchJson).toHaveBeenCalledWith(
+      expect(global.fetch).toHaveBeenCalledWith(
         '/api/todos',
         expect.objectContaining({
           method: 'POST',
-          body: input,
-          schema: TodoSchema,
+          body: JSON.stringify(input),
         })
       )
 
       expect(result).toEqual(mockResponse)
     })
 
-    it('should use custom base URL when provided', async () => {
-      const input = { title: 'Test', completed: false }
-      mockFetchJson.mockResolvedValue({
-        id: '1',
-        title: 'Test',
-        completed: false,
-        createdAt: '2024-01-01T00:00:00Z',
-      })
-
-      await createTodo(input, 'https://api.example.com')
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        'https://api.example.com/api/todos',
-        expect.any(Object)
-      )
-    })
-
-    it('should throw validation error on malformed response', async () => {
-      const input = { title: 'Test', completed: false }
-      const invalidResponse = {
-        id: 123, // Should be string
-        title: 'Test',
-        // Missing required 'completed' field
-        createdAt: '2024-01-01T00:00:00Z',
+    it('should validate input before sending', async () => {
+      const invalidInput = {
+        title: '', // Should be at least 1 character
       }
 
-      mockFetchJson.mockImplementation((_, options) => {
-        const schema = options?.schema
-        return Promise.resolve(
-          schema?.parse(invalidResponse) ?? invalidResponse
-        )
-      })
-
-      await expect(createTodo(input)).rejects.toThrow(z.ZodError)
+      try {
+        await createTodo(invalidInput)
+        expect.fail('Expected createTodo to throw an error')
+      } catch (error: unknown) {
+        expect(error).toHaveProperty('name', 'ZodError')
+        expect(error).toHaveProperty('issues')
+      }
     })
   })
 
-  describe('schemas', () => {
-    it('TodoSchema should validate correct todo object', () => {
-      const validTodo = {
+  describe('updateTodo', () => {
+    it('should update todo and return result', async () => {
+      const mockResponse: Todo = {
         id: '1',
-        title: 'Test',
+        title: 'Updated todo',
         completed: true,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-02T00:00:00Z',
       }
 
-      expect(() => TodoSchema.parse(validTodo)).not.toThrow()
-    })
-
-    it('TodoSchema should allow optional updatedAt', () => {
-      const validTodo = {
-        id: '1',
-        title: 'Test',
-        completed: true,
-        createdAt: '2024-01-01T00:00:00Z',
-      }
-
-      expect(() => TodoSchema.parse(validTodo)).not.toThrow()
-    })
-
-    it('CreateTodoInputSchema should validate input', () => {
-      const validInput = {
-        title: 'New todo',
-        completed: true,
-      }
-
-      expect(() => CreateTodoInputSchema.parse(validInput)).not.toThrow()
-    })
-
-    it('CreateTodoInputSchema should default completed to false', () => {
-      const input = { title: 'New todo' }
-      const parsed = CreateTodoInputSchema.parse(input)
-
-      expect(parsed.completed).toBe(false)
-    })
-
-    it('CreateTodoInputSchema should reject empty title', () => {
-      const invalidInput = { title: '' }
-
-      expect(() => CreateTodoInputSchema.parse(invalidInput)).toThrow(
-        z.ZodError
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: mockResponse }), { status: 200 })
       )
+
+      const result = await updateTodo('1', { completed: true })
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/todos/1',
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify({ completed: true }),
+        })
+      )
+
+      expect(result).toEqual(mockResponse)
+    })
+  })
+
+  describe('deleteTodo', () => {
+    it('should delete todo and return success', async () => {
+      vi.mocked(global.fetch).mockResolvedValueOnce(
+        new Response(JSON.stringify({ success: true }), { status: 200 })
+      )
+
+      const result = await deleteTodo('1')
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/todos/1',
+        expect.objectContaining({
+          method: 'DELETE',
+        })
+      )
+
+      expect(result).toEqual({ success: true })
     })
   })
 })

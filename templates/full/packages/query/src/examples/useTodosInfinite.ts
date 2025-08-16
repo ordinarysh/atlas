@@ -6,7 +6,7 @@ import {
   type UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
 import { z } from "zod";
-import { fetchJson } from "../fetch";
+import { fetchJson } from "@atlas/api-client";
 import { todoKeys } from "./keys";
 import { TodosResponseSchema, type Todo, type TodoFilters, type TodosResponse } from "./types";
 
@@ -159,7 +159,7 @@ export function useTodosInfinite(
       // Set page size
       params.set("limit", "20");
 
-      return fetchJson(`/api/todos?${params.toString()}`, {
+      return fetchJson<TodosInfiniteResponse>(`/api/todos?${params.toString()}`, {
         schema: TodosInfiniteResponseSchema,
       });
     },
