@@ -2,9 +2,10 @@
   "extends": "@atlas/config-typescript/react-library",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": ".",
-    "declarationDir": "dist/types",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "rootDir": "src"
   },
   "include": [
     "src/**/*.ts",

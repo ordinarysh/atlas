@@ -18,7 +18,7 @@ scalability, maintainability, and developer experience.
 
 ### @repo/configs-eslint
 
-**Location**: `packages/configs/eslint`
+**Location**: `packages/config/eslint`
 
 Provides ESLint v9 flat config with typescript-eslint v8 support. Includes multiple presets for
 different use cases.

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./packages/configs/typescript/base.json",
+  "extends": "./packages/config/typescript/base.json",
   "compilerOptions": {
     // =================================================================
     // Monorepo Root Configuration
@@ -17,10 +17,10 @@
     "paths": {
       "@atlas/ui": ["./packages/ui/src"],
       "@atlas/ui/*": ["./packages/ui/src/*"],
-      "@atlas/config-typescript": ["./packages/configs/typescript"],
-      "@atlas/config-typescript/*": ["./packages/configs/typescript/*"],
-      "@atlas/config-eslint": ["./packages/configs/eslint"],
-      "@atlas/config-eslint/*": ["./packages/configs/eslint/*"]
+      "@atlas/config-typescript": ["./packages/config/typescript"],
+      "@atlas/config-typescript/*": ["./packages/config/typescript/*"],
+      "@atlas/config-eslint": ["./packages/config/eslint"],
+      "@atlas/config-eslint/*": ["./packages/config/eslint/*"]
     },
     "module": "ESNext", // Use modern module syntax
     "moduleResolution": "bundler", // Use modern bundler resolution
@@ -42,8 +42,8 @@
   },
   "references": [
     { "path": "./packages/ui" },
-    { "path": "./packages/configs/eslint" },
-    { "path": "./packages/configs/typescript" }
+    { "path": "./packages/config/eslint" },
+    { "path": "./packages/config/typescript" }
   ],
   "include": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.mjs", "*.cjs", "*.json"],
   "exclude": [

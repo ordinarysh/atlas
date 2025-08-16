@@ -3,7 +3,7 @@ import js from "@eslint/js";
 // Use the /flat export for better config inspector experience
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import tseslint from "typescript-eslint";
-import eslintConfig from "./packages/configs/eslint/base.js";
+import eslintConfig from "./packages/config/eslint/base.js";
 
 export default tseslint.config(
   // Global ignores must come first
@@ -31,6 +31,11 @@ export default tseslint.config(
       "**/*.json",
       "**/*.jsonc",
       "pnpm-lock.yaml",
+      // Generated TypeScript files that shouldn't be linted
+      "packages/*/src/**/*.d.ts",
+      "packages/*/src/**/*.js",
+      "packages/*/src/**/*.js.map",
+      "packages/*/src/**/*.d.ts.map",
     ],
   },
 
@@ -88,6 +93,25 @@ export default tseslint.config(
       "@typescript-eslint/only-throw-error": "error", // New in v8 - ensure only Error objects are thrown
       "@typescript-eslint/no-array-delete": "error", // New in v8 - prevent array delete
       "@typescript-eslint/no-unsafe-unary-minus": "error", // New in v8
+    },
+  },
+
+  // Node.js packages configuration - add Node.js globals
+  {
+    name: "@repo/root/nodejs-packages",
+    files: ["packages/*/**/*.{js,ts}"],
+    languageOptions: {
+      globals: {
+        Buffer: "readonly",
+        console: "readonly",
+        process: "readonly",
+        global: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        performance: "readonly",
+      },
     },
   },
 
