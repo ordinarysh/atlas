@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-16T17:20:20.418Z",
+  "generated": "2025-08-17T16:05:04.873Z",
   "structure": [
     {
       "type": "directory",
@@ -456,72 +456,32 @@
       "name": "docs",
       "children": [
         {
-          "type": "directory",
-          "name": "development",
-          "children": [
-            {
-              "type": "file",
-              "name": "COMMANDS.md"
-            },
-            {
-              "type": "file",
-              "name": "CONFIG_SYSTEM.md"
-            },
-            {
-              "type": "file",
-              "name": "WORKFLOW.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "frontend",
-          "children": [
-            {
-              "type": "file",
-              "name": "TAILWIND.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "guides",
-          "children": [
-            {
-              "type": "file",
-              "name": "TROUBLESHOOTING.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "setup",
-          "children": [
-            {
-              "type": "file",
-              "name": "ENVIRONMENT.md"
-            },
-            {
-              "type": "file",
-              "name": "FONT_SETUP.md"
-            },
-            {
-              "type": "file",
-              "name": "GETTING_STARTED.md"
-            },
-            {
-              "type": "file",
-              "name": "MONOREPO_LAYOUTS.md"
-            }
-          ]
+          "type": "file",
+          "name": "addons.md"
         },
         {
           "type": "file",
-          "name": "_INDEX.md"
+          "name": "api-overview.md"
         },
         {
           "type": "file",
-          "name": "MIDDLEWARE_EXTENSIBILITY.md"
+          "name": "architecture.md"
+        },
+        {
+          "type": "file",
+          "name": "auth-and-security.md"
+        },
+        {
+          "type": "file",
+          "name": "ci-and-automation.md"
+        },
+        {
+          "type": "file",
+          "name": "conventions.md"
+        },
+        {
+          "type": "file",
+          "name": "getting-started.md"
         },
         {
           "type": "file",
@@ -529,7 +489,7 @@
         },
         {
           "type": "file",
-          "name": "SECURITY.md"
+          "name": "release-notes.md"
         }
       ]
     },
@@ -854,6 +814,10 @@
                   "name": "tsconfig.json"
                 }
               ]
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             }
           ]
         },
@@ -984,6 +948,10 @@
             {
               "type": "file",
               "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             },
             {
               "type": "file",
@@ -1150,6 +1118,16 @@
               "name": "vitest.config.ts"
             }
           ]
+        },
+        {
+          "type": "directory",
+          "name": "repository",
+          "children": [
+            {
+              "type": "file",
+              "name": "README.md"
+            }
+          ]
         }
       ]
     },
@@ -1224,10 +1202,6 @@
     {
       "type": "file",
       "name": "README.md"
-    },
-    {
-      "type": "file",
-      "name": "TOOLING.md"
     },
     {
       "type": "file",
