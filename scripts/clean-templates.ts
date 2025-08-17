@@ -311,6 +311,132 @@ async function removeFiles(
 }
 
 /**
+ * Check if a file is a legitimate config file that should be preserved
+ */
+function isConfigFile(filePath: string): boolean {
+  const fileName = filePath.split("/").pop() || "";
+  const configPatterns = [
+    /^vitest\.config\.(js|ts)$/,
+    /^vite\.config\.(js|ts)$/,
+    /^eslint\.config\.(js|mjs|ts)$/,
+    /^prettier\.config\.(js|ts)$/,
+    /^tailwind\.config\.(js|ts)$/,
+    /^tsconfig.*\.json$/,
+    /^jest\.config\.(js|ts)$/,
+    /^rollup\.config\.(js|ts)$/,
+    /^webpack\.config\.(js|ts)$/,
+    /^babel\.config\.(js|ts)$/,
+    /^postcss\.config\.(js|ts)$/,
+  ];
+  
+  return configPatterns.some(pattern => pattern.test(fileName));
+}
+
+/**
+ * Clean TypeScript build artifacts from src directories (excluding config files)
+ */
+async function cleanTypeScriptArtifacts(
+  templatePath: string,
+  stats: CleanupStats,
+): Promise<void> {
+  // Find .d.ts files in src directories that have corresponding .ts files (generated declarations)
+  const declarationFiles = await glob("**/src/**/*.d.ts", {
+    cwd: templatePath,
+    absolute: true,
+    dot: true,
+  });
+
+  for (const file of declarationFiles) {
+    if (isWhitelisted(file)) continue;
+
+    // Check if there's a corresponding TypeScript source file
+    const tsFile = file.replace(/\.d\.ts$/, '.ts');
+    const tsxFile = file.replace(/\.d\.ts$/, '.tsx');
+    
+    if (existsSync(tsFile) || existsSync(tsxFile)) {
+      try {
+        const fileStats = await stat(file);
+        
+        if (isDryRun) {
+          console.log(pc.blue(`  [DRY RUN] Would remove generated TypeScript declaration: ${file}`));
+          stats.filesRemoved++;
+          stats.spaceFreed += fileStats.size;
+        } else {
+          await rm(file, { force: true });
+          stats.filesRemoved++;
+          stats.spaceFreed += fileStats.size;
+          console.log(pc.yellow(`  ✗ Removed generated TypeScript declaration: ${file}`));
+        }
+      } catch (error) {
+        console.error(pc.red(`  ⚠ Failed to remove ${file}: ${error}`));
+      }
+    }
+  }
+
+  // Find all .map files (always safe to remove - these are source maps)
+  const mapFiles = await glob("**/*.map", {
+    cwd: templatePath,
+    absolute: true,
+    dot: true,
+  });
+
+  for (const file of mapFiles) {
+    if (isWhitelisted(file)) continue;
+
+    try {
+      const fileStats = await stat(file);
+      
+      if (isDryRun) {
+        console.log(pc.blue(`  [DRY RUN] Would remove source map: ${file}`));
+        stats.filesRemoved++;
+        stats.spaceFreed += fileStats.size;
+      } else {
+        await rm(file, { force: true });
+        stats.filesRemoved++;
+        stats.spaceFreed += fileStats.size;
+        console.log(pc.yellow(`  ✗ Removed source map: ${file}`));
+      }
+    } catch (error) {
+      console.error(pc.red(`  ⚠ Failed to remove ${file}: ${error}`));
+    }
+  }
+
+  // Find .js files in src directories that have corresponding .ts files (compiled outputs)
+  const jsFiles = await glob("**/src/**/*.js", {
+    cwd: templatePath,
+    absolute: true,
+    dot: true,
+  });
+
+  for (const jsFile of jsFiles) {
+    if (isWhitelisted(jsFile) || isConfigFile(jsFile)) continue;
+
+    // Check if there's a corresponding TypeScript file
+    const tsFile = jsFile.replace(/\.js$/, '.ts');
+    const tsxFile = jsFile.replace(/\.js$/, '.tsx');
+    
+    if (existsSync(tsFile) || existsSync(tsxFile)) {
+      try {
+        const fileStats = await stat(jsFile);
+        
+        if (isDryRun) {
+          console.log(pc.blue(`  [DRY RUN] Would remove compiled JS from src: ${jsFile}`));
+          stats.filesRemoved++;
+          stats.spaceFreed += fileStats.size;
+        } else {
+          await rm(jsFile, { force: true });
+          stats.filesRemoved++;
+          stats.spaceFreed += fileStats.size;
+          console.log(pc.yellow(`  ✗ Removed compiled JS from src: ${jsFile}`));
+        }
+      } catch (error) {
+        console.error(pc.red(`  ⚠ Failed to remove ${jsFile}: ${error}`));
+      }
+    }
+  }
+}
+
+/**
  * Format bytes to human readable format
  */
 function formatBytes(bytes: number): string {
@@ -405,6 +531,9 @@ async function cleanTemplate(templatePath: string): Promise<CleanupStats> {
     }
   }
 
+  // Clean TypeScript build artifacts
+  await cleanTypeScriptArtifacts(templatePath, stats);
+
   return stats;
 }
 
@@ -447,6 +576,58 @@ async function validateTemplate(templatePath: string): Promise<boolean> {
         `Found ${forbiddenFiles.length} files matching ${filePattern} (excluding whitelisted)`,
       );
     }
+  }
+
+  // Check for generated TypeScript declaration files in src directories (.d.ts with .ts counterparts)
+  const declarationFiles = await glob("**/src/**/*.d.ts", {
+    cwd: templatePath,
+    dot: true,
+  });
+  let generatedDeclarationCount = 0;
+  for (const declarationFile of declarationFiles) {
+    const fullDtsPath = join(templatePath, declarationFile);
+    if (isWhitelisted(fullDtsPath)) continue;
+    
+    const tsFile = fullDtsPath.replace(/\.d\.ts$/, '.ts');
+    const tsxFile = fullDtsPath.replace(/\.d\.ts$/, '.tsx');
+    if (existsSync(tsFile) || existsSync(tsxFile)) {
+      generatedDeclarationCount++;
+    }
+  }
+  if (generatedDeclarationCount > 0) {
+    isClean = false;
+    issues.push(`Found ${generatedDeclarationCount} generated TypeScript declaration files in src directories (.d.ts)`);
+  }
+
+  const mapFiles = await glob("**/*.map", {
+    cwd: templatePath,
+    dot: true,
+  });
+  const forbiddenMaps = mapFiles.filter(file => !isWhitelisted(join(templatePath, file)));
+  if (forbiddenMaps.length > 0) {
+    isClean = false;
+    issues.push(`Found ${forbiddenMaps.length} source map files (.map)`);
+  }
+
+  // Check for compiled JavaScript files in src directories that have TypeScript counterparts
+  const jsFiles = await glob("**/src/**/*.js", {
+    cwd: templatePath,
+    dot: true,
+  });
+  let compiledJsCount = 0;
+  for (const jsFile of jsFiles) {
+    const fullJsPath = join(templatePath, jsFile);
+    if (isWhitelisted(fullJsPath) || isConfigFile(fullJsPath)) continue;
+    
+    const tsFile = fullJsPath.replace(/\.js$/, '.ts');
+    const tsxFile = fullJsPath.replace(/\.js$/, '.tsx');
+    if (existsSync(tsFile) || existsSync(tsxFile)) {
+      compiledJsCount++;
+    }
+  }
+  if (compiledJsCount > 0) {
+    isClean = false;
+    issues.push(`Found ${compiledJsCount} compiled JavaScript files in src directories with TypeScript counterparts`);
   }
 
   if (isClean) {
