@@ -3,11 +3,20 @@ import {
   createRateLimitPresets,
   getRateLimitConfig,
 } from '@atlas/config-rate-limit'
+
+// Local interface to ensure type safety for config usage
+interface LocalRateLimitConfig {
+  max: number
+  windowMs: number
+  prefix: string
+  provider: 'memory' | 'redis'
+  trustProxy: boolean
+}
 import {
   createMemoryStore,
   createRateLimiter,
-  type RateLimiter,
-} from '@atlas/rate-limit'
+  type RateLimiterAdapter,
+} from '@atlas/services-rate-limit'
 import { API_ERROR_CODES } from '@/lib/api-utils'
 import { logger } from '@/lib/logger'
 
@@ -174,7 +183,7 @@ export async function requireRateLimit(
     }
 
     // Get configuration for trustProxy setting
-    const config = getRateLimitConfig()
+    const config: LocalRateLimitConfig = getRateLimitConfig()
 
     // Generate client key
     let authContext
@@ -261,7 +270,9 @@ export async function requireRateLimit(
 /**
  * Get rate limiter for specific use case
  */
-export function getRateLimiter(type: keyof typeof limiters): RateLimiter {
+export function getRateLimiter(
+  type: keyof typeof limiters
+): RateLimiterAdapter {
   return limiters[type]
 }
 
@@ -273,7 +284,7 @@ export async function resetRateLimit(
   auth?: { apiKeyId?: string },
   limiterType: keyof typeof limiters = 'standard'
 ): Promise<void> {
-  const config = getRateLimitConfig()
+  const config: LocalRateLimitConfig = getRateLimitConfig()
   const clientKey = getClientKey(headers, auth, config.trustProxy)
   const limiter = limiters[limiterType]
   await limiter.reset(clientKey)

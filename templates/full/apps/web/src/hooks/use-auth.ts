@@ -54,7 +54,10 @@ export const authKeys = createKeys('auth', {
 export function useSession() {
   return useQuery({
     queryKey: authKeys.session(),
-    queryFn: () => makeApi().get<Session>('/auth/session'),
+    queryFn: async (): Promise<Session> => {
+      const response = await makeApi().get('/auth/session')
+      return response as Session
+    },
     staleTime: 1000 * 60 * 5, // Consider fresh for 5 minutes
     retry: false, // Don't retry failed auth requests
   })
@@ -66,7 +69,10 @@ export function useSession() {
 export function useCurrentUser() {
   return useQuery({
     queryKey: authKeys.user(),
-    queryFn: () => makeApi().get<User>('/auth/me'),
+    queryFn: async (): Promise<User> => {
+      const response = await makeApi().get('/auth/me')
+      return response as User
+    },
     staleTime: 1000 * 60 * 5,
     retry: false,
   })
@@ -93,8 +99,10 @@ export function useLogin() {
   const router = useRouter()
 
   return useMutation({
-    mutationFn: (credentials: LoginInput) =>
-      makeApi().post<Session>('/auth/login', credentials),
+    mutationFn: async (credentials: LoginInput): Promise<Session> => {
+      const response = await makeApi().post('/auth/login', credentials)
+      return response as Session
+    },
     onSuccess: (session: Session) => {
       // TODO(auth): wire better-auth addon and provide getAuthToken in makeApi()
 
@@ -125,8 +133,10 @@ export function useRegister() {
   const router = useRouter()
 
   return useMutation({
-    mutationFn: (data: RegisterInput) =>
-      makeApi().post<Session>('/auth/register', data),
+    mutationFn: async (data: RegisterInput): Promise<Session> => {
+      const response = await makeApi().post('/auth/register', data)
+      return response as Session
+    },
     onSuccess: (session: Session) => {
       // TODO(auth): wire better-auth addon and provide getAuthToken in makeApi()
 
@@ -148,7 +158,9 @@ export function useLogout() {
   const router = useRouter()
 
   return useMutation({
-    mutationFn: () => makeApi().post<void>('/auth/logout'),
+    mutationFn: async (): Promise<void> => {
+      await makeApi().post('/auth/logout')
+    },
     onSuccess: () => {
       // TODO(auth): wire better-auth addon and provide getAuthToken in makeApi()
 
@@ -172,8 +184,10 @@ export function useUpdateProfile() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: UpdateProfileInput) =>
-      makeApi().patch<User>('/auth/profile', data),
+    mutationFn: async (data: UpdateProfileInput): Promise<User> => {
+      const response = await makeApi().patch('/auth/profile', data)
+      return response as User
+    },
     onMutate: async (updates) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: authKeys.user() })
@@ -211,7 +225,10 @@ export function useRefreshToken() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: () => makeApi().post<Session>('/auth/refresh'),
+    mutationFn: async (): Promise<Session> => {
+      const response = await makeApi().post('/auth/refresh')
+      return response as Session
+    },
     onSuccess: (session: Session) => {
       // TODO(auth): wire better-auth addon and provide getAuthToken in makeApi()
 
@@ -227,8 +244,10 @@ export function useRefreshToken() {
  */
 export function useRequestPasswordReset() {
   return useMutation({
-    mutationFn: (email: string) =>
-      makeApi().post<{ message: string }>('/auth/forgot-password', { email }),
+    mutationFn: async (email: string): Promise<{ message: string }> => {
+      const response = await makeApi().post('/auth/forgot-password', { email })
+      return response as { message: string }
+    },
   })
 }
 
@@ -239,11 +258,13 @@ export function useResetPassword() {
   const router = useRouter()
 
   return useMutation({
-    mutationFn: ({ token, password }: { token: string; password: string }) =>
-      makeApi().post<{ message: string }>('/auth/reset-password', {
+    mutationFn: async ({ token, password }: { token: string; password: string }): Promise<{ message: string }> => {
+      const response = await makeApi().post('/auth/reset-password', {
         token,
         password,
-      }),
+      })
+      return response as { message: string }
+    },
     onSuccess: () => {
       // Redirect to login with success message
       router.push('/login?reset=success')

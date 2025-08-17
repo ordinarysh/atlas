@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import {
-  getRateLimitConfig,
-  createRateLimitPresets,
-  __resetRedisWarningForTesting,
-} from "../index";
+import { getRateLimitConfig, createRateLimitPresets } from "../index.js";
 
 describe("Rate Limit Configuration", () => {
   let originalEnv: NodeJS.ProcessEnv;
@@ -21,7 +17,7 @@ describe("Rate Limit Configuration", () => {
     delete process.env.RATE_LIMIT_MAX;
     delete process.env.RATE_LIMIT_WINDOW_MS;
     delete process.env.RATE_LIMIT_PREFIX;
-    delete process.env.RATE_LIMIT_PROVIDER;
+    delete process.env.RATE_LIMIT_STORE;
     delete process.env.TRUST_PROXY;
     Object.assign(process.env, originalEnv);
 
@@ -66,16 +62,12 @@ describe("Rate Limit Configuration", () => {
       expect(config.prefix).toBe("custom");
     });
 
-    it("should parse RATE_LIMIT_PROVIDER from environment", () => {
-      process.env.RATE_LIMIT_PROVIDER = "redis";
+    it("should parse RATE_LIMIT_STORE from environment", () => {
+      process.env.RATE_LIMIT_STORE = "redis";
 
       const config = getRateLimitConfig();
 
-      // Should fall back to memory and show warning
-      expect(config.provider).toBe("memory");
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Redis rate limiting provider is an opt-in add-on"),
-      );
+      expect(config.provider).toBe("redis");
     });
 
     it("should parse TRUST_PROXY from environment", () => {
@@ -137,24 +129,6 @@ describe("Rate Limit Configuration", () => {
       expect(config.windowMs).toBe(60_000);
       expect(console.warn).toHaveBeenCalledWith(
         expect.stringContaining("Invalid RATE_LIMIT_WINDOW_MS"),
-      );
-    });
-
-    it("should show Redis warning only once", () => {
-      // Reset the warning flag for this test
-      __resetRedisWarningForTesting();
-
-      process.env.RATE_LIMIT_PROVIDER = "redis";
-
-      // Call multiple times
-      getRateLimitConfig();
-      getRateLimitConfig();
-      getRateLimitConfig();
-
-      // Warning should only be called once
-      expect(console.warn).toHaveBeenCalledTimes(1);
-      expect(console.warn).toHaveBeenCalledWith(
-        expect.stringContaining("Redis rate limiting provider is an opt-in add-on"),
       );
     });
   });

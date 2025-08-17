@@ -10,5 +10,6 @@
     "types": ["node"],
     "skipLibCheck": true
   },
-  "include": ["scripts", "tests", "addons", "migrations"]
+  "include": ["scripts", "tests", "addons", "migrations"],
+  "exclude": ["addons/**/templates/**"]
 }

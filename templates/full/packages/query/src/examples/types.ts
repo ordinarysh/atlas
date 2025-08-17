@@ -1,40 +1,31 @@
 import { z } from "zod";
 
-export const TodoSchema = z.object({
+export const ItemSchema = z.object({
   id: z.string(),
   title: z.string(),
-  completed: z.boolean(),
+  status: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
   userId: z.string().optional(),
 });
 
-export type Todo = z.infer<typeof TodoSchema>;
+export type Item = z.infer<typeof ItemSchema>;
 
-export const TodosResponseSchema = z.object({
-  todos: z.array(TodoSchema),
+export const ItemsResponseSchema = z.object({
+  items: z.array(ItemSchema),
   total: z.number(),
   page: z.number().optional(),
   pageSize: z.number().optional(),
 });
 
-export type TodosResponse = z.infer<typeof TodosResponseSchema>;
+export type ItemsResponse = z.infer<typeof ItemsResponseSchema>;
 
-export const CreateTodoSchema = z.object({
-  title: z.string().min(1).max(500),
-  completed: z.boolean().optional().default(false),
+export const UserSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.email(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
-export type CreateTodoInput = z.infer<typeof CreateTodoSchema>;
-
-export const UpdateTodoSchema = CreateTodoSchema.partial();
-
-export type UpdateTodoInput = z.infer<typeof UpdateTodoSchema>;
-
-export const TodoFiltersSchema = z.object({
-  status: z.enum(["all", "active", "completed"]).optional(),
-  search: z.string().optional(),
-  userId: z.string().optional(),
-});
-
-export type TodoFilters = z.infer<typeof TodoFiltersSchema>;
+export type User = z.infer<typeof UserSchema>;

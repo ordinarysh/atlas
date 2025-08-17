@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-16T02:26:26.279Z",
+  "generated": "2025-08-17T16:13:29.508Z",
   "structure": [
     {
       "type": "directory",
@@ -133,7 +133,27 @@
                             },
                             {
                               "type": "file",
-                              "name": "todos.test.ts"
+                              "name": "smoke.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "whoami.test.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "auth",
+                          "children": [
+                            {
+                              "type": "directory",
+                              "name": "me",
+                              "children": [
+                                {
+                                  "type": "file",
+                                  "name": "route.ts"
+                                }
+                              ]
                             }
                           ]
                         },
@@ -186,26 +206,6 @@
                               "name": "route.ts"
                             }
                           ]
-                        },
-                        {
-                          "type": "directory",
-                          "name": "todos",
-                          "children": [
-                            {
-                              "type": "directory",
-                              "name": "[id]",
-                              "children": [
-                                {
-                                  "type": "file",
-                                  "name": "route.ts"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "file",
-                              "name": "route.ts"
-                            }
-                          ]
                         }
                       ]
                     },
@@ -216,40 +216,6 @@
                         {
                           "type": "file",
                           "name": "page.tsx"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "directory",
-                      "name": "example-todos",
-                      "children": [
-                        {
-                          "type": "file",
-                          "name": "create-todo.tsx"
-                        },
-                        {
-                          "type": "file",
-                          "name": "page.tsx"
-                        },
-                        {
-                          "type": "file",
-                          "name": "todo-list.tsx"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "directory",
-                      "name": "examples",
-                      "children": [
-                        {
-                          "type": "directory",
-                          "name": "todos",
-                          "children": [
-                            {
-                              "type": "file",
-                              "name": "page.tsx"
-                            }
-                          ]
                         }
                       ]
                     },
@@ -297,10 +263,6 @@
                     },
                     {
                       "type": "file",
-                      "name": "example-todos.tsx"
-                    },
-                    {
-                      "type": "file",
                       "name": "header.tsx"
                     },
                     {
@@ -330,10 +292,6 @@
                     {
                       "type": "file",
                       "name": "use-auth.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "use-todos.ts"
                     }
                   ]
                 },
@@ -445,10 +403,6 @@
                 },
                 {
                   "type": "file",
-                  "name": "middleware.example.ts"
-                },
-                {
-                  "type": "file",
                   "name": "middleware.ts"
                 }
               ]
@@ -502,72 +456,32 @@
       "name": "docs",
       "children": [
         {
-          "type": "directory",
-          "name": "development",
-          "children": [
-            {
-              "type": "file",
-              "name": "COMMANDS.md"
-            },
-            {
-              "type": "file",
-              "name": "CONFIG_SYSTEM.md"
-            },
-            {
-              "type": "file",
-              "name": "WORKFLOW.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "frontend",
-          "children": [
-            {
-              "type": "file",
-              "name": "TAILWIND.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "guides",
-          "children": [
-            {
-              "type": "file",
-              "name": "TROUBLESHOOTING.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "setup",
-          "children": [
-            {
-              "type": "file",
-              "name": "ENVIRONMENT.md"
-            },
-            {
-              "type": "file",
-              "name": "FONT_SETUP.md"
-            },
-            {
-              "type": "file",
-              "name": "GETTING_STARTED.md"
-            },
-            {
-              "type": "file",
-              "name": "MONOREPO_LAYOUTS.md"
-            }
-          ]
+          "type": "file",
+          "name": "addons.md"
         },
         {
           "type": "file",
-          "name": "_INDEX.md"
+          "name": "api-overview.md"
         },
         {
           "type": "file",
-          "name": "MIDDLEWARE_EXTENSIBILITY.md"
+          "name": "architecture.md"
+        },
+        {
+          "type": "file",
+          "name": "auth-and-security.md"
+        },
+        {
+          "type": "file",
+          "name": "ci-and-automation.md"
+        },
+        {
+          "type": "file",
+          "name": "conventions.md"
+        },
+        {
+          "type": "file",
+          "name": "getting-started.md"
         },
         {
           "type": "file",
@@ -575,7 +489,7 @@
         },
         {
           "type": "file",
-          "name": "SECURITY.md"
+          "name": "release-notes.md"
         }
       ]
     },
@@ -583,70 +497,6 @@
       "type": "directory",
       "name": "domains",
       "children": [
-        {
-          "type": "directory",
-          "name": "todos",
-          "children": [
-            {
-              "type": "directory",
-              "name": "components",
-              "children": [
-                {
-                  "type": "file",
-                  "name": "TodoEmpty.tsx"
-                },
-                {
-                  "type": "file",
-                  "name": "TodoError.tsx"
-                },
-                {
-                  "type": "file",
-                  "name": "TodoItem.tsx"
-                },
-                {
-                  "type": "file",
-                  "name": "TodoList.tsx"
-                },
-                {
-                  "type": "file",
-                  "name": "TodoSkeleton.tsx"
-                }
-              ]
-            },
-            {
-              "type": "file",
-              "name": "fixtures.ts"
-            },
-            {
-              "type": "file",
-              "name": "index.ts"
-            },
-            {
-              "type": "file",
-              "name": "keys.ts"
-            },
-            {
-              "type": "file",
-              "name": "logic.ts"
-            },
-            {
-              "type": "file",
-              "name": "package.json"
-            },
-            {
-              "type": "file",
-              "name": "schemas.ts"
-            },
-            {
-              "type": "file",
-              "name": "tsconfig.json"
-            },
-            {
-              "type": "file",
-              "name": "types.ts"
-            }
-          ]
-        },
         {
           "type": "file",
           "name": "README.md"
@@ -731,19 +581,7 @@
             },
             {
               "type": "file",
-              "name": "vitest.config.d.ts"
-            },
-            {
-              "type": "file",
-              "name": "vitest.config.d.ts.map"
-            },
-            {
-              "type": "file",
               "name": "vitest.config.js"
-            },
-            {
-              "type": "file",
-              "name": "vitest.config.js.map"
             },
             {
               "type": "file",
@@ -774,20 +612,6 @@
                     {
                       "type": "file",
                       "name": "setup.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "todos.test.ts"
-                    }
-                  ]
-                },
-                {
-                  "type": "directory",
-                  "name": "resources",
-                  "children": [
-                    {
-                      "type": "file",
-                      "name": "todos.ts"
                     }
                   ]
                 },
@@ -802,10 +626,6 @@
                 {
                   "type": "file",
                   "name": "index.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "todos.ts"
                 }
               ]
             },
@@ -919,6 +739,10 @@
                     },
                     {
                       "type": "file",
+                      "name": "constants.ts"
+                    },
+                    {
+                      "type": "file",
                       "name": "index.ts"
                     }
                   ]
@@ -978,6 +802,10 @@
                   "name": "tsconfig.json"
                 }
               ]
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             }
           ]
         },
@@ -1072,14 +900,6 @@
                     {
                       "type": "file",
                       "name": "types.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "useTodos.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "useTodosInfinite.ts"
                     }
                   ]
                 },
@@ -1109,65 +929,7 @@
                 },
                 {
                   "type": "file",
-                  "name": "todos.ts"
-                },
-                {
-                  "type": "file",
                   "name": "utils.ts"
-                }
-              ]
-            },
-            {
-              "type": "file",
-              "name": "package.json"
-            },
-            {
-              "type": "file",
-              "name": "tsconfig.json"
-            },
-            {
-              "type": "file",
-              "name": "vitest.config.ts"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "rate-limit",
-          "children": [
-            {
-              "type": "directory",
-              "name": "src",
-              "children": [
-                {
-                  "type": "directory",
-                  "name": "__tests__",
-                  "children": [
-                    {
-                      "type": "file",
-                      "name": "memoryStore.test.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "rateLimiter.test.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "setup.ts"
-                    }
-                  ]
-                },
-                {
-                  "type": "file",
-                  "name": "index.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "memoryStore.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "types.ts"
                 }
               ]
             },
@@ -1273,25 +1035,85 @@
     },
     {
       "type": "directory",
-      "name": "scripts",
-      "children": [
-        {
-          "type": "file",
-          "name": "smoke.mjs"
-        }
-      ]
-    },
-    {
-      "type": "directory",
       "name": "services",
       "children": [
+        {
+          "type": "directory",
+          "name": "rate-limit",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "factory.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "in-memory.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "rate-limiter.test.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "errors.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "factory.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "in-memory.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "rate-limiter.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "types.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
+            }
+          ]
+        },
         {
           "type": "directory",
           "name": "repository",
           "children": [
             {
               "type": "file",
-              "name": "todos-repo.ts"
+              "name": "README.md"
             }
           ]
         }
@@ -1312,6 +1134,10 @@
             {
               "type": "file",
               "name": "mint-api-key.ts"
+            },
+            {
+              "type": "file",
+              "name": "smoke.mjs"
             }
           ]
         }
@@ -1364,14 +1190,6 @@
     {
       "type": "file",
       "name": "README.md"
-    },
-    {
-      "type": "file",
-      "name": "theme-validation.json"
-    },
-    {
-      "type": "file",
-      "name": "TOOLING.md"
     },
     {
       "type": "file",

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { GET, POST } from '../projects/route'
 
 // Mock the rate limiter to control behavior
-vi.mock('@atlas/rate-limit', () => {
+vi.mock('@atlas/services-rate-limit', () => {
   const mockRateLimiter = {
     check: vi.fn(),
     setErrorHandler: vi.fn(),
@@ -77,8 +77,12 @@ describe('Projects API Rate Limiting Integration', () => {
     vi.setSystemTime(new Date('2024-01-01T00:00:00Z'))
 
     // Get access to the mock through the helper
-    const rateLimitModule = await import('@atlas/rate-limit')
-    mockRateLimiter = (rateLimitModule as any).__getMockRateLimiter()
+    const rateLimitModule = await import('@atlas/services-rate-limit') as {
+      createRateLimiter: any
+      createMemoryStore: any
+      __getMockRateLimiter: () => typeof mockRateLimiter
+    }
+    mockRateLimiter = rateLimitModule.__getMockRateLimiter()
   })
 
   afterEach(() => {

@@ -59,30 +59,30 @@ function shouldExclude(path: string): boolean {
 
 async function generateSnapshotFromGit(_templatePath: string): Promise<FileNode[]> {
   // Get all tracked files in the template from git
-  const gitOutput = execSync(
-    `git ls-tree -r HEAD --name-only`,
-    { encoding: "utf-8", cwd: process.cwd() }
-  );
-  
+  const gitOutput = execSync(`git ls-tree -r HEAD --name-only`, {
+    encoding: "utf-8",
+    cwd: process.cwd(),
+  });
+
   const templateRelativePath = "templates/full/";
   const allFiles = gitOutput
     .split("\n")
-    .filter(file => file.startsWith(templateRelativePath))
-    .map(file => file.substring(templateRelativePath.length))
-    .filter(file => file.length > 0)
-    .filter(file => !shouldExclude(file));
+    .filter((file) => file.startsWith(templateRelativePath))
+    .map((file) => file.substring(templateRelativePath.length))
+    .filter((file) => file.length > 0)
+    .filter((file) => !shouldExclude(file));
 
   // Build tree structure from file paths
   const tree: Record<string, unknown> = {};
-  
+
   for (const filePath of allFiles) {
     const parts = filePath.split("/");
     let current = tree;
-    
+
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       const isLastPart = i === parts.length - 1;
-      
+
       if (isLastPart) {
         // It's a file
         current[part] = "file";
@@ -95,11 +95,11 @@ async function generateSnapshotFromGit(_templatePath: string): Promise<FileNode[
       }
     }
   }
-  
+
   // Convert tree to FileNode array
   function treeToNodes(tree: Record<string, unknown>): FileNode[] {
     const nodes: FileNode[] = [];
-    
+
     for (const [name, value] of Object.entries(tree)) {
       if (value === "file") {
         nodes.push({
@@ -118,7 +118,7 @@ async function generateSnapshotFromGit(_templatePath: string): Promise<FileNode[
         nodes.push(result);
       }
     }
-    
+
     return nodes.sort((a, b) => {
       // Directories first, then files
       if (a.type !== b.type) {
@@ -127,7 +127,7 @@ async function generateSnapshotFromGit(_templatePath: string): Promise<FileNode[
       return a.name.localeCompare(b.name);
     });
   }
-  
+
   return treeToNodes(tree);
 }
 

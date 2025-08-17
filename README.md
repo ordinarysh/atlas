@@ -45,35 +45,32 @@ Everything you need, nothing you don't:
 - **Type-Safe Configs** - Full TypeScript definitions for all configs
 - **No Conflicts** - ESLint and Prettier configured to work together
 - **Multiple Presets** - Different configs for apps, libraries, and tests
-- **[Documentation](./docs/development/CONFIG_SYSTEM.md)** - Complete configuration guide
 
-### 📦 **Workspace Structure**
+### 📦 **Repository Structure**
 
 ```
-├── apps/
-│   └── scope/                  # Next.js application
-├── packages/
-│   ├── ui/                     # Shared React components & theme
-│   ├── design-system/          # Design system tokens
-│   ├── api-client/             # Unified API client SDK
-│   └── configs/                # Shared configurations
-│       ├── eslint/             # ESLint v9 flat configs
-│       ├── prettier/           # Prettier with plugins
-│       └── typescript/         # TypeScript presets
-├── services/
-│   └── core/                   # Core domain service
-├── docs/                       # Documentation
-├── turbo.json                  # Pipeline definitions
-└── pnpm-workspace.yaml         # Workspace configuration
+├── templates/
+│   └── full/                   # Complete monorepo template
+├── addons/
+│   ├── redis/                  # Redis addon
+│   └── redis-rate-limit/       # Redis rate limiting addon
+├── migrations/                 # Version migration scripts
+├── scripts/                    # Build and validation scripts
+├── release/                    # Generated release artifacts
+├── docs/                      # Documentation
+└── pnpm-workspace.yaml        # Workspace configuration
 ```
 
 ## 🚀 **Using Atlas Templates**
 
 ### Template Consumer
 
-Templates are distributed as versioned tarballs and consumed via the Atlas CLI:
+Templates are distributed as versioned tarballs and consumed via the **[Atlas CLI](https://github.com/ordinarysh/atlas-cli)**:
 
 ```bash
+# Install Atlas CLI
+npm install -g @ordinarysh/atlas-cli
+
 # Create a new project from the full template
 atlas create my-project --template=full
 
@@ -82,7 +79,7 @@ cd my-project
 
 # Install dependencies and start developing
 pnpm install
-pnpm dev:web
+pnpm dev
 ```
 
 ### Available Templates
@@ -208,34 +205,21 @@ This boilerplate is configured for enterprise production deployment:
 
 ## 📚 **Documentation**
 
-Comprehensive guides organized by topic in `/docs`:
+- **[Release Guidelines](./docs/RELEASE_GUIDELINES.md)** - Release process and versioning
+- **[Template Checklist](./docs/TEMPLATE_V1_CHECKLIST.md)** - Production readiness checklist
+- **[CI/CD Documentation](./docs/ci.md)** - GitHub Actions workflows
+- **[Git Hooks](./docs/hooks.md)** - Pre-commit and pre-push hooks
 
-**🚀 Getting Started:**
-
-- **[📖 Getting Started](./docs/setup/GETTING_STARTED.md)** - Quick setup and first steps
-- **[🏗️ Project Structure](./docs/setup/PROJECT_STRUCTURE.md)** - Understanding the monorepo
-- **[🔧 Development Workflow](./docs/development/WORKFLOW.md)** - Daily development patterns
-
-**🎨 Frontend & Styling:**
-
-- **[🎨 Tailwind CSS](./docs/frontend/TAILWIND.md)** - Complete styling guide
-- **[🔤 Custom Fonts](./docs/setup/FONT_SETUP.md)** - Font integration guide
-- **[🌍 Environment Setup](./docs/setup/ENVIRONMENT.md)** - Environment configuration
-
-**📚 All Documentation:**
-
-- **[📖 Documentation Hub](./docs/)** - Complete index of all guides
-
-## 📚 **Template Development Guide**
+## 🛠️ **Template Development**
 
 For contributors working on Atlas templates:
 
-1. **Template Structure** - Follow the established patterns in `templates/`
-2. **Build System** - Use the automated packaging in `scripts/build-release.ts`
-3. **Quality Assurance** - All templates undergo automated validation
-4. **Versioning** - Semantic versioning with automated changelog generation
-5. **Distribution** - Templates are packaged into deterministic tarballs
-6. **Documentation** - Comprehensive guides in each template's `docs/` folder
+1. **Clone & Setup** - `git clone` this repository and run `pnpm install`
+2. **Development** - Edit templates in `templates/` directory
+3. **Validation** - Run `pnpm validate` to check template integrity
+4. **Testing** - Run `pnpm smoke:test` to test template extraction
+5. **Building** - Run `pnpm build:release` to generate release artifacts
+6. **Quality Checks** - Run `pnpm check-all` before submitting PRs
 
 ## 💡 **Why Atlas Templates?**
 

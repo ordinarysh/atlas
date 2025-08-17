@@ -125,10 +125,13 @@ describe("Contract-compliant API", () => {
     it("should support full create-verify workflow", async () => {
       // 1. Create API key with contract API
       const rawKey = generateApiKey("integration");
-      const record = await createApiKey("workflow-test", rawKey, ["read:projects", "write:todos"]);
+      const record = await createApiKey("workflow-test", rawKey, [
+        "read:projects",
+        "write:projects",
+      ]);
 
       expect(record.id).toBe("workflow-test");
-      expect(record.scopes).toEqual(["read:projects", "write:todos"]);
+      expect(record.scopes).toEqual(["read:projects", "write:projects"]);
 
       // 2. Extract key from header
       const authHeader = `Bearer ${rawKey}`;
@@ -145,10 +148,10 @@ describe("Contract-compliant API", () => {
 
       expect(auth).not.toBeNull();
       expect(auth?.id).toBe("workflow-test");
-      expect(auth?.scopes).toEqual(["read:projects", "write:todos"]);
+      expect(auth?.scopes).toEqual(["read:projects", "write:projects"]);
 
       // 4. Verify with different scope
-      const authWithDifferentScope = await verifyApiKey(extractedKey, "write:todos");
+      const authWithDifferentScope = await verifyApiKey(extractedKey, "write:projects");
 
       expect(authWithDifferentScope).not.toBeNull();
       expect(authWithDifferentScope?.id).toBe("workflow-test");

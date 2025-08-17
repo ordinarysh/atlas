@@ -27,7 +27,7 @@ interface DirectoryTree {
 
 function shouldIgnore(filePath: string, ignore: string[]): boolean {
   const fileName = filePath.split("/").pop() || "";
-  
+
   for (const pattern of ignore) {
     if (pattern.includes("*")) {
       const regex = new RegExp("^" + pattern.replace(/\*/g, ".*") + "$");
@@ -63,30 +63,30 @@ export async function getDirectoryTree(
   ],
 ): Promise<DirectoryTree> {
   // Use git to get tracked files instead of filesystem
-  const gitOutput = execSync(
-    `git ls-tree -r HEAD --name-only`,
-    { encoding: "utf-8", cwd: process.cwd() }
-  );
-  
+  const gitOutput = execSync(`git ls-tree -r HEAD --name-only`, {
+    encoding: "utf-8",
+    cwd: process.cwd(),
+  });
+
   const templateRelativePath = "templates/full/";
   const allFiles = gitOutput
     .split("\n")
-    .filter(file => file.startsWith(templateRelativePath))
-    .map(file => file.substring(templateRelativePath.length))
-    .filter(file => file.length > 0)
-    .filter(file => !shouldIgnore(file, ignore));
+    .filter((file) => file.startsWith(templateRelativePath))
+    .map((file) => file.substring(templateRelativePath.length))
+    .filter((file) => file.length > 0)
+    .filter((file) => !shouldIgnore(file, ignore));
 
   // Build tree structure from file paths
   const tree: DirectoryTree = {};
-  
+
   for (const filePath of allFiles) {
     const parts = filePath.split("/");
     let current = tree;
-    
+
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
       const isLastPart = i === parts.length - 1;
-      
+
       if (isLastPart) {
         // It's a file
         current[part] = "file";
@@ -99,7 +99,7 @@ export async function getDirectoryTree(
       }
     }
   }
-  
+
   return tree;
 }
 

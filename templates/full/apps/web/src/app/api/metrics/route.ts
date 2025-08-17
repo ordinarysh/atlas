@@ -1,15 +1,14 @@
 import * as os from 'os'
 import type { NextRequest } from 'next/server'
+import { COMMON_SCOPES } from '@atlas/api-auth'
 import { z, type ZodTypeAny } from 'zod'
-import {
-  apiResponse,
-  requirePermission,
-  withErrorHandling,
-} from '@/lib/api-utils'
+import { apiResponse, withErrorHandling } from '@/lib/api-utils'
 import { createApiKeyStore } from '@/lib/auth/api-key-store'
-import { API_PERMISSIONS } from '@/lib/auth/api-keys'
+import { createCorsPreflightResponse } from '@/lib/cors'
 import { nodeRuntime } from '@/lib/node-runtime'
 import { registerRouteDoc } from '@/lib/openapi'
+import { requireApiKey } from '@/server/auth'
+import { requireRateLimit } from '@/server/rate-limit'
 
 /**
  * Metrics response interface
@@ -18,7 +17,7 @@ import { registerRouteDoc } from '@/lib/openapi'
  * This is a lightweight metrics endpoint - for production, consider
  * using proper metrics solutions like Prometheus, DataDog, etc.
  */
-interface MetricsResponse {
+interface _MetricsResponse {
   timestamp: string
   uptime: number
   memory: {
@@ -191,8 +190,15 @@ function getEnvironmentMetrics() {
  * Requires system:metrics permission
  */
 export const GET = withErrorHandling(async (request: NextRequest) => {
-  // Require metrics permission
-  await requirePermission(request, API_PERMISSIONS.METRICS)
+  // Apply rate limiting for metrics endpoint
+  const rateLimitResult = await requireRateLimit(request, {
+    limiter: 'standard',
+  })
+  if (rateLimitResult.type === 'blocked') return rateLimitResult.response
+
+  // Require metrics scope
+  const auth = await requireApiKey(COMMON_SCOPES.METRICS)
+  if (auth instanceof Response) return auth
 
   // Gather all metrics
   const [memoryMetrics, apiMetrics] = await Promise.all([
@@ -200,33 +206,47 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     getApiMetrics(),
   ])
 
-  const metricsData: MetricsResponse = {
+  const processMetrics = getProcessMetrics()
+  const environmentMetrics = getEnvironmentMetrics()
+
+  const metricsData = {
     timestamp: new Date().toISOString(),
     uptime: nodeRuntime.uptime(),
+    system: {
+      memory: memoryMetrics,
+      process: processMetrics,
+      environment: environmentMetrics,
+    },
+    application: {
+      api: apiMetrics,
+      uptime: nodeRuntime.uptime(),
+      version: processMetrics.version,
+    },
+    // Keep original structure for backward compatibility
     memory: memoryMetrics,
-    process: getProcessMetrics(),
+    process: processMetrics,
     api: apiMetrics,
-    environment: getEnvironmentMetrics(),
+    environment: environmentMetrics,
   }
 
-  return apiResponse(metricsData, 200, {
+  const response = apiResponse(metricsData, 200, {
     'Cache-Control': 'no-cache, no-store, must-revalidate',
     'X-Content-Type': 'application/json',
   })
+
+  // Apply rate limit headers to response
+  rateLimitResult.setHeaders(response)
+  return response
 })
 
 /**
  * OPTIONS /api/metrics
  * Handle preflight requests
  */
-export function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
-      'Access-Control-Max-Age': '86400',
-    },
+export function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  return createCorsPreflightResponse(origin, {
+    allowedMethods: ['GET', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   })
 }

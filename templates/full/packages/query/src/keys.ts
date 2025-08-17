@@ -7,16 +7,16 @@ import { getQueryClient } from "./client";
  *
  * @example
  * ```ts
- * const todoKeys = createKeys('todos', {
- *   list: (filters?: TodoFilters) => ({ filters }),
+ * const itemKeys = createKeys('items', {
+ *   list: (filters?: ItemFilters) => ({ filters }),
  *   byId: (id: string) => ({ id }),
  *   byUser: (userId: string, status?: string) => ({ userId, status }),
  * })
  *
  * // Usage:
- * todoKeys.list() // ['todos', 'list']
- * todoKeys.list({ status: 'active' }) // ['todos', 'list', { filters: { status: 'active' } }]
- * todoKeys.byId('123') // ['todos', 'byId', { id: '123' }]
+ * itemKeys.list() // ['items', 'list']
+ * itemKeys.list({ status: 'active' }) // ['items', 'list', { filters: { status: 'active' } }]
+ * itemKeys.byId('123') // ['items', 'byId', { id: '123' }]
  * ```
  */
 export function createKeys<TScope extends string, TBuilders>(
@@ -73,14 +73,14 @@ export const createQueryKeys = createKeys;
  *
  * @example
  * ```ts
- * // Invalidate all todos queries
- * await invalidate.scope('todos').all()
+ * // Invalidate all items queries
+ * await invalidate.scope('items').all()
  *
  * // Invalidate specific operation
- * await invalidate.scope('todos').list()
+ * await invalidate.scope('items').list()
  *
  * // Invalidate with params
- * await invalidate.scope('todos').byId('123')
+ * await invalidate.scope('items').byId('123')
  * ```
  */
 export const invalidate = {

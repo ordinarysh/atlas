@@ -184,7 +184,7 @@ describe("verifyApiKey", () => {
     // Create a key
     const result = await createApiKey(store, {
       id: "test-key",
-      scopes: ["read:projects", "write:todos"],
+      scopes: ["read:projects", "write:projects"],
     });
 
     // Verify the key
@@ -193,7 +193,7 @@ describe("verifyApiKey", () => {
     expect(auth).not.toBeNull();
     if (auth) {
       expect(auth.id).toBe("test-key");
-      expect(auth.scopes).toEqual(["read:projects", "write:todos"]);
+      expect(auth.scopes).toEqual(["read:projects", "write:projects"]);
     }
   });
 
@@ -201,7 +201,7 @@ describe("verifyApiKey", () => {
     const store = new MemoryApiKeyStore();
 
     const result = await createApiKey(store, {
-      scopes: ["read:projects", "write:todos"],
+      scopes: ["read:projects", "write:projects"],
     });
 
     const auth = await verifyApiKey(store, result.key, "read:projects");

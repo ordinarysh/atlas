@@ -13,6 +13,7 @@ import {
   validateMethod,
   withErrorHandling,
 } from '@/lib/api-utils'
+import { createCorsPreflightResponse } from '@/lib/cors'
 import { logger } from '@/lib/logger'
 import { getAuthContext, requireApiKey } from '@/server/auth'
 import { requireRateLimit } from '@/server/rate-limit'
@@ -314,14 +315,10 @@ export const DELETE = withErrorHandling(async (request: NextRequest) => {
  * OPTIONS /api/projects
  * Handle preflight requests
  */
-export function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-API-Key',
-      'Access-Control-Max-Age': '86400',
-    },
+export function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin')
+  return createCorsPreflightResponse(origin, {
+    allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
   })
 }

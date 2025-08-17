@@ -19,10 +19,10 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/v1/todos',
+        '/v1/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -33,10 +33,10 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1/' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/v1/todos',
+        '/v1/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -47,10 +47,10 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('todos')
+      await api.get('items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/v1/todos',
+        '/v1/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -61,10 +61,10 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('https://api.example.com/todos')
+      await api.get('https://api.example.com/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        'https://api.example.com/todos',
+        'https://api.example.com/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -75,10 +75,10 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
+        '/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -91,12 +91,12 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos', {
+      await api.get('/items', {
         params: { status: 'active', limit: 10 },
       })
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?status=active&limit=10',
+        '/items?status=active&limit=10',
         expect.objectContaining({
           method: 'GET',
         })
@@ -107,12 +107,12 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos?sort=asc', {
+      await api.get('/items?sort=asc', {
         params: { status: 'active' },
       })
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?sort=asc&status=active',
+        '/items?sort=asc&status=active',
         expect.objectContaining({
           method: 'GET',
         })
@@ -123,7 +123,7 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos', {
+      await api.get('/items', {
         params: {
           status: 'active',
           limit: undefined,
@@ -133,7 +133,7 @@ describe('createApi', () => {
       })
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?status=active',
+        '/items?status=active',
         expect.objectContaining({
           method: 'GET',
         })
@@ -148,9 +148,9 @@ describe('createApi', () => {
       })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
-      expect(mockFetchJson).toHaveBeenCalledWith('/todos', expect.any(Object))
+      expect(mockFetchJson).toHaveBeenCalledWith('/items', expect.any(Object))
 
       const call = mockFetchJson.mock.calls[0]
       const options = call[1]
@@ -168,7 +168,7 @@ describe('createApi', () => {
       })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       const call = mockFetchJson.mock.calls[0]
       const headers = call[1]?.headers as Headers
@@ -181,7 +181,7 @@ describe('createApi', () => {
       })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       const call = mockFetchJson.mock.calls[0]
       const headers = call[1]?.headers as Headers
@@ -194,10 +194,10 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
+        '/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -208,11 +208,11 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      const body = { title: 'New todo' }
-      await api.post('/todos', body)
+      const body = { title: 'New item' }
+      await api.post('/items', body)
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
+        '/items',
         expect.objectContaining({
           method: 'POST',
           body,
@@ -224,11 +224,11 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      const body = { title: 'Updated todo' }
-      await api.put('/todos/1', body)
+      const body = { title: 'Updated item' }
+      await api.put('/items/1', body)
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos/1',
+        '/items/1',
         expect.objectContaining({
           method: 'PUT',
           body,
@@ -241,10 +241,10 @@ describe('createApi', () => {
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
       const body = { completed: true }
-      await api.patch('/todos/1', body)
+      await api.patch('/items/1', body)
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos/1',
+        '/items/1',
         expect.objectContaining({
           method: 'PATCH',
           body,
@@ -256,10 +256,10 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.del('/todos/1')
+      await api.del('/items/1')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos/1',
+        '/items/1',
         expect.objectContaining({
           method: 'DELETE',
         })
@@ -272,7 +272,7 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos', {
+      await api.get('/items', {
         headers: {
           'X-Custom-Header': 'custom-value',
         },
@@ -287,7 +287,7 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.post('/todos', { title: 'test' })
+      await api.post('/items', { title: 'test' })
 
       const call = mockFetchJson.mock.calls[0]
       const headers = call[1]?.headers as Headers

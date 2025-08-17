@@ -1,172 +1,154 @@
-# Atlas Web App
+# Purpose
 
-Production-ready Next.js API with route-level authentication and rate limiting.
+Next.js 15 web application providing API routes, authentication middleware, and frontend components with production-ready patterns.
 
-## Architecture
+## Public Surface
 
-### Route-Level Enforcement (Default)
+- **API Routes**: `/api/health`, `/api/auth/*`, `/api/projects`, `/api/metrics`, `/api/ready`, `/api/docs`
+- **Route Handlers**: `GET`, `POST`, `PUT`, `DELETE` methods with type safety
+- **Middleware**: Optional global rate limiting and authentication (disabled by default)
+- **Components**: Base UI components and page layouts
+- **Utilities**: Error handling, API helpers, validation schemas
 
-All authentication and rate limiting is handled at the route level for:
-- **Fine-grained control** - Each endpoint can have custom limits and permissions
-- **Better performance** - No unnecessary middleware overhead
-- **Easier testing** - Route logic is self-contained
-- **Error handling** - Proper error responses with correct status codes
+## Responsibilities
 
-### API Route Pattern
+- **API Endpoints**: Request/response handling with proper HTTP status codes
+- **Route-Level Security**: Authentication and rate limiting applied per endpoint
+- **Request Validation**: Input sanitization and schema validation
+- **Error Handling**: Consistent error responses and logging
+- **Frontend Components**: UI components and page routing
+- **Static Assets**: Public files, fonts, images
 
-```typescript
-import { requireApiKey } from '@/server/auth'
-import { requireRateLimit } from '@/server/rate-limit'
-import { withErrorHandling } from '@/lib/api-utils'
+## Extension Points
 
-export const GET = withErrorHandling(async (request: NextRequest) => {
-  // 1. Rate limiting first
-  const rateLimitResult = await requireRateLimit(request, { limiter: 'standard' })
-  if (rateLimitResult.type === 'blocked') return rateLimitResult.response
-  
-  // 2. Authentication with scope
-  const auth = await requireApiKey('read:projects')
-  if (auth instanceof NextResponse) return auth
-  
-  // 3. Your business logic
-  const data = await getProjects()
-  
-  // 4. Apply rate limit headers to success response
-  const response = NextResponse.json({ data })
-  rateLimitResult.setHeaders(response)
-  return response
-})
-```
+### Adding New API Routes
 
-## Enable Optional Middleware
+1. **Create Route Directory**
+   ```bash
+   mkdir -p src/app/api/new-endpoint
+   ```
 
-The middleware is **disabled by default** and provides only coarse global protection. All real enforcement happens at the route level.
+2. **Add Route Handler**
+   ```typescript
+   // src/app/api/new-endpoint/route.ts
+   import { NextRequest, NextResponse } from 'next/server'
+   import { requireApiKey } from '@/lib/auth'
+   import { requireRateLimit } from '@/lib/rate-limit'
+   
+   export async function GET(request: NextRequest) {
+     const rateLimitResult = await requireRateLimit(request, { limiter: 'standard' })
+     if (rateLimitResult.type === 'blocked') return rateLimitResult.response
+     
+     const auth = await requireApiKey('read:scope')
+     if (auth instanceof NextResponse) return auth
+     
+     // Business logic here
+     const data = { message: 'Hello World' }
+     
+     const response = NextResponse.json({ data })
+     rateLimitResult.setHeaders(response)
+     return response
+   }
+   ```
 
-### To Enable Global Middleware
+3. **Add Validation Schema**
+   ```typescript
+   // src/schemas/new-endpoint.ts
+   import { z } from 'zod'
+   
+   export const NewEndpointSchema = z.object({
+     name: z.string().min(1).max(100),
+     data: z.object({}).optional()
+   })
+   ```
 
-1. **Rename the example file:**
+### Adding Frontend Pages
+
+1. **Create Page File**
+   ```typescript
+   // src/app/new-page/page.tsx
+   export default function NewPage() {
+     return <div>New Page Content</div>
+   }
+   ```
+
+2. **Add Layout (Optional)**
+   ```typescript
+   // src/app/new-page/layout.tsx
+   export default function NewPageLayout({ children }: { children: React.ReactNode }) {
+     return <div className="new-page-layout">{children}</div>
+   }
+   ```
+
+### Enabling Global Middleware
+
+1. **Activate Middleware File**
    ```bash
    mv src/middleware.example.ts src/middleware.ts
    ```
 
-2. **Set the environment variable:**
-   ```bash
-   # In your .env file
-   GLOBAL_SHIELD=1
+2. **Configure Middleware Options**
+   ```typescript
+   // src/middleware.ts
+   export const config = {
+     matcher: ['/api/:path*', '/dashboard/:path*']
+   }
    ```
-
-3. **Restart your development server**
-
-### Important Caveats
-
-When middleware is enabled, understand these limitations:
-
-- **Runs on every `/api` request** - Adds overhead to all API calls
-- **No request body access** - Cannot parse POST/PUT data for intelligent filtering
-- **Keep limits generous** - Should only block obvious abuse, not implement real rate limiting
-- **Security headers only** - Authentication and rate limiting still happen at route level
-
-### What the Middleware Provides
-
-When enabled, the middleware adds:
-
-- **Security headers** (CSP, HSTS, X-Frame-Options, etc.)
-- **Request correlation** (X-Request-Id for tracing)
-- **CORS headers** (for API access)
-- **Basic logging** (request method and path)
-
-### What It Does NOT Provide
-
-The middleware intentionally does not handle:
-
-- ❌ **Authentication** - Use `requireApiKey()` in routes
-- ❌ **Rate limiting** - Use `requireRateLimit()` in routes  
-- ❌ **Request validation** - Use `validateRequest()` in routes
-- ❌ **Error handling** - Use `withErrorHandling()` wrapper
-
-## Route Configuration
-
-### Available Rate Limiters
-
-- `standard`: Default limits (60 req/min)
-- `strict`: Sensitive operations (20 req/min) 
-- `auth`: Authentication endpoints (5 req/15min)
-- `admin`: Admin operations (30 req/min)
-- `upload`: File uploads (10 req/min)
-
-### Permission Scopes
-
-Common scopes from `@atlas/api-auth`:
-
-```typescript
-import { COMMON_SCOPES } from '@atlas/api-auth'
-
-// Basic permissions
-COMMON_SCOPES.READ          // 'read'
-COMMON_SCOPES.WRITE         // 'write'  
-COMMON_SCOPES.DELETE        // 'delete'
-COMMON_SCOPES.ADMIN         // 'admin'
-
-// Resource-specific
-COMMON_SCOPES.READ_PROJECTS  // 'read:projects'
-COMMON_SCOPES.WRITE_PROJECTS // 'write:projects'
-```
 
 ## Testing
 
+### API Route Testing
+```typescript
+// __tests__/api/health.test.ts
+import { GET } from '@/app/api/health/route'
+
+describe('GET /api/health', () => {
+  it('returns health status', async () => {
+    const request = new NextRequest('http://localhost/api/health')
+    const response = await GET(request)
+    const data = await response.json()
+    
+    expect(response.status).toBe(200)
+    expect(data.status).toBe('healthy')
+  })
+})
+```
+
+### Component Testing
+```typescript
+// __tests__/components/Button.test.tsx
+import { render, screen } from '@testing-library/react'
+import { Button } from '@/components/ui/Button'
+
+describe('Button', () => {
+  it('renders with correct text', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByText('Click me')).toBeInTheDocument()
+  })
+})
+```
+
+### Commands
 ```bash
 # Run all tests
 pnpm test
 
-# Type checking
-pnpm typecheck
+# Run specific test file
+pnpm test health.test.ts
 
-# Linting
-pnpm lint
+# Run with coverage
+pnpm test:coverage
 
-# Build verification
-pnpm build
+# Watch mode
+pnpm test:watch
 ```
 
-## Development
+## Links
 
-```bash
-# Start development server
-pnpm dev
+- **Architecture**: [../../docs/architecture.md](../../docs/architecture.md)
+- **API Overview**: [../../docs/api-overview.md](../../docs/api-overview.md)
+- **Authentication**: [../../docs/auth-and-security.md](../../docs/auth-and-security.md)
+- **API Client**: [../../packages/api-client/README.md](../../packages/api-client/README.md)
+- **Design System**: [../../packages/design-system/README.md](../../packages/design-system/README.md)
 
-# The API will be available at http://localhost:3000/api
-```
-
-### API Documentation
-
-Visit `/api/docs` for interactive API documentation with examples and authentication instructions.
-
-## Security
-
-### API Keys
-
-All protected routes require an API key:
-
-```bash
-# Using Authorization header (recommended)
-curl -H "Authorization: Bearer your-api-key" \
-  http://localhost:3000/api/todos
-
-# Using X-API-Key header  
-curl -H "X-API-Key: your-api-key" \
-  http://localhost:3000/api/todos
-```
-
-### Rate Limiting
-
-Rate limits are enforced per route with appropriate headers:
-
-```
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 59
-X-RateLimit-Reset: 1640995200
-```
-
-### Security Headers
-
-When middleware is enabled, all API responses include comprehensive security headers for defense in depth.
+*Last reviewed: 2025-08-16*

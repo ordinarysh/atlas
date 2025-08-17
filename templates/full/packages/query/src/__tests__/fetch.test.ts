@@ -64,19 +64,19 @@ describe("fetchJson", () => {
   });
 
   it("should send POST request with JSON body", async () => {
-    const body = { title: "New Todo" };
+    const body = { title: "New Item" };
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () => ({ id: 1, ...body }),
     });
 
-    await fetchJson("/api/todos", {
+    await fetchJson("/api/items", {
       method: "POST",
       body,
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "/api/todos",
+      "/api/items",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(body),
