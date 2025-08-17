@@ -22,6 +22,7 @@ export default tseslint.config(
       'dist/',
       '.turbo/',
       'node_modules/',
+      'scripts/',
       '*.d.ts',
       '*.config.*',
       'coverage/',
