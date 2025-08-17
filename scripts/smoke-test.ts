@@ -164,15 +164,18 @@ class SmokeTestRunner {
     this.execInTemp(`tar -xzf "${archivePath}" --strip-components=0`);
     this.log(`Extracted ${archiveName}`);
 
-    // Verify extraction
-    const extractedPath = join(this.tempDir, `atlas-${this.config.templateName}`);
-    if (!existsSync(extractedPath)) {
-      throw new Error(`Template not extracted correctly to ${extractedPath}`);
+    // Verify extraction by checking for key template files
+    const requiredFiles = ["package.json", "atlas.json", "pnpm-workspace.yaml"];
+    for (const file of requiredFiles) {
+      const filePath = join(this.tempDir, file);
+      if (!existsSync(filePath)) {
+        throw new Error(`Template not extracted correctly - missing ${file} in ${this.tempDir}`);
+      }
     }
 
-    // Change working directory to extracted template
-    process.chdir(extractedPath);
-    this.log(`Changed to directory: ${extractedPath}`);
+    // Change working directory to extracted template (tempDir contains the template files)
+    process.chdir(this.tempDir);
+    this.log(`Changed to directory: ${this.tempDir}`);
   }
 
   /**
@@ -184,8 +187,12 @@ class SmokeTestRunner {
       throw new Error("package.json not found in extracted template");
     }
 
-    // Install dependencies
-    this.exec("pnpm install --frozen-lockfile=false --no-optional");
+    // Enable corepack for proper pnpm setup (matches CI)
+    this.exec("corepack enable");
+    this.log("Corepack enabled for proper pnpm setup");
+
+    // Install dependencies (match CI exactly)
+    this.exec("pnpm install --no-frozen-lockfile");
     this.log("Dependencies installed successfully");
 
     // Verify node_modules was created
@@ -198,7 +205,7 @@ class SmokeTestRunner {
    * Run TypeScript type checking
    */
   private async runTypeCheck(): Promise<void> {
-    this.exec("pnpm run type-check");
+    this.exec("pnpm run typecheck");
     this.log("Type checking passed");
   }
 
@@ -211,17 +218,40 @@ class SmokeTestRunner {
   }
 
   /**
-   * Run build process
+   * Run build process using Turbo's dependency graph (matches CI)
    */
   private async runBuild(): Promise<void> {
     // Set build environment variable for smoke testing
     process.env.BUILD_SMOKE = "1";
 
-    this.exec("pnpm run build");
+    // Configure environment for Next.js to properly recognize pnpm
+    const cleanEnv = { ...process.env };
+
+    // Tell Next.js we're using pnpm
+    cleanEnv.npm_config_user_agent = "pnpm/10.14.0 npm/? node/v22.18.0 darwin arm64";
+    cleanEnv.NPM_CONFIG_USER_AGENT = "pnpm/10.14.0 npm/? node/v22.18.0 darwin arm64";
+
+    // Clean problematic npm configs
+    delete cleanEnv.npm_config_recursive;
+    delete cleanEnv.npm_config_verify_deps_before_run;
+    delete cleanEnv.npm_config_jsr_registry;
+    delete cleanEnv.npm_config_enable_pre_post_scripts;
+    delete cleanEnv.npm_config_overrides;
+
+    // Use simple recursive build (matches CI approach)
+    this.log("Building all packages and apps with Turbo dependency resolution...");
+    this.execWithEnv("pnpm -r build", cleanEnv);
     this.log("Build completed successfully");
 
     // Verify build outputs exist
-    const buildDirs = ["apps/web/.next", "packages/ui/dist"];
+    const buildDirs = [
+      "apps/web/.next",
+      "packages/ui/dist",
+      "packages/design-system/dist",
+      "packages/api-client/dist",
+      "packages/query/dist",
+    ];
+
     for (const dir of buildDirs) {
       if (existsSync(dir)) {
         const stats = await stat(dir);
@@ -231,6 +261,8 @@ class SmokeTestRunner {
         this.log(`Verified build output: ${dir}`);
       }
     }
+
+    this.log("All build outputs verified successfully");
   }
 
   /**
@@ -259,11 +291,19 @@ class SmokeTestRunner {
    * Execute command with error handling
    */
   private exec(command: string): void {
+    this.execWithEnv(command, process.env);
+  }
+
+  /**
+   * Execute command with custom environment
+   */
+  private execWithEnv(command: string, env: NodeJS.ProcessEnv): void {
     try {
       const output = execSync(command, {
         encoding: "utf-8",
         stdio: ["pipe", "pipe", "pipe"],
         timeout: this.config.timeout,
+        env,
       });
       this.log(`Command executed: ${command}`);
       this.log(`Output: ${output.trim()}`);
