@@ -44,11 +44,21 @@ module.exports = {
     "footer-leading-blank": [1, "always"],
     "footer-max-line-length": [0], // Disabled
   },
-  // Allow WIP commits on non-protected branches
+  // Allow WIP commits on non-protected branches and handle GitHub merge patterns
   ignores: [
     (message) => {
-      // Allow merge commits
+      // Allow standard merge commits
       if (/^(Merge branch|Merge pull request)/.test(message)) {
+        return true;
+      }
+
+      // Allow GitHub squash merge commits (PR title + (#123) pattern)
+      if (/^.+\s+\(#\d+\)$/.test(message.split('\n')[0])) {
+        return true;
+      }
+
+      // Allow revert commits
+      if (/^Revert\s+/.test(message)) {
         return true;
       }
 

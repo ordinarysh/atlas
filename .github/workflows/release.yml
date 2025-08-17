@@ -74,7 +74,28 @@ jobs:
         run: |
           # Only check the last commit to avoid failing on old commits
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            pnpm exec commitlint --from HEAD~1 --to HEAD --verbose
+            echo "Checking commit compliance for: $(git log -1 --oneline)"
+            
+            # Get the commit message to check if it's a merge commit
+            COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+            echo "Commit message: $COMMIT_MSG"
+            
+            # Check if this is a GitHub squash merge or standard merge commit
+            if [[ $COMMIT_MSG =~ ^(Merge|Revert) ]] || [[ $COMMIT_MSG =~ '#'[0-9]+')'$ ]]; then
+              echo "✓ Detected merge/squash commit - skipping commitlint validation"
+            else
+              echo "Running commitlint validation..."
+              if ! pnpm exec commitlint --from HEAD~1 --to HEAD --verbose; then
+                echo "❌ Commit message validation failed"
+                echo "Please ensure commit messages follow conventional commit format:"
+                echo "  feat: add new feature"
+                echo "  fix: resolve bug"
+                echo "  docs: update documentation"
+                echo "For more info: https://www.conventionalcommits.org/"
+                exit 1
+              fi
+              echo "✓ Commit message validation passed"
+            fi
           fi
 
       - name: Run semantic-release

@@ -24,7 +24,15 @@
           { "type": "test", "release": false },
           { "type": "build", "release": false },
           { "type": "ci", "release": false }
-        ]
+        ],
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"],
+          "headerPattern": "^(\\w*)(?:\\(([^)]*)\\))?!?: (.*)$",
+          "headerCorrespondence": ["type", "scope", "subject"],
+          "mergePattern": "^Merge pull request #(\\d+) from (.*)$",
+          "mergeCorrespondence": ["id", "source"],
+          "issuePrefixes": ["#", "gh-"]
+        }
       }
     ],
     [
@@ -45,6 +53,14 @@
             { "type": "build", "section": "📦 Build System", "hidden": true },
             { "type": "ci", "section": "👷 CI/CD", "hidden": true }
           ]
+        },
+        "parserOpts": {
+          "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"],
+          "headerPattern": "^(\\w*)(?:\\(([^)]*)\\))?!?: (.*)$",
+          "headerCorrespondence": ["type", "scope", "subject"],
+          "mergePattern": "^Merge pull request #(\\d+) from (.*)$",
+          "mergeCorrespondence": ["id", "source"],
+          "issuePrefixes": ["#", "gh-"]
         }
       }
     ],
@@ -71,9 +87,18 @@
   ],
   "preset": "conventionalcommits",
   "parserOpts": {
-    "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+    "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"],
+    "headerPattern": "^(\\w*)(?:\\(([^)]*)\\))?!?: (.*)$",
+    "headerCorrespondence": ["type", "scope", "subject"],
+    "mergePattern": "^Merge pull request #(\\d+) from (.*)$",
+    "mergeCorrespondence": ["id", "source"],
+    "issuePrefixes": ["#", "gh-"]
   },
   "writerOpts": {
-    "commitsSort": ["subject", "scope"]
+    "commitsSort": ["subject", "scope"],
+    "transform": {
+      "hash": false,
+      "date": false
+    }
   }
 }
