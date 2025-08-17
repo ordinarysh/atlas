@@ -1,7 +1,7 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-17T16:05:04.873Z",
+  "generated": "2025-08-17T16:13:29.508Z",
   "structure": [
     {
       "type": "directory",
@@ -581,19 +581,7 @@
             },
             {
               "type": "file",
-              "name": "vitest.config.d.ts"
-            },
-            {
-              "type": "file",
-              "name": "vitest.config.d.ts.map"
-            },
-            {
-              "type": "file",
               "name": "vitest.config.js"
-            },
-            {
-              "type": "file",
-              "name": "vitest.config.js.map"
             },
             {
               "type": "file",
