@@ -28,7 +28,7 @@ jobs:
       - name: Analyze version jump
         id: version-check
         run: |
-          echo "🔍 Analyzing version changes from develop to main..."
+          echo "🔍 Analyzing version changes from PR to main..."
 
           # Get current main version
           git checkout origin/main -- package.json 2>/dev/null || echo "No package.json on main yet"
@@ -38,7 +38,7 @@ jobs:
           fi
           mv package.json package.json.main 2>/dev/null || true
 
-          # Get PR version (develop version)
+          # Get PR version
           git checkout HEAD -- package.json
           PR_VERSION=$(cat package.json | grep '"version"' | sed 's/.*"version": "\([^"]*\)".*/\1/')
 
@@ -106,7 +106,7 @@ jobs:
               message += `⚠️ **Large Version Jump Detected**\n\n`;
               message += `This PR will jump ${version_jump_major} major version(s). Consider:\n`;
               message += `- Are all intermediate features properly tested?\n`;
-              message += `- Should develop be merged to main more frequently?\n`;
+              message += `- Should feature branches be merged to main more frequently?\n`;
               message += `- Is this intentional for a major stable release?\n\n`;
             } else {
               message += `✅ **Version jump looks reasonable**\n\n`;

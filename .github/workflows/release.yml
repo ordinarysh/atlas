@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
   workflow_dispatch:
     inputs:
       dry_run:
@@ -120,11 +119,7 @@ jobs:
             VERSION=$(cat .VERSION)
             echo "released=true" >> $GITHUB_OUTPUT
             echo "version=$VERSION" >> $GITHUB_OUTPUT
-            if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
-              echo "channel=beta" >> $GITHUB_OUTPUT
-            else
-              echo "channel=latest" >> $GITHUB_OUTPUT
-            fi
+            echo "channel=latest" >> $GITHUB_OUTPUT
             echo "✅ Released version: $VERSION"
           else
             echo "released=false" >> $GITHUB_OUTPUT
