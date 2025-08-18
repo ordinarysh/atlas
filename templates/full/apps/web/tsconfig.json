@@ -6,10 +6,12 @@
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./src/*"],
-      "@atlas/ui": ["../../packages/ui/src"],
-      "@atlas/query": ["../../packages/query/src"],
-      "@atlas/api-client": ["../../packages/api-client/src"],
-      "@atlas/design-system": ["../../packages/design-system/src"]
+      "@atlas/ui": ["../../packages/ui/dist"],
+      "@atlas/query": ["../../packages/query/dist"],
+      "@atlas/api-client": ["../../packages/api-client/dist"],
+      "@atlas/design-system": ["../../packages/design-system/dist"],
+      "@atlas/services-rate-limit": ["../../services/rate-limit/dist"],
+      "@atlas/config-rate-limit": ["../../packages/config/rate-limit/dist"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/types/**/*.d.ts"],

@@ -11,8 +11,11 @@ export { createKeys, createQueryKeys, invalidate, commonPatterns } from "./keys"
 // Custom hooks
 export { useOptimisticMutation, useInvalidatingMutation, usePaginatedQuery } from "./hooks";
 
-// Fetch utilities
-export { fetchJson, createFetch, FetchError } from "./fetch";
+// Example hooks (optional)
+export * from "./examples";
+
+// Re-export fetch utilities from api-client for backward compatibility
+export { fetchJson, createFetch, ApiError } from "@atlas/api-client";
 
 // Re-export essential TanStack Query hooks and types
 export {

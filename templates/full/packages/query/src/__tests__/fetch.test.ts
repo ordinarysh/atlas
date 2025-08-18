@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
-import { createFetch, FetchError, fetchJson } from "../fetch";
+import { createFetch, ApiError, fetchJson } from "@atlas/api-client";
 
 describe("fetchJson", () => {
   beforeEach(() => {
@@ -64,19 +64,19 @@ describe("fetchJson", () => {
   });
 
   it("should send POST request with JSON body", async () => {
-    const body = { title: "New Todo" };
+    const body = { title: "New Item" };
     global.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
       json: () => ({ id: 1, ...body }),
     });
 
-    await fetchJson("/api/todos", {
+    await fetchJson("/api/items", {
       method: "POST",
       body,
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "/api/todos",
+      "/api/items",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(body),
@@ -86,11 +86,14 @@ describe("fetchJson", () => {
 
     const mockFetch = vi.mocked(global.fetch);
     const callArgs = mockFetch.mock.calls[0];
-    const headers = callArgs[1]?.headers as Headers;
-    expect(headers.get("Content-Type")).toBe("application/json");
+    const headers = callArgs[1]?.headers;
+    expect(headers).toBeInstanceOf(Headers);
+    if (headers instanceof Headers) {
+      expect(headers.get("Content-Type")).toBe("application/json");
+    }
   });
 
-  it("should throw FetchError on 4xx without retry", async () => {
+  it("should throw ApiError on 4xx without retry", async () => {
     const errorData = { error: "Bad Request" };
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
@@ -99,7 +102,7 @@ describe("fetchJson", () => {
       json: () => errorData,
     });
 
-    await expect(fetchJson("/api/test")).rejects.toThrow(FetchError);
+    await expect(fetchJson("/api/test")).rejects.toThrow(ApiError);
     expect(global.fetch).toHaveBeenCalledTimes(1); // No retry
   });
 
@@ -159,16 +162,10 @@ describe("fetchJson", () => {
     expect(global.fetch).toHaveBeenCalledTimes(1); // No retry on abort
   });
 
-  it("should handle absolute URLs", async () => {
-    const mockData = { external: true };
-    global.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => mockData,
-    });
-
-    await fetchJson("https://api.example.com/data");
-
-    expect(global.fetch).toHaveBeenCalledWith("https://api.example.com/data", expect.any(Object));
+  it("should reject absolute URLs for security", async () => {
+    await expect(fetchJson("https://api.example.com/data")).rejects.toThrow(
+      "fetchJson only accepts relative URLs starting with /",
+    );
   });
 });
 
@@ -220,17 +217,17 @@ describe("createFetch", () => {
   });
 });
 
-describe("FetchError", () => {
+describe("ApiError", () => {
   it("should create error with correct properties", () => {
-    const response = new Response("", { status: 404, statusText: "Not Found" });
-    const error = new FetchError("Resource not found", 404, response, {
+    const _response = new Response("", { status: 404, statusText: "Not Found" });
+    const error = new ApiError("Resource not found", 404, "NOT_FOUND", {
       error: "Not Found",
     });
 
     expect(error.message).toBe("Resource not found");
     expect(error.status).toBe(404);
-    expect(error.response).toBe(response);
+    expect(error.code).toBe("NOT_FOUND");
     expect(error.data).toEqual({ error: "Not Found" });
-    expect(error.name).toBe("FetchError");
+    expect(error.name).toBe("ApiError");
   });
 });

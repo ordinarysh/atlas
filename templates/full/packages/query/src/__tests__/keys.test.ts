@@ -4,19 +4,19 @@ import { commonPatterns, createKeys, invalidate } from "../keys";
 
 describe("createKeys", () => {
   it("should create typed query keys with scope", () => {
-    const todoKeys = createKeys("todos", {
+    const itemKeys = createKeys("items", {
       list: (filters?: { status?: string }) => ({ filters }),
       byId: (id: string) => ({ id }),
     });
 
-    expect(todoKeys.all()).toEqual(["todos"]);
-    expect(todoKeys.list()).toEqual(["todos", "list"]);
-    expect(todoKeys.list({ status: "active" })).toEqual([
-      "todos",
+    expect(itemKeys.all()).toEqual(["items"]);
+    expect(itemKeys.list()).toEqual(["items", "list"]);
+    expect(itemKeys.list({ status: "active" })).toEqual([
+      "items",
       "list",
       { filters: { status: "active" } },
     ]);
-    expect(todoKeys.byId("123")).toEqual(["todos", "byId", { id: "123" }]);
+    expect(itemKeys.byId("123")).toEqual(["items", "byId", { id: "123" }]);
   });
 
   it("should omit params when all values are undefined", () => {
@@ -57,24 +57,24 @@ describe("invalidate", () => {
   it("should invalidate all queries in a scope", async () => {
     const spy = vi.spyOn(queryClient, "invalidateQueries");
 
-    await invalidate.scope("todos").all(queryClient);
+    await invalidate.scope("items").all(queryClient);
 
-    expect(spy).toHaveBeenCalledWith({ queryKey: ["todos"] });
+    expect(spy).toHaveBeenCalledWith({ queryKey: ["items"] });
   });
 
   it("should invalidate specific operation", async () => {
     const spy = vi.spyOn(queryClient, "invalidateQueries");
 
-    await invalidate.scope("todos").operation("list", queryClient);
+    await invalidate.scope("items").operation("list", queryClient);
 
-    expect(spy).toHaveBeenCalledWith({ queryKey: ["todos", "list"] });
+    expect(spy).toHaveBeenCalledWith({ queryKey: ["items", "list"] });
   });
 
   it("should invalidate with exact match", async () => {
     const spy = vi.spyOn(queryClient, "invalidateQueries");
-    const queryKey = ["todos", "byId", { id: "123" }];
+    const queryKey = ["items", "byId", { id: "123" }];
 
-    await invalidate.scope("todos").exact(queryKey, queryClient);
+    await invalidate.scope("items").exact(queryKey, queryClient);
 
     expect(spy).toHaveBeenCalledWith({ queryKey, exact: true });
   });
@@ -82,9 +82,9 @@ describe("invalidate", () => {
   it("should invalidate multiple scopes", async () => {
     const spy = vi.spyOn(queryClient, "invalidateQueries");
 
-    await invalidate.multiple(["todos", "users"], queryClient);
+    await invalidate.multiple(["items", "users"], queryClient);
 
-    expect(spy).toHaveBeenCalledWith({ queryKey: ["todos"] });
+    expect(spy).toHaveBeenCalledWith({ queryKey: ["items"] });
     expect(spy).toHaveBeenCalledWith({ queryKey: ["users"] });
   });
 
@@ -99,18 +99,18 @@ describe("invalidate", () => {
 
 describe("commonPatterns", () => {
   it("should create CRUD resource pattern", () => {
-    const todoKeys = commonPatterns.resource("todos");
+    const itemKeys = commonPatterns.resource("items");
 
-    expect(todoKeys.list()).toEqual(["todos", "list"]);
-    expect(todoKeys.list({ status: "active" })).toEqual([
-      "todos",
+    expect(itemKeys.list()).toEqual(["items", "list"]);
+    expect(itemKeys.list({ status: "active" })).toEqual([
+      "items",
       "list",
       { params: { status: "active" } },
     ]);
-    expect(todoKeys.byId("123")).toEqual(["todos", "byId", { id: "123" }]);
-    expect(todoKeys.create()).toEqual(["todos", "create"]);
-    expect(todoKeys.update("456")).toEqual(["todos", "update", { id: "456" }]);
-    expect(todoKeys.delete("789")).toEqual(["todos", "delete", { id: "789" }]);
+    expect(itemKeys.byId("123")).toEqual(["items", "byId", { id: "123" }]);
+    expect(itemKeys.create()).toEqual(["items", "create"]);
+    expect(itemKeys.update("456")).toEqual(["items", "update", { id: "456" }]);
+    expect(itemKeys.delete("789")).toEqual(["items", "delete", { id: "789" }]);
   });
 
   it("should create paginated resource pattern", () => {

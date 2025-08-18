@@ -1,0 +1,93 @@
+name: PR Title Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  pr-title-check:
+    name: Validate PR Title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate PR title follows conventional commits
+        uses: amannn/action-semantic-pull-request@0723387faaf9b38adef4775cd42cfd5155ed6017 # v5.5.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Configure which types are allowed (must match our commitlint config)
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          # Allow scopes (optional)
+          requireScope: false
+          # Disallow uppercase first letter in description
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            doesn't start with an uppercase character.
+          # Allow conventional commit syntax without strict enforcement of all rules
+          validateSingleCommitMatchesPrTitle: false
+          # Custom footer pattern for breaking changes
+          headerPattern: '^(\w*)(?:\(([^)]*)\))?!?: (.*)$'
+          headerPatternCorrespondence: type,scope,subject
+
+      - name: Comment on PR with guidance (on failure)
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const prTitle = context.payload.pull_request.title;
+
+            const comment = `## 📝 PR Title Format Issue
+
+            The PR title \`${prTitle}\` doesn't follow our conventional commit format.
+
+            ### Required Format:
+            \`\`\`
+            <type>[optional scope]: <description>
+            \`\`\`
+
+            ### Valid Types:
+            - \`feat\`: New feature
+            - \`fix\`: Bug fix  
+            - \`docs\`: Documentation changes
+            - \`style\`: Code style changes
+            - \`refactor\`: Code refactoring
+            - \`perf\`: Performance improvements
+            - \`test\`: Test changes
+            - \`build\`: Build system changes
+            - \`ci\`: CI/CD changes
+            - \`chore\`: Maintenance tasks
+            - \`revert\`: Revert previous changes
+
+            ### Examples:
+            - \`feat: add user authentication\`
+            - \`fix(api): resolve timeout issues\`
+            - \`docs: update installation guide\`
+            - \`refactor!: change API structure\` (breaking change)
+
+            This ensures our automated release system works correctly. Please update your PR title to match this format.
+
+            📚 Learn more: [Conventional Commits](https://www.conventionalcommits.org/)`;
+
+            github.rest.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

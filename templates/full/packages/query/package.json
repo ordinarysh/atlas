@@ -27,6 +27,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@atlas/api-client": "workspace:*",
     "@tanstack/react-query": "5.84.1",
     "@tanstack/react-query-devtools": "5.84.1",
     "react": "19.1.0",

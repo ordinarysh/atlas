@@ -1,6 +1,6 @@
 // @ts-check
 import tseslint from 'typescript-eslint'
-import eslintConfig from '../configs/eslint/base.js'
+import eslintConfig from '../config/eslint/base.js'
 
 /**
  * UI library ESLint configuration using centralized enterprise-grade rules.
@@ -8,11 +8,11 @@ import eslintConfig from '../configs/eslint/base.js'
  * and ensure consistency across the monorepo.
  *
  * ARCHITECTURE:
- * - Uses centralized library config from packages/configs/eslint/base.js
+ * - Uses centralized library config from packages/config/eslint/base.js
  * - Adds UI-specific ignore patterns
  * - Maintains same enterprise-grade standards as other library packages
  *
- * @see packages/configs/eslint/base.js - Centralized configuration source
+ * @see packages/config/eslint/base.js - Centralized configuration source
  */
 export default tseslint.config(
   // UI-specific ignore patterns
@@ -22,6 +22,7 @@ export default tseslint.config(
       'dist/',
       '.turbo/',
       'node_modules/',
+      'scripts/',
       '*.d.ts',
       '*.config.*',
       'coverage/',

@@ -1,9 +1,8 @@
 {
   "extends": "@atlas/config-typescript/react-library",
   "compilerOptions": {
+    "rootDir": "src",
     "outDir": "dist",
-    "rootDir": ".",
-    "declarationDir": "dist/types",
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
   "include": [
@@ -14,6 +13,5 @@
     "src/**/*.test.tsx",
     "src/**/__tests__/**/*.ts",
     "src/**/__tests__/**/*.tsx"
-  ],
-  "exclude": ["dist", "node_modules"]
+  ]
 }

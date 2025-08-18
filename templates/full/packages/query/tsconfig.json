@@ -2,7 +2,7 @@
   "extends": "@atlas/config-typescript/react-library",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "declarationDir": "./dist",

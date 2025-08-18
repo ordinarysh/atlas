@@ -15,11 +15,11 @@ import {
  *
  * @example
  * const mutation = useOptimisticMutation({
- *   mutationFn: updateTodo,
- *   queryKey: ['todos'],
+ *   mutationFn: updateItem,
+ *   queryKey: ['items'],
  *   updateFn: (old, variables) => {
- *     return old.map(todo =>
- *       todo.id === variables.id ? { ...todo, ...variables } : todo
+ *     return old.map(item =>
+ *       item.id === variables.id ? { ...item, ...variables } : item
  *     )
  *   }
  * })

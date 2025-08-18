@@ -1,6 +1,6 @@
-# 🚀 Modern Turborepo Boilerplate
+# 🚀 Atlas Template System
 
-A minimal, production-ready monorepo starter with the latest web tooling. Perfect for building scalable applications without the bloat.
+A template distribution system that packages enterprise-grade monorepo templates into versioned, verified artifacts. Templates are consumed via the Atlas CLI tool for rapid project scaffolding.
 
 ## 🎯 Recent Improvements
 
@@ -45,65 +45,73 @@ Everything you need, nothing you don't:
 - **Type-Safe Configs** - Full TypeScript definitions for all configs
 - **No Conflicts** - ESLint and Prettier configured to work together
 - **Multiple Presets** - Different configs for apps, libraries, and tests
-- **[Documentation](./docs/development/CONFIG_SYSTEM.md)** - Complete configuration guide
 
-### 📦 **Workspace Structure**
+### 📦 **Repository Structure**
 
 ```
-├── apps/
-│   └── scope/                  # Next.js application
-├── packages/
-│   ├── ui/                     # Shared React components & theme
-│   ├── design-system/          # Design system tokens
-│   ├── api-client/             # Unified API client SDK
-│   └── configs/                # Shared configurations
-│       ├── eslint/             # ESLint v9 flat configs
-│       ├── prettier/           # Prettier with plugins
-│       └── typescript/         # TypeScript presets
-├── services/
-│   └── core/                   # Core domain service
-├── docs/                       # Documentation
-├── turbo.json                  # Pipeline definitions
-└── pnpm-workspace.yaml         # Workspace configuration
+├── templates/
+│   └── full/                   # Complete monorepo template
+├── addons/
+│   ├── redis/                  # Redis addon
+│   └── redis-rate-limit/       # Redis rate limiting addon
+├── migrations/                 # Version migration scripts
+├── scripts/                    # Build and validation scripts
+├── release/                    # Generated release artifacts
+├── docs/                      # Documentation
+└── pnpm-workspace.yaml        # Workspace configuration
 ```
 
-## 🚀 **Getting Started**
+## 🚀 **Using Atlas Templates**
 
-### Prerequisites
+### Template Consumer
 
-- Node.js >= 22.18.0
-- pnpm 10.14.0 (exact version)
-
-### Quick Start
+Templates are distributed as versioned tarballs and consumed via the **[Atlas CLI](https://github.com/ordinarysh/atlas-cli)**:
 
 ```bash
-# Clone this boilerplate
-git clone <your-repo-url> my-project
+# Install Atlas CLI
+npm install -g @ordinarysh/atlas-cli
+
+# Create a new project from the full template
+atlas create my-project --template=full
+
+# Navigate to your new project
 cd my-project
+
+# Install dependencies and start developing
+pnpm install
+pnpm dev
+```
+
+### Available Templates
+
+- **`full`** - Complete monorepo with Next.js, packages, services, and tooling
+
+### Release Artifacts
+
+Each release provides:
+
+- **Templates** (`atlas-{template}-v{version}.tar.gz`) - Project scaffolds
+- **Addons** (`atlas-addon-{name}-v{version}.tar.gz`) - Optional components
+- **Migrations** (`atlas-migration-{from}-to-{to}-v{version}.tar.gz`) - Version upgrade scripts
+- **SHA256SUMS** - Cryptographic checksums for verification
+
+## 🔧 **Template Development**
+
+### For Template Contributors
+
+```bash
+# Clone the template system repository
+git clone https://github.com/ordinarysh/atlas
+cd atlas
 
 # Install dependencies
 pnpm install
 
-# Start development
-pnpm dev
+# Build release artifacts
+pnpm build:release
 
-# Build everything
-pnpm build
-
-# Run quality checks
+# Run all quality checks
 pnpm check-all
-```
-
-### Development Commands
-
-```bash
-pnpm dev          # Start all apps in development
-pnpm build        # Build all packages and apps
-pnpm type-check   # Run TypeScript checks
-pnpm lint         # Run ESLint
-pnpm format       # Format with Prettier
-pnpm test         # Run tests (when added)
-pnpm clean        # Clean build outputs
 ```
 
 ## 📋 **Enterprise Features**
@@ -197,45 +205,43 @@ This boilerplate is configured for enterprise production deployment:
 
 ## 📚 **Documentation**
 
-Comprehensive guides organized by topic in `/docs`:
+- **[Release Guidelines](./docs/RELEASE_GUIDELINES.md)** - Release process and versioning
+- **[Template Checklist](./docs/TEMPLATE_V1_CHECKLIST.md)** - Production readiness checklist
+- **[CI/CD Documentation](./docs/ci.md)** - GitHub Actions workflows
+- **[Git Hooks](./docs/hooks.md)** - Pre-commit and pre-push hooks
 
-**🚀 Getting Started:**
+## 🛠️ **Template Development**
 
-- **[📖 Getting Started](./docs/setup/GETTING_STARTED.md)** - Quick setup and first steps
-- **[🏗️ Project Structure](./docs/setup/PROJECT_STRUCTURE.md)** - Understanding the monorepo
-- **[🔧 Development Workflow](./docs/development/WORKFLOW.md)** - Daily development patterns
+For contributors working on Atlas templates:
 
-**🎨 Frontend & Styling:**
+1. **Clone & Setup** - `git clone` this repository and run `pnpm install`
+2. **Development** - Edit templates in `templates/` directory
+3. **Validation** - Run `pnpm validate` to check template integrity
+4. **Testing** - Run `pnpm smoke:test` to test template extraction
+5. **Building** - Run `pnpm build:release` to generate release artifacts
+6. **Quality Checks** - Run `pnpm check-all` before submitting PRs
 
-- **[🎨 Tailwind CSS](./docs/frontend/TAILWIND.md)** - Complete styling guide
-- **[🔤 Custom Fonts](./docs/setup/FONT_SETUP.md)** - Font integration guide
-- **[🌍 Environment Setup](./docs/setup/ENVIRONMENT.md)** - Environment configuration
+## 💡 **Why Atlas Templates?**
 
-**📚 All Documentation:**
+- **⏰ Rapid Scaffolding** - Generate production-ready projects in seconds
+- **🏗️ Battle-tested Architecture** - Enterprise patterns from day one
+- **🔧 Modern Tooling** - Latest versions with optimized configurations
+- **📈 Performance Optimized** - Pre-configured caching and build optimization
+- **🏢 Enterprise Grade** - Security, scalability, and maintainability built-in
+- **🔄 Version Management** - Automated updates and migration paths
 
-- **[📖 Documentation Hub](./docs/)** - Complete index of all guides
+## 🛠️ **Release Process**
 
-## 📚 **Next Steps**
+Atlas uses semantic-release for automated versioning and GitHub Actions for CI/CD:
 
-After using this boilerplate:
-
-1. **Customize the UI Package** - Add your design system components
-2. **Configure Remote Cache** - Set up team caching for faster builds
-3. **Add Testing** - Integrate Vitest or Jest with Turborepo
-4. **Setup CI/CD** - Configure deployment pipelines
-5. **Add More Apps** - Create admin panels, landing pages, etc.
-6. **Database Integration** - Add Prisma, Drizzle, or your preferred ORM
-
-## 💡 **Why This Boilerplate?**
-
-- **⏰ Time to Market** - Skip weeks of configuration, start building features
-- **🏗️ Scalable Architecture** - Grows with your team and codebase
-- **🔧 Latest Tooling** - Always up-to-date with modern best practices
-- **📈 Performance First** - Optimized for speed and developer experience
-- **🏢 Enterprise Ready** - Battle-tested patterns for production workloads
+1. **Commit Analysis** - Conventional commits determine version bumps
+2. **Template Validation** - Automated checks ensure template integrity
+3. **Artifact Generation** - Deterministic tarballs with SHA256 checksums
+4. **Release Distribution** - GitHub releases with downloadable assets
+5. **CLI Integration** - Templates consumed via Atlas CLI tool
 
 ---
 
-**Built with ❤️ for modern development teams**
+**Built for modern development teams who value velocity and quality**
 
-Ready to build something amazing? Start with this boilerplate and focus on what matters - your product.
+Atlas templates provide the foundation - you focus on building your product.

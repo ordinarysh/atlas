@@ -1,0 +1,119 @@
+name: Main Validation
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  tarball-smoke:
+    name: Tarball Installation Smoke Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: write # For artifact upload
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+        with:
+          egress-policy: audit
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build release artifacts
+        run: pnpm -w build:release
+
+      - name: Real tarball installation test
+        run: |
+          set -euo pipefail
+          echo "Testing actual CLI consumption flow..."
+
+          # Create temporary workspace
+          TEMP=$(mktemp -d)
+          echo "Test directory: $TEMP"
+
+          # Extract tarball (simulating Atlas CLI)
+          tar -xzf release/atlas-full-*.tar.gz -C "$TEMP" --strip-components=0
+          cd "$TEMP"
+
+          echo "📦 Installing dependencies..."
+          pnpm install --no-frozen-lockfile
+
+          echo "🔍 Running quality checks..."
+          pnpm -r lint
+          pnpm -r typecheck
+
+          echo "🏗️ Testing build process..."
+          pnpm -r build
+
+          echo "✅ Tarball smoke test completed successfully"
+
+          # Verify critical files exist
+          test -f "package.json" || { echo "❌ Missing package.json"; exit 1; }
+          test -f "atlas.json" || { echo "❌ Missing atlas.json"; exit 1; }
+          test -f "pnpm-workspace.yaml" || { echo "❌ Missing pnpm-workspace.yaml"; exit 1; }
+
+      - name: Verify checksums
+        run: |
+          set -euo pipefail
+          cd release
+          if [ -f SHA256SUMS ]; then
+            echo "✅ SHA256SUMS file exists"
+            echo "Verifying checksums..."
+            sha256sum -c SHA256SUMS
+          else
+            echo "❌ SHA256SUMS file missing"
+            exit 1
+          fi
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.3.1
+        with:
+          name: release-${{ github.sha }}
+          path: release/
+          retention-days: 7
+
+      - name: Report artifact details
+        run: |
+          set -euo pipefail
+          echo "## Release Artifact Report" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size | SHA256 (first 8) |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|------------------|" >> $GITHUB_STEP_SUMMARY
+
+          for file in release/*.tar.gz; do
+            if [ -f "$file" ]; then
+              SIZE=$(du -sh "$file" | cut -f1)
+              SHA=$(sha256sum "$file" | cut -c1-8)
+              NAME=$(basename "$file")
+              echo "| $NAME | $SIZE | $SHA... |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done

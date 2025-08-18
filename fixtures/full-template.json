@@ -1,18 +1,8 @@
 {
   "name": "full-template",
   "version": "1.0.0",
-  "generated": "2025-08-12T19:08:14.041Z",
+  "generated": "2025-08-17T16:13:29.508Z",
   "structure": [
-    {
-      "type": "directory",
-      "name": ".claude",
-      "children": [
-        {
-          "type": "file",
-          "name": "settings.local.json"
-        }
-      ]
-    },
     {
       "type": "directory",
       "name": ".github",
@@ -42,10 +32,6 @@
           "name": "pre-commit"
         }
       ]
-    },
-    {
-      "type": "directory",
-      "name": ".vscode"
     },
     {
       "type": "directory",
@@ -90,6 +76,16 @@
                   "name": "__tests__",
                   "children": [
                     {
+                      "type": "directory",
+                      "name": "helpers",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "next-request.ts"
+                        }
+                      ]
+                    },
+                    {
                       "type": "file",
                       "name": "env.client.test.ts"
                     },
@@ -103,6 +99,10 @@
                     },
                     {
                       "type": "file",
+                      "name": "security.test.ts"
+                    },
+                    {
+                      "type": "file",
                       "name": "setup.ts"
                     }
                   ]
@@ -113,25 +113,123 @@
                   "children": [
                     {
                       "type": "directory",
-                      "name": "example-todos",
+                      "name": "api",
+                      "children": [
+                        {
+                          "type": "directory",
+                          "name": "__tests__",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "api-utils.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "health.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "projects.integration.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "smoke.test.ts"
+                            },
+                            {
+                              "type": "file",
+                              "name": "whoami.test.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "auth",
+                          "children": [
+                            {
+                              "type": "directory",
+                              "name": "me",
+                              "children": [
+                                {
+                                  "type": "file",
+                                  "name": "route.ts"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "docs",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "health",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "metrics",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "projects",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "directory",
+                          "name": "ready",
+                          "children": [
+                            {
+                              "type": "file",
+                              "name": "route.ts"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "directory",
+                      "name": "docs",
                       "children": [
                         {
                           "type": "file",
-                          "name": "create-todo.tsx"
-                        },
-                        {
-                          "type": "file",
                           "name": "page.tsx"
-                        },
-                        {
-                          "type": "file",
-                          "name": "todo-list.tsx"
                         }
                       ]
                     },
                     {
                       "type": "file",
+                      "name": "error.tsx"
+                    },
+                    {
+                      "type": "file",
                       "name": "favicon.ico"
+                    },
+                    {
+                      "type": "file",
+                      "name": "global-error.tsx"
                     },
                     {
                       "type": "file",
@@ -140,6 +238,10 @@
                     {
                       "type": "file",
                       "name": "layout.tsx"
+                    },
+                    {
+                      "type": "file",
+                      "name": "not-found.tsx"
                     },
                     {
                       "type": "file",
@@ -158,10 +260,6 @@
                     {
                       "type": "file",
                       "name": "env-demo.tsx"
-                    },
-                    {
-                      "type": "file",
-                      "name": "example-todos.tsx"
                     },
                     {
                       "type": "file",
@@ -194,10 +292,6 @@
                     {
                       "type": "file",
                       "name": "use-auth.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "use-todos.ts"
                     }
                   ]
                 },
@@ -206,8 +300,46 @@
                   "name": "lib",
                   "children": [
                     {
+                      "type": "directory",
+                      "name": "auth",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "api-key-store.ts"
+                        },
+                        {
+                          "type": "file",
+                          "name": "api-keys.ts"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "api-utils.ts"
+                    },
+                    {
                       "type": "file",
                       "name": "api.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "config.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "cors.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "logger.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "node-runtime.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "openapi.ts"
                     },
                     {
                       "type": "file",
@@ -216,6 +348,30 @@
                     {
                       "type": "file",
                       "name": "utils.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "directory",
+                  "name": "server",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "__tests__",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "rate-limit.test.ts"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "auth.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "rate-limit.ts"
                     }
                   ]
                 },
@@ -234,10 +390,6 @@
                   ]
                 },
                 {
-                  "type": "directory",
-                  "name": "utils"
-                },
-                {
                   "type": "file",
                   "name": "env.client.ts"
                 },
@@ -248,6 +400,10 @@
                 {
                   "type": "file",
                   "name": "env.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "middleware.ts"
                 }
               ]
             },
@@ -265,10 +421,6 @@
             },
             {
               "type": "file",
-              "name": "next-env.d.ts"
-            },
-            {
-              "type": "file",
               "name": "next.config.ts"
             },
             {
@@ -278,6 +430,10 @@
             {
               "type": "file",
               "name": "postcss.config.mjs"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             },
             {
               "type": "file",
@@ -300,89 +456,47 @@
       "name": "docs",
       "children": [
         {
-          "type": "directory",
-          "name": "api"
-        },
-        {
-          "type": "directory",
-          "name": "auth"
-        },
-        {
-          "type": "directory",
-          "name": "data"
-        },
-        {
-          "type": "directory",
-          "name": "development",
-          "children": [
-            {
-              "type": "file",
-              "name": "COMMANDS.md"
-            },
-            {
-              "type": "file",
-              "name": "CONFIG_SYSTEM.md"
-            },
-            {
-              "type": "file",
-              "name": "WORKFLOW.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "devops"
-        },
-        {
-          "type": "directory",
-          "name": "frontend",
-          "children": [
-            {
-              "type": "file",
-              "name": "TAILWIND.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "guides",
-          "children": [
-            {
-              "type": "file",
-              "name": "TROUBLESHOOTING.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "setup",
-          "children": [
-            {
-              "type": "file",
-              "name": "ENVIRONMENT.md"
-            },
-            {
-              "type": "file",
-              "name": "FONT_SETUP.md"
-            },
-            {
-              "type": "file",
-              "name": "GETTING_STARTED.md"
-            },
-            {
-              "type": "file",
-              "name": "MONOREPO_LAYOUTS.md"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "name": "testing"
+          "type": "file",
+          "name": "addons.md"
         },
         {
           "type": "file",
-          "name": "_INDEX.md"
+          "name": "api-overview.md"
         },
+        {
+          "type": "file",
+          "name": "architecture.md"
+        },
+        {
+          "type": "file",
+          "name": "auth-and-security.md"
+        },
+        {
+          "type": "file",
+          "name": "ci-and-automation.md"
+        },
+        {
+          "type": "file",
+          "name": "conventions.md"
+        },
+        {
+          "type": "file",
+          "name": "getting-started.md"
+        },
+        {
+          "type": "file",
+          "name": "README.md"
+        },
+        {
+          "type": "file",
+          "name": "release-notes.md"
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "name": "domains",
+      "children": [
         {
           "type": "file",
           "name": "README.md"
@@ -391,30 +505,90 @@
     },
     {
       "type": "directory",
-      "name": "domains"
-    },
-    {
-      "type": "directory",
-      "name": "infra",
-      "children": [
-        {
-          "type": "directory",
-          "name": "environments"
-        },
-        {
-          "type": "directory",
-          "name": "secrets"
-        },
-        {
-          "type": "directory",
-          "name": "terraform"
-        }
-      ]
-    },
-    {
-      "type": "directory",
       "name": "packages",
       "children": [
+        {
+          "type": "directory",
+          "name": "api-auth",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "apiKey.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "contract.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "hmac.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "setup.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "store.test.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "apiKey.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "contract.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "hmac.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "store.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "types.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.js"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
+            }
+          ]
+        },
         {
           "type": "directory",
           "name": "api-client",
@@ -438,26 +612,16 @@
                     {
                       "type": "file",
                       "name": "setup.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "todos.test.ts"
-                    }
-                  ]
-                },
-                {
-                  "type": "directory",
-                  "name": "resources",
-                  "children": [
-                    {
-                      "type": "file",
-                      "name": "todos.ts"
                     }
                   ]
                 },
                 {
                   "type": "file",
                   "name": "client.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "fetch.ts"
                 },
                 {
                   "type": "file",
@@ -489,7 +653,7 @@
         },
         {
           "type": "directory",
-          "name": "configs",
+          "name": "config",
           "children": [
             {
               "type": "directory",
@@ -557,6 +721,52 @@
             },
             {
               "type": "directory",
+              "name": "rate-limit",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "src",
+                  "children": [
+                    {
+                      "type": "directory",
+                      "name": "__tests__",
+                      "children": [
+                        {
+                          "type": "file",
+                          "name": "index.test.ts"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "file",
+                      "name": "constants.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "index.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "package.json"
+                },
+                {
+                  "type": "file",
+                  "name": "README.md"
+                },
+                {
+                  "type": "file",
+                  "name": "tsconfig.json"
+                },
+                {
+                  "type": "file",
+                  "name": "vitest.config.ts"
+                }
+              ]
+            },
+            {
+              "type": "directory",
               "name": "typescript",
               "children": [
                 {
@@ -592,6 +802,10 @@
                   "name": "tsconfig.json"
                 }
               ]
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             }
           ]
         },
@@ -686,24 +900,12 @@
                     {
                       "type": "file",
                       "name": "types.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "useTodos.ts"
-                    },
-                    {
-                      "type": "file",
-                      "name": "useTodosInfinite.ts"
                     }
                   ]
                 },
                 {
                   "type": "file",
                   "name": "client.ts"
-                },
-                {
-                  "type": "file",
-                  "name": "fetch.ts"
                 },
                 {
                   "type": "file",
@@ -734,6 +936,10 @@
             {
               "type": "file",
               "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
             },
             {
               "type": "file",
@@ -829,17 +1035,89 @@
     },
     {
       "type": "directory",
-      "name": "scripts",
+      "name": "services",
       "children": [
         {
-          "type": "file",
-          "name": "smoke.mjs"
+          "type": "directory",
+          "name": "rate-limit",
+          "children": [
+            {
+              "type": "directory",
+              "name": "src",
+              "children": [
+                {
+                  "type": "directory",
+                  "name": "__tests__",
+                  "children": [
+                    {
+                      "type": "file",
+                      "name": "factory.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "in-memory.test.ts"
+                    },
+                    {
+                      "type": "file",
+                      "name": "rate-limiter.test.ts"
+                    }
+                  ]
+                },
+                {
+                  "type": "file",
+                  "name": "errors.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "factory.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "in-memory.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "index.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "rate-limiter.ts"
+                },
+                {
+                  "type": "file",
+                  "name": "types.ts"
+                }
+              ]
+            },
+            {
+              "type": "file",
+              "name": "package.json"
+            },
+            {
+              "type": "file",
+              "name": "README.md"
+            },
+            {
+              "type": "file",
+              "name": "tsconfig.json"
+            },
+            {
+              "type": "file",
+              "name": "vitest.config.ts"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "name": "repository",
+          "children": [
+            {
+              "type": "file",
+              "name": "README.md"
+            }
+          ]
         }
       ]
-    },
-    {
-      "type": "directory",
-      "name": "services"
     },
     {
       "type": "directory",
@@ -847,19 +1125,19 @@
       "children": [
         {
           "type": "directory",
-          "name": "ci"
-        },
-        {
-          "type": "directory",
-          "name": "generators"
-        },
-        {
-          "type": "directory",
           "name": "scripts",
           "children": [
             {
               "type": "file",
               "name": "copy-fonts.js"
+            },
+            {
+              "type": "file",
+              "name": "mint-api-key.ts"
+            },
+            {
+              "type": "file",
+              "name": "smoke.mjs"
             }
           ]
         }
@@ -903,10 +1181,6 @@
     },
     {
       "type": "file",
-      "name": "next-env.d.ts"
-    },
-    {
-      "type": "file",
       "name": "package.json"
     },
     {
@@ -916,10 +1190,6 @@
     {
       "type": "file",
       "name": "README.md"
-    },
-    {
-      "type": "file",
-      "name": "theme-validation.json"
     },
     {
       "type": "file",

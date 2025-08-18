@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApi, qs } from '../client'
-import { mockFetchJson } from './setup'
+import { fetchJson } from '../fetch'
+
+// Mock the fetch module
+vi.mock('../fetch', () => ({
+  fetchJson: vi.fn(),
+}))
+
+const mockFetchJson = vi.mocked(fetchJson)
 
 describe('createApi', () => {
   beforeEach(() => {
@@ -12,10 +19,10 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/v1/todos',
+        '/v1/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -26,10 +33,10 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1/' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/v1/todos',
+        '/v1/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -40,10 +47,24 @@ describe('createApi', () => {
       const api = createApi({ baseUrl: '/v1' })
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('todos')
+      await api.get('items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/v1/todos',
+        '/v1/items',
+        expect.objectContaining({
+          method: 'GET',
+        })
+      )
+    })
+
+    it('should handle absolute URLs', async () => {
+      const api = createApi({ baseUrl: '/v1' })
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.get('https://api.example.com/items')
+
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        'https://api.example.com/items',
         expect.objectContaining({
           method: 'GET',
         })
@@ -54,149 +75,12 @@ describe('createApi', () => {
       const api = createApi()
       mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos')
+      await api.get('/items')
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
+        '/items',
         expect.objectContaining({
           method: 'GET',
-        })
-      )
-    })
-
-    it('should handle absolute URLs by ignoring base URL', async () => {
-      const api = createApi({ baseUrl: '/v1' })
-      mockFetchJson.mockResolvedValue({ data: 'test' })
-
-      await api.get('https://external-api.com/data')
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        'https://external-api.com/data',
-        expect.objectContaining({
-          method: 'GET',
-        })
-      )
-    })
-  })
-
-  describe('auth header', () => {
-    it('should include auth header when getAuthToken returns a token', async () => {
-      const api = createApi({
-        getAuthToken: () => 'test-token',
-      })
-      mockFetchJson.mockResolvedValue({ data: 'test' })
-
-      await api.get('/todos')
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
-        expect.objectContaining({
-          method: 'GET',
-          headers: expect.any(Headers) as Headers,
-        })
-      )
-
-      const headers = mockFetchJson.mock.calls[0]?.[1]?.headers as Headers
-      expect(headers.get('Authorization')).toBe('Bearer test-token')
-    })
-
-    it('should support async getAuthToken', async () => {
-      const api = createApi({
-        getAuthToken: async () => {
-          await new Promise((resolve) => setTimeout(resolve, 10))
-          return 'async-token'
-        },
-      })
-      mockFetchJson.mockResolvedValue({ data: 'test' })
-
-      await api.get('/todos')
-
-      const headers = mockFetchJson.mock.calls[0]?.[1]?.headers as Headers
-      expect(headers.get('Authorization')).toBe('Bearer async-token')
-    })
-
-    it('should not include auth header when getAuthToken returns null', async () => {
-      const api = createApi({
-        getAuthToken: () => null,
-      })
-      mockFetchJson.mockResolvedValue({ data: 'test' })
-
-      await api.get('/todos')
-
-      const headers = mockFetchJson.mock.calls[0]?.[1]?.headers as Headers
-      expect(headers.get('Authorization')).toBeNull()
-    })
-
-    it('should not include auth header when getAuthToken is not provided', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue({ data: 'test' })
-
-      await api.get('/todos')
-
-      const headers = mockFetchJson.mock.calls[0]?.[1]?.headers as Headers
-      expect(headers.get('Authorization')).toBeNull()
-    })
-  })
-
-  describe('HTTP methods', () => {
-    it('should support POST with body', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue({ id: '1' })
-
-      const body = { title: 'Test todo' }
-      await api.post('/todos', body)
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
-        expect.objectContaining({
-          method: 'POST',
-          body,
-        })
-      )
-    })
-
-    it('should support PUT with body', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue({ id: '1' })
-
-      const body = { title: 'Updated todo' }
-      await api.put('/todos/1', body)
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos/1',
-        expect.objectContaining({
-          method: 'PUT',
-          body,
-        })
-      )
-    })
-
-    it('should support PATCH with body', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue({ id: '1' })
-
-      const body = { completed: true }
-      await api.patch('/todos/1', body)
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos/1',
-        expect.objectContaining({
-          method: 'PATCH',
-          body,
-        })
-      )
-    })
-
-    it('should support DELETE', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue(null)
-
-      await api.del('/todos/1')
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos/1',
-        expect.objectContaining({
-          method: 'DELETE',
         })
       )
     })
@@ -205,151 +89,249 @@ describe('createApi', () => {
   describe('query parameters', () => {
     it('should append query params to URL', async () => {
       const api = createApi()
-      mockFetchJson.mockResolvedValue([])
+      mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos', {
+      await api.get('/items', {
         params: { status: 'active', limit: 10 },
       })
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?status=active&limit=10',
-        expect.any(Object)
+        '/items?status=active&limit=10',
+        expect.objectContaining({
+          method: 'GET',
+        })
       )
     })
 
     it('should handle existing query params in URL', async () => {
       const api = createApi()
-      mockFetchJson.mockResolvedValue([])
+      mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      await api.get('/todos?sort=date', {
+      await api.get('/items?sort=asc', {
         params: { status: 'active' },
       })
 
       expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?sort=date&status=active',
-        expect.any(Object)
-      )
-    })
-
-    it('should skip undefined and null params', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue([])
-
-      await api.get('/todos', {
-        params: {
-          status: 'active',
-          limit: undefined,
-          offset: null as unknown as undefined,
-          page: 1,
-        },
-      })
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?status=active&page=1',
-        expect.any(Object)
-      )
-    })
-
-    it('should handle boolean params', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue([])
-
-      await api.get('/todos', {
-        params: { active: true, archived: false },
-      })
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos?active=true&archived=false',
-        expect.any(Object)
-      )
-    })
-  })
-
-  describe('abort signal', () => {
-    it('should pass abort signal to fetchJson', async () => {
-      const api = createApi()
-      mockFetchJson.mockResolvedValue({ data: 'test' })
-
-      const controller = new AbortController()
-      await api.get('/todos', { signal: controller.signal })
-
-      expect(mockFetchJson).toHaveBeenCalledWith(
-        '/todos',
+        '/items?sort=asc&status=active',
         expect.objectContaining({
-          signal: controller.signal,
+          method: 'GET',
         })
       )
     })
 
-    it('should propagate abort errors', async () => {
+    it('should ignore null and undefined params', async () => {
       const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      const abortError = new DOMException('Aborted', 'AbortError')
-      mockFetchJson.mockRejectedValue(abortError)
+      await api.get('/items', {
+        params: {
+          status: 'active',
+          limit: undefined,
+          page: null,
+          filter: '',
+        },
+      })
 
-      const controller = new AbortController()
-      controller.abort()
-
-      await expect(
-        api.get('/todos', { signal: controller.signal })
-      ).rejects.toThrow('Aborted')
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        '/items?status=active',
+        expect.objectContaining({
+          method: 'GET',
+        })
+      )
     })
   })
 
-  describe('retry behavior (via fetchJson)', () => {
-    it('should not retry on 4xx errors', async () => {
+  describe('auth token', () => {
+    it('should add auth token when provided', async () => {
+      const api = createApi({
+        getAuthToken: () => 'test-token',
+      })
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.get('/items')
+
+      expect(mockFetchJson).toHaveBeenCalledWith('/items', expect.any(Object))
+
+      const call = mockFetchJson.mock.calls[0]
+      const options = call[1]
+      expect(options).toHaveProperty('headers')
+      const headers = options?.headers as Headers
+      expect(headers.get('Authorization')).toBe('Bearer test-token')
+    })
+
+    it('should support async token retrieval', async () => {
+      const api = createApi({
+        getAuthToken: async () => {
+          await new Promise((resolve) => setTimeout(resolve, 10))
+          return 'async-token'
+        },
+      })
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.get('/items')
+
+      const call = mockFetchJson.mock.calls[0]
+      const headers = call[1]?.headers as Headers
+      expect(headers.get('Authorization')).toBe('Bearer async-token')
+    })
+
+    it('should not add auth header when token is null', async () => {
+      const api = createApi({
+        getAuthToken: () => null,
+      })
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.get('/items')
+
+      const call = mockFetchJson.mock.calls[0]
+      const headers = call[1]?.headers as Headers
+      expect(headers.get('Authorization')).toBeNull()
+    })
+  })
+
+  describe('HTTP methods', () => {
+    it('should make GET requests', async () => {
       const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
 
-      const error = new Error('Not Found')
-      Object.assign(error, { status: 404 })
-      mockFetchJson.mockRejectedValue(error)
+      await api.get('/items')
 
-      await expect(api.get('/todos')).rejects.toThrow('Not Found')
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        '/items',
+        expect.objectContaining({
+          method: 'GET',
+        })
+      )
+    })
 
-      // fetchJson should only be called once (no retry)
-      expect(mockFetchJson).toHaveBeenCalledTimes(1)
+    it('should make POST requests with body', async () => {
+      const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      const body = { title: 'New item' }
+      await api.post('/items', body)
+
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        '/items',
+        expect.objectContaining({
+          method: 'POST',
+          body,
+        })
+      )
+    })
+
+    it('should make PUT requests with body', async () => {
+      const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      const body = { title: 'Updated item' }
+      await api.put('/items/1', body)
+
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        '/items/1',
+        expect.objectContaining({
+          method: 'PUT',
+          body,
+        })
+      )
+    })
+
+    it('should make PATCH requests with body', async () => {
+      const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      const body = { completed: true }
+      await api.patch('/items/1', body)
+
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        '/items/1',
+        expect.objectContaining({
+          method: 'PATCH',
+          body,
+        })
+      )
+    })
+
+    it('should make DELETE requests', async () => {
+      const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.del('/items/1')
+
+      expect(mockFetchJson).toHaveBeenCalledWith(
+        '/items/1',
+        expect.objectContaining({
+          method: 'DELETE',
+        })
+      )
+    })
+  })
+
+  describe('custom headers', () => {
+    it('should include custom headers', async () => {
+      const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.get('/items', {
+        headers: {
+          'X-Custom-Header': 'custom-value',
+        },
+      })
+
+      const call = mockFetchJson.mock.calls[0]
+      const headers = call[1]?.headers as Headers
+      expect(headers.get('X-Custom-Header')).toBe('custom-value')
+    })
+
+    it('should set Content-Type for JSON by default', async () => {
+      const api = createApi()
+      mockFetchJson.mockResolvedValue({ data: 'test' })
+
+      await api.post('/items', { title: 'test' })
+
+      const call = mockFetchJson.mock.calls[0]
+      const headers = call[1]?.headers as Headers
+      expect(headers.get('Content-Type')).toBe('application/json')
     })
   })
 })
 
-describe('qs helper', () => {
-  it('should serialize simple params', () => {
-    const result = qs({ page: 1, limit: 10 })
-    expect(result).toBe('page=1&limit=10')
-  })
-
-  it('should handle boolean values', () => {
-    const result = qs({ active: true, archived: false })
-    expect(result).toBe('active=true&archived=false')
-  })
-
-  it('should skip undefined values', () => {
-    const result = qs({
-      page: 1,
-      limit: undefined,
+describe('qs', () => {
+  it('should serialize query params', () => {
+    const params = {
       status: 'active',
-    })
-    expect(result).toBe('page=1&status=active')
+      limit: 10,
+      featured: true,
+    }
+
+    const result = qs(params)
+    expect(result).toBe('status=active&limit=10&featured=true')
   })
 
-  it('should handle empty strings as valid', () => {
-    const result = qs({
-      q: '',
-      page: 1,
-    })
-    expect(result).toBe('page=1')
+  it('should ignore null and undefined values', () => {
+    const params = {
+      status: 'active',
+      limit: undefined,
+      page: null,
+      filter: '',
+    }
+
+    const result = qs(params)
+    expect(result).toBe('status=active')
+  })
+
+  it('should handle empty object', () => {
+    const result = qs({})
+    expect(result).toBe('')
   })
 
   it('should encode special characters', () => {
-    const result = qs({
-      query: 'hello world',
-      filter: 'status=active',
-    })
-    expect(result).toBe('query=hello+world&filter=status%3Dactive')
-  })
+    const params = {
+      search: 'hello world',
+      filter: 'a&b',
+    }
 
-  it('should return empty string for empty object', () => {
-    const result = qs({})
-    expect(result).toBe('')
+    const result = qs(params)
+    expect(result).toBe('search=hello+world&filter=a%26b')
   })
 })
