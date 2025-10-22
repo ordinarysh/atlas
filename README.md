@@ -9,19 +9,41 @@ A production-ready monorepo template for building modern web applications with N
 - Node.js ≥ 18
 - pnpm 10.19.0+
 
-### Installation
+### Create New Project
+
+**Option 1: GitHub Template (Recommended)**
+
+Click "Use this template" on GitHub or use GitHub CLI:
 
 ```bash
-# Clone and install
-git clone https://github.com/ordinarysh/atlas.git
-cd atlas
+gh repo create my-project --template ordinarysh/atlas
+cd my-project
 pnpm install
+pnpm dev
+```
 
-# Start development
+**Option 2: Clone Directly**
+
+```bash
+git clone https://github.com/ordinarysh/atlas.git my-project
+cd my-project
+pnpm install
 pnpm dev
 ```
 
 The web app runs on `http://localhost:3001`.
+
+### Customize Package Scope
+
+To rename `@ordinarysh/*` to your own scope:
+
+```bash
+# Preview changes
+pnpm rename-scope --dry-run
+
+# Apply changes
+pnpm rename-scope --scope myorg
+```
 
 ## What's Inside
 

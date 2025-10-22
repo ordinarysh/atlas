@@ -1,6 +1,7 @@
 {
   "name": "atlas",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -8,9 +9,12 @@
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "ncu": "ncu --deep --interactive --format group",
-    "ncu:check": "ncu --deep"
+    "ncu:check": "ncu --deep",
+    "rename-scope": "node scripts/rename-scope.js",
+    "rename-scope:check": "node scripts/rename-scope.js --check"
   },
   "devDependencies": {
+    "glob": "^11.0.3",
     "npm-check-updates": "^19.1.1",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
