@@ -4,31 +4,31 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3001 --turbopack",
+    "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
-    "next": "^15.4.2",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "@ordinarysh/ui": "workspace:*",
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^15.4.6",
-    "@repo/eslint-config": "workspace:*",
-    "@repo/tailwind-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@tailwindcss/postcss": "^4.1.5",
-    "@types/node": "^22.15.30",
-    "@types/react": "^19.1.0",
-    "@types/react-dom": "^19.1.1",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.33.0",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.1.5",
-    "typescript": "5.9.2"
+    "@next/eslint-plugin-next": "^16.0.0",
+    "@ordinarysh/eslint-config": "workspace:*",
+    "@ordinarysh/tailwind-config": "workspace:*",
+    "@ordinarysh/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.15",
+    "@types/node": "^24.9.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.38.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.15",
+    "typescript": "5.9.3"
   }
 }

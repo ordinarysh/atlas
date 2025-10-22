@@ -1,58 +1,180 @@
-# Turborepo Tailwind CSS starter
+# Atlas
 
-This Turborepo starter is maintained by the Turborepo core team.
+A production-ready monorepo template for building modern web applications with Next.js 16, React 19, and Tailwind CSS. Includes pre-configured shared packages for UI components, TypeScript, ESLint, and Tailwind styling.
 
-## Using this example
+## Quick Start
 
-Run the following command:
+### Prerequisites
 
-```sh
-npx create-turbo@latest -e with-tailwind
+- Node.js ≥ 18
+- pnpm 10.19.0+
+
+### Installation
+
+```bash
+# Clone and install
+git clone https://github.com/ordinarysh/atlas.git
+cd atlas
+pnpm install
+
+# Start development
+pnpm dev
 ```
 
-## What's inside?
+The web app runs on `http://localhost:3001`.
 
-This Turborepo includes the following packages/apps:
+## What's Inside
 
-### Apps and Packages
+### Apps
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- **`web`** – Next.js 16 application with Tailwind CSS, React 19, and TypeScript. The main entry point for your application.
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Packages
 
-### Building packages/ui
+- **`@ordinarysh/ui`** – Shared React component library with pre-compiled Tailwind CSS. Components are prefixed with `ui-` to avoid style conflicts. Built with TypeScript and exported as ESM.
 
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.ts`. This was chosen for several reasons:
+- **`@ordinarysh/eslint-config`** – Shared ESLint configurations (flat config format, ESLint 9+):
+  - `./base` – Base ESLint rules
+  - `./next-js` – Next.js-specific rules
+  - `./react-internal` – React component library rules
 
-- Make sharing one `tailwind.config.ts` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
+- **`@ordinarysh/typescript-config`** – Shared TypeScript configurations:
+  - `nextjs.json` – For Next.js apps
+  - `react-library.json` – For React packages
 
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.ts` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
+- **`@ordinarysh/tailwind-config`** – Shared Tailwind CSS configuration and PostCSS setup. Exports styles and PostCSS config for consistent styling across apps and packages.
 
-For example, in [tailwind.config.ts](packages/tailwind-config/tailwind.config.ts):
+## Development
 
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
+### Available Commands
+
+```bash
+# Start all dev servers
+pnpm dev
+
+# Build all packages and apps
+pnpm build
+
+# Run linting
+pnpm lint
+
+# Type check
+pnpm check-types
+
+# Format code
+pnpm format
+
+# Check for outdated dependencies
+pnpm ncu:check
+
+# Update dependencies (interactive)
+pnpm ncu
 ```
 
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
+### Project Structure
 
-### Utilities
+```
+atlas/
+├── apps/
+│   └── web/                    # Next.js 16 application
+├── packages/
+│   ├── ui/                     # React component library
+│   ├── eslint-config/          # Shared ESLint configs
+│   ├── typescript-config/      # Shared TypeScript configs
+│   └── tailwind-config/        # Shared Tailwind setup
+├── turbo.json                  # Turborepo configuration
+├── pnpm-workspace.yaml         # pnpm workspace definition
+└── package.json                # Root scripts and dependencies
+```
 
-This Turborepo has some additional tools already setup for you:
+## Tech Stack
 
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- **Framework:** Next.js 16 (Turbopack)
+- **Runtime:** React 19
+- **Language:** TypeScript 5.9
+- **Styling:** Tailwind CSS 4.1
+- **Package Manager:** pnpm 10.19
+- **Monorepo:** Turborepo 2.5
+- **Linting:** ESLint 9.38 (flat config)
+- **Formatting:** Prettier 3.6
+
+## Building for Production
+
+```bash
+# Build all packages
+pnpm build
+
+# Start production server
+cd apps/web
+pnpm start
+```
+
+The build output is optimized with Turbopack and includes:
+- Static page pre-rendering
+- TypeScript compilation
+- CSS optimization with Tailwind
+- Code splitting and lazy loading
+
+## Configuration
+
+### Environment Variables
+
+Create `.env.local` in `apps/web` for environment-specific settings:
+
+```bash
+# .env.local
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+### Tailwind CSS
+
+Customize styling in `packages/tailwind-config/tailwind.config.ts`. Changes automatically apply to all apps and packages.
+
+### TypeScript
+
+Each app/package extends a base config from `packages/typescript-config`. Modify base configs to enforce standards across the monorepo.
+
+### ESLint
+
+Each app/package uses a flat config (ESLint 9+) that imports from `packages/eslint-config`. Customize rules in respective `eslint.config.js` files.
+
+## Monorepo Workflow
+
+This project uses **Turborepo** for task orchestration and caching:
+
+- Tasks run in parallel when possible
+- Dependency graph ensures correct build order
+- Outputs are cached for faster rebuilds
+- Remote caching available via Vercel
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push to GitHub
+2. Import project in Vercel
+3. Set root directory to `apps/web`
+4. Deploy
+
+### Docker
+
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+CMD ["pnpm", "start"]
+```
+
+## Contributing
+
+1. Create a feature branch
+2. Make changes and test locally
+3. Run `pnpm lint` and `pnpm check-types`
+4. Commit and push
+5. Open a pull request
+
+## License
+
+MIT
